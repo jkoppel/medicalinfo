@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MIClient", "MIClient\MIClient.vcproj", "{D00354BC-8DC4-4131-9659-5B7CCA5018AC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|MKL (ARMV4I) = Debug|MKL (ARMV4I)
+		Release|MKL (ARMV4I) = Release|MKL (ARMV4I)
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Debug|MKL (ARMV4I).ActiveCfg = Debug|MKL (ARMV4I)
+		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Debug|MKL (ARMV4I).Build.0 = Debug|MKL (ARMV4I)
+		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Debug|MKL (ARMV4I).Deploy.0 = Debug|MKL (ARMV4I)
+		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Release|MKL (ARMV4I).ActiveCfg = Release|MKL (ARMV4I)
+		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Release|MKL (ARMV4I).Build.0 = Release|MKL (ARMV4I)
+		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Release|MKL (ARMV4I).Deploy.0 = Release|MKL (ARMV4I)
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
