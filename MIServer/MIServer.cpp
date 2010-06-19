@@ -3,7 +3,10 @@
 
 #include "stdafx.h"
 #include "MIServer.h"
-#include "MIServerDlg.h"
+#ifdef _DEBUG_VER_
+#include MIServerDlog.h"
+#include "MIServerThread.h"
+#endif
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -54,19 +57,13 @@ BOOL CMIServerApp::InitInstance()
 	Enable3dControlsStatic();	// Call this when linking to MFC statically
 #endif
 
-	CMIServerDlg dlg;
-	m_pMainWnd = &dlg;
-	int nResponse = dlg.DoModal();
-	if (nResponse == IDOK)
-	{
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with OK
-	}
-	else if (nResponse == IDCANCEL)
-	{
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with Cancel
-	}
+#ifdef _DEBUG_VER_
+	CMIServerDlg p;
+#else
+	CMIServerThread p;
+#endif
+	m_pMainWnd = &p;
+	p.DoModal();
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.
