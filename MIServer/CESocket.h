@@ -78,7 +78,7 @@ public:
 	 *                    1024 bytes for TCP and 2048 bytes for UDP.
 	 *  @return TRUE if created successfully, FALSE if an error occurs.
 	 */
-	bool Create(int socketType, int bufferSize = 0);
+	BOOL Create(int socketType, int bufferSize = 0);
 
 	///////////////////////////////////////////////////////
 	// CONNECTION FUNCTIONS
@@ -94,7 +94,7 @@ public:
 	 *           UDP sockets can connect multiple times to different addresses,
 	 *           it is not necessary to disconnect each time.
 	 */
-	bool Connect(CString &addr, UINT remotePort);
+	BOOL Connect(CString &addr, UINT remotePort);
 
 	//! Accepts an incoming connection request.
 	/*! Accepts an incoming connection request. To make a server first call
@@ -111,7 +111,7 @@ public:
 	 *  @param[in] maxConn   Maximum length of the queue of pending connections.
 	 *  @return TRUE if accept was successful, FALSE if an error occurs.
 	 */
-	bool Accept(UINT localPort, int maxConn = SOMAXCONN);
+	BOOL Accept(UINT localPort, int maxConn = SOMAXCONN);
 
 	//! Disconnects the socket.
 	/*! Disconnect the socket. Both client (connected) or server (accpting)
@@ -166,7 +166,7 @@ public:
 	 *           with the data and then send a message to the main thread or
 	 *           make something else that will not hurt MFC.
 	 */
-	virtual bool OnReceive(char* buf, int len){return FALSE;}
+	virtual BOOL OnReceive(char* buf, int len){return FALSE;}
 
 	//! Received data notification.
 	/*! If you refused the first OnReceive notification (probably because
@@ -189,7 +189,7 @@ public:
 	 *                           the remote client. Pass it to AcceptServiceSocket.
 	 *  @return Return FALSE if you don't accept the connection.
 	 */
-	virtual bool OnAccept(SOCKET serviceSocket){return FALSE;}
+	virtual BOOL OnAccept(SOCKET serviceSocket){return FALSE;}
 
 	//! Attaches a connected socket.
 	/*! Use this function in conjunction with OnAccept to receive remote client
@@ -250,7 +250,7 @@ public:
 	 *                  resultant string after it is read from the buffer.
 	 *  @return TRUE if the string was read, FALSE if there was no string to read.
 	 */
-	bool ReadString(CString &str);
+	BOOL ReadString(CString &str);
 
 	//! Returns the total data size queued in the buffer.
 	int GetDataSize() {return m_availableData;}
@@ -273,7 +273,7 @@ public:
 	 *  @return TRUE if the packet was successfuly retrieved, FALSE if there was
 	 *          no packet to retrieve.
 	 */
-	bool GetPacket(char*& buf, int* len);
+	BOOL GetPacket(char*& buf, int* len);
 
 	///////////////////////////////////////////////////////
 	// OTHER FUNCTIONS
@@ -307,7 +307,7 @@ protected:
 
 	enum threadState {CLOSED=0, CLOSING, RUNNING};
 
-	static bool m_bWSAStarted;
+	static BOOL m_bWSAStarted;
 
 	SOCKET s;
 	int m_socketType;
@@ -315,7 +315,7 @@ protected:
 	SOCKADDR_IN m_remoteAddress;
 	SOCKADDR_IN m_localAddress;
 	int m_receiveAddrSz;
-	bool m_udpReadyToSend;
+	BOOL m_udpReadyToSend;
 
 	HANDLE m_readThread;
 	HANDLE m_acceptThread;
