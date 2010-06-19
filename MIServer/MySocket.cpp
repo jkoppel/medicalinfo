@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "MIServer.h"
 #include "MySocket.h"
-#include "MIServerDlg.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -31,7 +30,7 @@ CMySocket::~CMySocket()
 {
 }
 
-bool CMySocket::OnAccept(SOCKET serviceSocket)
+BOOL CMySocket::OnAccept(SOCKET serviceSocket)
 {
 	if(m_parent)
 	{
