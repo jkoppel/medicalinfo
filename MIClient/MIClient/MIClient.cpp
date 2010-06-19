@@ -32,9 +32,7 @@ CMIClientApp theApp;
 
 BOOL CMIClientApp::InitInstance()
 {
-
-	if (!AfxSocketInit())
-	{
+	if (!AfxSocketInit()){
 		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);
 		return FALSE;
 	}
