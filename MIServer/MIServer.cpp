@@ -5,6 +5,7 @@
 #include "MIServer.h"
 #ifdef _DEBUG_VER_
 #include MIServerDlog.h"
+#else
 #include "MIServerThread.h"
 #endif
 
