@@ -64,7 +64,7 @@ BOOL CMIServerDlg::OnInitDialog()
 	
 	m_server = new CMySocket(this);
 	m_bServerType.SetCheck(1);
-	m_sPort = _T("3000");
+	m_sPort = _T("5000");
 	UpdateData(FALSE);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -138,7 +138,7 @@ LRESULT CMIServerDlg::OnDisconnected(WPARAM wParam, LPARAM lParam)
 
 void CMIServerDlg::OnStartServer() 
 {
-	bool created;
+	BOOL created;
 	UpdateData();
 
 	if(m_bServerType.GetCheck())
