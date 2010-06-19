@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "..\COMMON\CESocket.h"
+#include "CESocket.h"
 
 class CClientSocket : public CCESocket  
 {
