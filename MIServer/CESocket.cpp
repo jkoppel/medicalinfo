@@ -21,7 +21,7 @@ static char THIS_FILE[]=__FILE__;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-bool CCESocket::m_bWSAStarted = FALSE;
+BOOL CCESocket::m_bWSAStarted = FALSE;
 #ifdef _WCE_SECTION
 	CRITICAL_SECTION CCESocket::m_readLock;
 #else
@@ -105,7 +105,7 @@ void CCESocket::SetBufferSize(int bufSize)
 		m_recvBufSize = bufSize;
 }
 
-bool CCESocket::Create(int socketType, int bufferSize)
+BOOL CCESocket::Create(int socketType, int bufferSize)
 {
 	BOOL dontLinger = TRUE;
 	LINGER lingerOpt;
@@ -178,7 +178,7 @@ bool CCESocket::Create(int socketType, int bufferSize)
 	return TRUE;
 }
 
-bool CCESocket::Connect(CString &addr, UINT remotePort)
+BOOL CCESocket::Connect(CString &addr, UINT remotePort)
 {
 	char hostStr[257];
 	int wHostLen;
@@ -424,7 +424,7 @@ int CCESocket::Send(const char* buf, int len)
 	return dataPtr;
 }
 
-bool CCESocket::Accept(UINT localPort, int maxConn)
+BOOL CCESocket::Accept(UINT localPort, int maxConn)
 {
 	if(!m_bWSAStarted)
 		return FALSE;
@@ -716,9 +716,9 @@ int CCESocket::Read(char* buf, int len)
 	return readBytes;
 }
 
-bool CCESocket::ReadString(CString &str)
+BOOL CCESocket::ReadString(CString &str)
 {
-	bool strFound;
+	BOOL strFound;
 	int strSize, strPos;
 	DataPacket *data;
 	char *buf;
@@ -825,7 +825,7 @@ int CCESocket::GetPacketSize()
 	return 0;
 }
 
-bool CCESocket::GetPacket(char*& buf, int* len)
+BOOL CCESocket::GetPacket(char*& buf, int* len)
 {
 	DataPacket *data = NULL;
 
