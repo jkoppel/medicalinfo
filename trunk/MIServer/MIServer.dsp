@@ -91,7 +91,15 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=.\CESocket.cpp
+
+!IF  "$(CFG)" == "MIServer - Win32 Release"
+
 # SUBTRACT CPP /YX /Yc /Yu
+
+!ELSEIF  "$(CFG)" == "MIServer - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -99,16 +107,21 @@ SOURCE=.\Chat.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\DataFile.cpp
+SOURCE=.\ChatThread.cpp
 
 !IF  "$(CFG)" == "MIServer - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "MIServer - Win32 Debug"
 
-# SUBTRACT CPP /YX /Yc /Yu
+# ADD CPP /Yu
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\DataFile.cpp
+# SUBTRACT CPP /YX /Yc /Yu
 # End Source File
 # Begin Source File
 
@@ -124,8 +137,11 @@ SOURCE=.\MIServerDlg.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\MIServerThread.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\MySocket.cpp
-# SUBTRACT CPP /YX /Yc /Yu
 # End Source File
 # Begin Source File
 
@@ -146,7 +162,7 @@ SOURCE=.\Chat.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\containers.h
+SOURCE=.\ChatThread.h
 # End Source File
 # Begin Source File
 
@@ -163,6 +179,10 @@ SOURCE=.\MIServer.h
 # Begin Source File
 
 SOURCE=.\MIServerDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\MIServerThread.h
 # End Source File
 # Begin Source File
 
