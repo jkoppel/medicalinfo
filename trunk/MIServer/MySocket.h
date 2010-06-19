@@ -21,7 +21,7 @@ public:
 	void SetParent(CWnd* parent) {m_parent = parent;}
 	
 	virtual void OnReceive();
-	virtual bool OnAccept(SOCKET serviceSocket);
+	virtual BOOL OnAccept(SOCKET serviceSocket);
 	virtual void OnClose(int closeEvent);
 
 protected:
