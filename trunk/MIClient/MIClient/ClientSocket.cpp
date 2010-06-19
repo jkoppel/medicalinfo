@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "GenClient.h"
+#include "MIClient.h"
 #include "ClientSocket.h"
 
 #ifdef _DEBUG
