@@ -36,8 +36,6 @@ public:
 	protected:
 	virtual BOOL OnInitDialog();
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
-	afx_msg void OnTimer(UINT nIDEvent);
 	//}}AFX_VIRTUAL
 
 // Implementation
@@ -46,6 +44,8 @@ protected:
 
 	// Generated message map functions
 	//{{AFX_MSG(CChatThread)
+	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
+	afx_msg void OnTimer(UINT nIDEvent);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
