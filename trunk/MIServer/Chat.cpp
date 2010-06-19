@@ -13,6 +13,7 @@ static char THIS_FILE[] = __FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CChat dialog
+// 本类配合CMIServerDlg使用，如果启动了该窗口，则在被连接的时候弹出Chat对话框
 
 
 CChat::CChat(CWnd* pParent /*=NULL*/)
@@ -37,9 +38,10 @@ void CChat::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CChat, CDialog)
 	//{{AFX_MSG_MAP(CChat)
+	ON_BN_CLICKED(IDC_EXIT, OnExit)
 	ON_MESSAGE(ON_RECEIVE, OnReceiveData)
 	ON_MESSAGE(ON_CLOSE, OnDisconnected)
-	ON_BN_CLICKED(IDC_EXIT, OnExit)
+	ON_WM_CLOSE()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -48,8 +50,8 @@ END_MESSAGE_MAP()
 
 void CChat::OnExit() 
 {
-	// TODO: Add your control notification handler code here
-	
+	CDialog::OnCancel();
+	m_peer.Disconnect();
 }
 
 void CChat::OnOK() 
@@ -69,8 +71,9 @@ void CChat::ConnectTo(SOCKET s)
 
 LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 {
-	while(m_peer.GetDataSize() > 0 && m_peer.ReadString(m_sRecv))
+	while(m_peer.GetDataSize() > 0 && m_peer.ReadString(m_sRecv)){
 		GetDlgItem(IDC_RECV)->SetWindowText(m_sRecv);
+	}
 	return 0;
 }
 
@@ -80,3 +83,10 @@ LRESULT CChat::OnDisconnected(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+
+void CChat::OnClose() 
+{
+	m_peer.Disconnect();
+	
+	CDialog::OnClose();
+}
