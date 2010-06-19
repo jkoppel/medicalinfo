@@ -45,6 +45,7 @@ protected:
 	//{{AFX_MSG(CChat)
 	afx_msg void OnExit();
 	virtual void OnOK();
+	afx_msg void OnClose();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
