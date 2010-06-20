@@ -3,11 +3,14 @@
 
 #include "stdafx.h"
 #include "MIServer.h"
+
+//#define _DEBUG_VER_
 #ifdef _DEBUG_VER_
-#include MIServerDlog.h"
+#include "MIServerDlg.h"
 #else
 #include "MIServerThread.h"
 #endif
+#include "GlobalFuncs.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -57,6 +60,9 @@ BOOL CMIServerApp::InitInstance()
 #else
 	Enable3dControlsStatic();	// Call this when linking to MFC statically
 #endif
+
+	//先创建系统缓存目录
+	CreateAppDataDir();
 
 #ifdef _DEBUG_VER_
 	CMIServerDlg p;
