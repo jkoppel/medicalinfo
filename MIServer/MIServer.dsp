@@ -125,6 +125,21 @@ SOURCE=.\DataFile.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\GlobalFuncs.cpp
+
+!IF  "$(CFG)" == "MIServer - Win32 Release"
+
+# SUBTRACT CPP /YX /Yc /Yu
+
+!ELSEIF  "$(CFG)" == "MIServer - Win32 Debug"
+
+# ADD CPP /Yu
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\MIServer.cpp
 # End Source File
 # Begin Source File
@@ -167,6 +182,10 @@ SOURCE=.\ChatThread.h
 # Begin Source File
 
 SOURCE=.\DataFile.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\GlobalFuncs.h
 # End Source File
 # Begin Source File
 
