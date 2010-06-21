@@ -5,5 +5,8 @@
 extern void CString2Char(CString, char *);
 extern void Char2CString(char *, CString);
 
+//ÏÔÊ¾ÏûÏ¢
+extern void ShowMsg(char msg[]);
+
 #endif
 
