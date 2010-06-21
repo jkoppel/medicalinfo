@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="MIClient"
 	ProjectGUID="{D00354BC-8DC4-4131-9659-5B7CCA5018AC}"
+	RootNamespace="MIClient"
 	Keyword="MFCProj"
 	>
 	<Platforms>
@@ -196,11 +197,47 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ConnectDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GlobalFuncs.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|MKL (ARMV4I)"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|MKL (ARMV4I)"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\GlobalVars.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MIClient.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\MIClientDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MIMainDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ProgressInfo.cpp"
 				>
 			</File>
 			<File
@@ -238,11 +275,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ConnectDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GlobalFuncs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GlobalVars.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MIClient.h"
 				>
 			</File>
 			<File
 				RelativePath=".\MIClientDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MIMainDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ProgressInfo.h"
 				>
 			</File>
 			<File
@@ -278,5 +335,9 @@
 		</File>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="MIClient.rc"
+		/>
 	</Globals>
 </VisualStudioProject>
