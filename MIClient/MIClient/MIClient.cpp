@@ -3,7 +3,10 @@
 
 #include "stdafx.h"
 #include "MIClient.h"
+#include "MIMainDlg.h"
 #include "MIClientDlg.h"
+#include "GlobalFuncs.h"
+#include "ProgressInfo.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -46,6 +49,10 @@ BOOL CMIClientApp::InitInstance()
 	// 例如修改为公司或组织名
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 
+	CMIMainDlg dlg;
+	m_pMainWnd = &dlg;
+	dlg.DoModal();
+	/*
 	CMIClientDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
@@ -54,8 +61,14 @@ BOOL CMIClientApp::InitInstance()
 		// TODO: 在此处放置处理何时用“确定”来关闭
 		//  对话框的代码
 	}
+	*/
 
 	// 由于对话框已关闭，所以将返回 FALSE 以便退出应用程序，
 	//  而不是启动应用程序的消息泵。
 	return FALSE;
+}
+
+int MyMessageBox(LPCTSTR lpszText, LPCTSTR lpszCaption, UINT nType)
+{
+	return AfxGetApp()->GetMainWnd()->GetActiveWindow()->MessageBox(lpszText, lpszCaption, nType);
 }
