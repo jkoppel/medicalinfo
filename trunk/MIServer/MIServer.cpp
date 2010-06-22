@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "MIServer.h"
 
-//#define _DEBUG_VER_
+#define _DEBUG_VER_
 #ifdef _DEBUG_VER_
 #include "MIServerDlg.h"
 #else
@@ -63,6 +63,7 @@ BOOL CMIServerApp::InitInstance()
 
 	//先创建系统缓存目录
 	CreateAppDataDir();
+	CreateDataFile();
 
 #ifdef _DEBUG_VER_
 	CMIServerDlg p;
