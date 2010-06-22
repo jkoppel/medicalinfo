@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GlobalFuncs.h"
+#include "DataFile.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -107,4 +108,39 @@ void PrintBuffer(const char *hint, const unsigned char *buffer,int len)
 	}
 	Printf("\n");
 	return;
+}
+
+#define DATAFILE "d:\\test.dat"
+
+void CreateDataFile()
+{
+	CFileStatus   status;
+	if(!CFile::GetStatus(DATAFILE,status)){
+		DataFile_Create(DATAFILE, sizeof(struct UserData));
+	}
+}
+
+int Cmd_GetRecordNum()
+{
+	unsigned int num;
+	int ret = DataFile_GetRecNum(DATAFILE, num);
+	if(ret!=SUCC){
+		return ret;
+	}
+	return num;
+}
+
+int Cmd_GetRecordAt(int index, struct UserData &data)
+{
+	return DataFile_ReadRec(DATAFILE, index, &data);
+}
+
+int Cmd_AppendRecord(struct UserData rec)
+{
+	return DataFile_AppendRec(DATAFILE, &rec);
+}
+
+int Cmd_DeleteRecordAt(int index)
+{
+	return DataFile_DeleteRec(DATAFILE, index);
 }
