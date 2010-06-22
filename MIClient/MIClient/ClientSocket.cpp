@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "MIClient.h"
 #include "ClientSocket.h"
+#include "GlobalVars.h"
+#include "GlobalFuncs.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -27,8 +29,12 @@ CClientSocket::~CClientSocket()
 
 void CClientSocket::OnReceive()
 {
-	if(m_Parent)
-		::PostMessage(m_Parent->m_hWnd, SOCK_ONRECEIVE, NULL, NULL);
+	CString str, temp;
+	while(g_pClientSocket->GetDataSize() > 0 && g_pClientSocket->ReadString(temp)){
+		str += temp+CString("\r\n");
+	}
+	CString2Char(str, g_RecvData);
+	g_bIsDataComing = TRUE;
 }
 
 
