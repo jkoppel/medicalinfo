@@ -1,5 +1,8 @@
 #pragma once
 #include "afxwin.h"
+#include "afxcmn.h"
+#include "GlobalFuncs.h"
+#include "GlobalVars.h"
 
 
 // CMIMainDlg dialog
@@ -20,6 +23,8 @@ protected:
 
 	CString m_strAddress;
 	UINT m_nPort;
+	CListCtrl m_lstPatient;
+	struct UserData m_pUserData[1000];
 protected:
 	afx_msg LRESULT OnDisconnect(WPARAM wParam, LPARAM lParam);
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -35,9 +40,11 @@ public:
 	afx_msg void OnBnClickedDelete();
 	afx_msg void OnBnClickedSearch();
 
+	void InitListBox();
+
 	int CmdConnect();
-	int CmdGetRecordNum();
-	int CmdGetRecordAt(int index);
+	int CmdGetRecordNum(int &num);
+	int CmdGetRecordAt(int index, struct UserData &data);
 	int CmdAppendRecord(struct UserData data);
 	int CmdDeleteRecordAt(int index);
 };
