@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "MIServer.h"
 #include "MIServerDlg.h"
+#include "GlobalFuncs.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
