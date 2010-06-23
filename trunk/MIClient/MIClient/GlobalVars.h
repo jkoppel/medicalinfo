@@ -19,5 +19,10 @@ extern BOOL g_bIsConnected;
 extern BOOL g_bIsDataComing;
 extern char g_RecvData[1024];
 
+struct UserData{
+	int id;
+	char Name[20];
+};
+
 #endif
 
