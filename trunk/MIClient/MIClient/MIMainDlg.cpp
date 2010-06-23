@@ -8,6 +8,7 @@
 #include "GlobalVars.h"
 #include "GlobalFuncs.h"
 #include "ProgressInfo.h"
+#include "PatientDataDlg.h"
 
 
 // CMIMainDlg dialog
@@ -28,6 +29,7 @@ CMIMainDlg::~CMIMainDlg()
 void CMIMainDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST_PATIENT, m_lstPatient);
 }
 
 
@@ -67,6 +69,7 @@ void CMIMainDlg::SetConnectStatus(BOOL status)
 		GetDlgItem(IDC_DELETE)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_SEARCH)->EnableWindow(FALSE);
+		m_lstPatient.DeleteAllItems();
 		g_pClientSocket->Disconnect();
 		g_bIsConnected = FALSE;
 	}
@@ -83,6 +86,9 @@ void CMIMainDlg::OnBnClickedConnect()
 	}
 	
 	///连接服务器
+	int ret, num, index;
+	struct UserData data;
+	char buf[1024];
 	CConnectDlg dlg;
 	dlg.m_strAddress = m_strAddress;
 	dlg.m_nPort = m_nPort;
@@ -93,14 +99,66 @@ void CMIMainDlg::OnBnClickedConnect()
 				m_strAddress = dlg.m_strAddress;
 				m_nPort = dlg.m_nPort;
 				g_ProgressInfo.Show("正在连接服务器...");
-				SetTimer(100, 2000, NULL);//TODO 2000->25000
-				g_bIsConnected = TRUE;
 				GetDlgItem(IDC_CONNECT)->EnableWindow(FALSE);
+
+				//SetTimer(100, 2000, NULL);//TODO 2000->25000
+
+				BOOL connected = FALSE;
+				unsigned int timeout = 100;
+				g_bIsDataComing = FALSE;
+				while(timeout--){
+					g_pClientSocket->Send("CMD1||\r\n", strlen("CMD1||\r\n"));
+					if(g_bIsDataComing==TRUE && strncmp(g_RecvData, "OK", 2)==0){
+						connected = TRUE;
+						break;
+					}
+					Sleep(100);
+				}
+				GetDlgItem(IDC_CONNECT)->EnableWindow(TRUE);
+				if(!connected){
+					SetConnectStatus(FALSE);
+					ShowMsg("连接失败");
+					return;
+				}
+
+				SetConnectStatus(TRUE);
+
+				if(CmdConnect()){
+					ret = CmdGetRecordNum(num);
+					if(ret){
+						for(index=0;index<num;index++){
+							ret = CmdGetRecordAt(index, data);
+							if(ret){
+								this->m_pUserData[index] = data;
+								m_lstPatient.InsertItem(index, CString("用户数据"));
+								sprintf(buf, "%d", data.id);
+								m_lstPatient.SetItemText(index, 0, CString(buf));
+								m_lstPatient.SetItemText(index, 1, CString(data.Name));
+							}
+							else{
+								SetConnectStatus(FALSE);
+								ShowMsg("连接失败");
+								return;
+							}
+						}
+					}
+				}
+				ShowMsg("连接成功");
 				return;
 			}
 		}
+		ShowMsg("连接失败");
 	}
 	SetConnectStatus(FALSE);
+}
+
+///设置ListBox项目栏
+void CMIMainDlg::InitListBox()
+{
+	m_lstPatient.SetExtendedStyle(LVS_EX_FULLROWSELECT|LVS_EX_ONECLICKACTIVATE);
+
+	m_lstPatient.InsertColumn(0, CString("用户ID"), LVCFMT_LEFT, 40);
+	m_lstPatient.InsertColumn(1, CString("用户名"), LVCFMT_LEFT, 120);
 }
 
 BOOL CMIMainDlg::OnInitDialog()
@@ -110,6 +168,7 @@ BOOL CMIMainDlg::OnInitDialog()
 	g_pClientSocket = new CClientSocket(this);
 	SetWindowPos(NULL, 0, 0, 240, 290, SWP_SHOWWINDOW);
 
+	InitListBox();
 	return TRUE;  
 }
 
@@ -138,56 +197,70 @@ int ReceiveData()
 	return g_bIsDataComing;
 }
 
-struct UserData{
-	int id;
-	char Name[20];
-};
-
 ///连接命令
 int CMIMainDlg::CmdConnect()
 {
 	g_bIsDataComing = FALSE;
-	g_pClientSocket->Send("CMD1 \r\n", strlen("CMD1 \r\n"));
+	g_pClientSocket->Send("CMD1||\r\n", strlen("CMD1||\r\n"));
 	if(!ReceiveData()){
 		return FALSE;
 	}
-	if(strncmp(g_RecvData,"OK\r\n", 4)==0){
+	if(strncmp(g_RecvData,"OK", 2)==0){
 		return TRUE;
 	}
 	return FALSE;
 }
 
-int CMIMainDlg::CmdGetRecordNum()
+int CMIMainDlg::CmdGetRecordNum(int &num)
 {
 	g_bIsDataComing = FALSE;
-	g_pClientSocket->Send("CMD2 \r\n", strlen("CMD2 \r\n"));
+	g_pClientSocket->Send("CMD2||\r\n", strlen("CMD2||\r\n"));
 	if(!ReceiveData()){
-		ShowMsg("获取记录个数失败");
+		return -1;
 	}
-	int num;
-	char buf[1000],buf1[100], buf2[100];
-	sscanf(g_RecvData, "%s %04d %s", buf1, &num, buf2);
 
-	sprintf(buf, "rec num:%d", num);
-	AfxMessageBox(CString(buf));
+	char buf[256];
+	CString strTmp;
+	POSITION p;
+
+	ParseSeparatorString(CString(g_RecvData));
+	p = g_strList.GetHeadPosition();
+
+	g_strList.GetNext(p);//cmd
+
+	strTmp = g_strList.GetNext(p);//num
+	CString2Char(strTmp, buf);
+	sscanf(buf, "%d", &num);
+	
 	return TRUE;
 }
 
-int CMIMainDlg::CmdGetRecordAt(int index)
+int CMIMainDlg::CmdGetRecordAt(int index, struct UserData &data)
 {
 	g_bIsDataComing = FALSE;
 	char buf[1000];
-	sprintf(buf, "%s %04d %s", "CMD3", index, "\r\n");
+	sprintf(buf, "%s||%d||%s", "CMD3", index, "\r\n");
 	g_pClientSocket->Send(buf, strlen(buf));
 	if(!ReceiveData()){
-		ShowMsg("获取记录失败");
+		return FALSE;
 	}
-	struct UserData data;
-	char buf1[100], buf2[100];
-	sscanf(g_RecvData, "%s %04d %s %s", buf1, &data.id, data.Name, buf2);
+
+	CString strTmp;
+	POSITION p;
+
+	ParseSeparatorString(CString(g_RecvData));
+	p = g_strList.GetHeadPosition();
+
+	g_strList.GetNext(p);//cmd
+
+	strTmp = g_strList.GetNext(p);//id
+	CString2Char(strTmp, buf);
+	sscanf(buf, "%d", &data.id);
+
+	strTmp = g_strList.GetNext(p);//id
+	CString2Char(strTmp, data.Name);
 
 	sprintf(buf, "%s %d %s", "rec data:", data.id, data.Name);
-	ShowMsg(buf);
 
 	return TRUE;
 }
@@ -195,63 +268,101 @@ int CMIMainDlg::CmdGetRecordAt(int index)
 int CMIMainDlg::CmdAppendRecord(struct UserData data)
 {
 	g_bIsDataComing = FALSE;
-	char buf[100];
-	sprintf(buf, "%s %04d %s %s", "CMD4", data.id, data.Name, "\r\n");
+	char buf[1024];
+	CString cmdStr;
+
+	g_strList.RemoveAll();
+	g_strList.AddTail(CString("CMD4"));
+
+	sprintf(buf, "%d", data.id);
+	g_strList.AddTail(CString(buf));
+	
+	g_strList.AddTail(CString(data.Name));
+	g_strList.AddTail(CString("\r\n"));
+	MakeSeparatorString(cmdStr);
+
+	CString2Char(cmdStr, buf);
 	g_pClientSocket->Send(buf, strlen(buf));
 	if(!ReceiveData()){
-		ShowMsg("添加记录失败");
+		return FALSE;
 	}
-	if(strncmp(g_RecvData,"OK\r\n", 4)==0){
-		ShowMsg("添加记录成功");
-		return TRUE;
-	}
-	ShowMsg("添加记录失败");
-	return TRUE;
+
+	return (strncmp(g_RecvData,"OK", 2)==0);
 }
 
 int CMIMainDlg::CmdDeleteRecordAt(int index)
 {
 	g_bIsDataComing = FALSE;
 	char buf[100];
-	sprintf(buf, "%s %04d %s", "CMD5", index, "\r\n");
+	sprintf(buf, "%s||%d||%s", "CMD5", index, "\r\n");
 	g_pClientSocket->Send(buf, strlen(buf));
 	if(!ReceiveData()){
-		ShowMsg("删除记录失败");
+		return FALSE;
 	}
-	if(strncmp(g_RecvData,"OK\r\n", 4)==0){
-		ShowMsg("删除记录成功");
-		return TRUE;
-	}
-	ShowMsg("删除记录失败");
-	return TRUE;
+	return (strncmp(g_RecvData,"OK\r\n", 4)==0);
 }
 
 void CMIMainDlg::OnBnClickedAdd()
 {
-	CString str("OK");
-	char buf[2000];
-	CString2Char(str, buf);
-
-	CmdConnect();
-	CmdGetRecordNum();
-	CmdGetRecordAt(0);
+	int ret;
+	char buf[256];
+	struct UserData data;
+	CPatientDataDlg dlg;
+	dlg.m_nFlag = 0;
+	if(dlg.DoModal()==IDOK){
+		data.id = dlg.m_nID;
+		CString2Char(dlg.m_strName, data.Name);
+		ret = CmdAppendRecord(data);
+		if(ret){
+			m_lstPatient.InsertItem(0, CString("用户数据"));
+			sprintf(buf, "%d", data.id);
+			m_lstPatient.SetItemText(0, 0, CString(buf));
+			m_lstPatient.SetItemText(0, 1, CString(data.Name));
+			ShowMsg("添加成功");
+		}
+		else{
+			ShowMsg("添加失败");
+		}
+	}
 }
 
 void CMIMainDlg::OnBnClickedEdit()
 {
+	POSITION pos;
+	int ret;
+	char buf[256];
 	struct UserData data;
 
-	data.id = 0;
-	sprintf(data.Name, "%s", "林仙立");
-	CmdAppendRecord(data);
+	pos = m_lstPatient.GetFirstSelectedItemPosition();
+	if(pos<=0){
+		ShowMsg("请选择记录");
+		return;
+	}
+
+	CPatientDataDlg dlg;
+	dlg.m_nFlag = 0;
+	if(dlg.DoModal()==IDOK){
+		data.id = dlg.m_nID;
+		CString2Char(dlg.m_strName, data.Name);
+		ret = CmdAppendRecord(data);
+		if(ret){
+			m_lstPatient.InsertItem(0, CString("用户数据"));
+			sprintf(buf, "%s", data.id);
+			m_lstPatient.SetItemText(0, 0, CString(buf));
+			m_lstPatient.SetItemText(0, 1, CString(data.Name));
+			ShowMsg("添加成功");
+		}
+		else{
+			ShowMsg("添加失败");
+		}
+	}
 }
 
 void CMIMainDlg::OnBnClickedDelete() 
 {
-	CmdDeleteRecordAt(0);
 }
 
 void CMIMainDlg::OnBnClickedSearch()
 {
-	CmdGetRecordAt(10);
 }
+
