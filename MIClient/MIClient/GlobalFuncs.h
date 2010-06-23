@@ -8,8 +8,10 @@ extern void Char2CString(char *, CString);
 //显示消息
 extern void ShowMsg(char msg[]);
 extern void ShowMsg(CString msg);
-//CRC校验
-extern void CRC_16(uchar *input,uchar dlen, uchar *crc);
+
+extern CStringList g_strList;
+extern void MakeSeparatorString(CString &destStr);
+extern void ParseSeparatorString(CString str);
 
 #endif
 
