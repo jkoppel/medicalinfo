@@ -237,6 +237,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PatientDataDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ProgressInfo.cpp"
 				>
 			</File>
@@ -296,6 +300,10 @@
 			</File>
 			<File
 				RelativePath=".\MIMainDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PatientDataDlg.h"
 				>
 			</File>
 			<File
