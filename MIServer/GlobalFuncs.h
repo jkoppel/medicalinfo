@@ -12,6 +12,10 @@ extern void Printf(const char *format, ...);
 //打印缓冲区数据
 extern void PrintBuffer(const char *hint, const unsigned char *buffer,int len);
 
+extern CStringList g_strList;
+extern void MakeSeparatorString(CString &destStr);
+extern void ParseSeparatorString(CString str);
+
 struct UserData{
 	int id;
 	char Name[20];
