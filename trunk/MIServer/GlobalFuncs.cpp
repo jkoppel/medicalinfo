@@ -110,6 +110,58 @@ void PrintBuffer(const char *hint, const unsigned char *buffer,int len)
 	return;
 }
 
+CStringList g_strList;
+void MakeSeparatorString(CString &str)
+{
+	int num = g_strList.GetCount();
+	POSITION p;
+
+	str.Empty();
+
+	for(p=g_strList.GetHeadPosition();p!=NULL;num--){
+		CString tmp = g_strList.GetNext(p);
+		if(num>1){
+			str += tmp + CString("||");
+		}
+		else{
+			str += tmp;
+		}
+	}
+}
+
+void ParseSeparatorString(CString str)
+{
+	int offset;
+	CString tmp;
+
+	g_strList.RemoveAll();
+	
+	offset = str.Find("||");
+	while(offset>0){
+		tmp = str.Left(offset);
+		g_strList.AddTail(tmp);
+		str = str.Right(str.GetLength()-offset-2);
+		offset = str.Find("||");
+	}
+}
+
+void DebugSeparatorString()
+{
+	CString str, str1;
+	g_strList.RemoveAll();
+	char buf[20];
+	for(int i=0;i<10;i++){
+		sprintf(buf, "%d", i);
+		g_strList.AddTail(CString("Hello")+CString(buf));
+	}
+	MakeSeparatorString(str);
+
+	g_strList.RemoveAll();
+	ParseSeparatorString(str);
+
+	MakeSeparatorString(str1);
+}
+
 #define DATAFILE "d:\\test.dat"
 
 void CreateDataFile()
