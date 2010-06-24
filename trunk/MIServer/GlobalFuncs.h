@@ -17,22 +17,50 @@ extern CStringList g_strList;
 extern void MakeSeparatorString(CString &destStr);
 extern void ParseSeparatorString(CString str);
 
+#define MAX_UDATA_STR_LENGTH	50
 struct UserData{
-	int id;
-	char Name[20];
+	int ID;
+	char ScancodeID[MAX_UDATA_STR_LENGTH+1];
+	int Number;
+	char Name[MAX_UDATA_STR_LENGTH+1];
+	char Sex[MAX_UDATA_STR_LENGTH+1];
+	int Age;
+	char BirthDate[MAX_UDATA_STR_LENGTH+1];
+	char People[MAX_UDATA_STR_LENGTH+1];
+	char Department[MAX_UDATA_STR_LENGTH+1];
+	char TypeOfWork[MAX_UDATA_STR_LENGTH+1];
+	char Province[MAX_UDATA_STR_LENGTH+1];
+	char City[MAX_UDATA_STR_LENGTH+1];
+	char Address[MAX_UDATA_STR_LENGTH+1];
+	char ZipCode[MAX_UDATA_STR_LENGTH+1];
+	char Tel[MAX_UDATA_STR_LENGTH+1];
+	char ClinicalDiagnosis[MAX_UDATA_STR_LENGTH+1];
+	int Height;
+	char Weight[MAX_UDATA_STR_LENGTH+1];
+	char CheckDate[MAX_UDATA_STR_LENGTH+1];
+	char Hazards[MAX_UDATA_STR_LENGTH+1];
+	char Pharmacy[MAX_UDATA_STR_LENGTH+1];
+	char PastHistory[MAX_UDATA_STR_LENGTH+1];
 };
+
+extern void MakeSeparatorStringFromRec(struct UserData data, CString &str);
+extern int ParseSeparatorStringToRec(CString str, struct UserData &data);
 
 extern void CreateDataFile();
 
-extern int Cmd_GetRecordNum();
+extern BOOL Cmd_GetRecordNum(int &num);
 
-extern int Cmd_GetRecordAt(int index, struct UserData &rec);
+extern BOOL Cmd_GetAllIDs(int *pID, int &num);
 
-extern int Cmd_AppendRecord(struct UserData rec);
+extern void MakeIDToSeparatorString(int *pID, int num, CString &str);
 
-extern int Cmd_DeleteRecordAt(int index);
+extern BOOL Cmd_GetRecordByID(int ID, struct UserData &rec);
 
-extern int Cmd_ModifyRecordAt(int index, struct UserData rec);
+extern BOOL Cmd_AppendRecord(struct UserData rec);
+
+extern BOOL Cmd_DeleteRecordByID(int ID);
+
+extern BOOL Cmd_ModifyRecordByID(int ID, struct UserData rec);
 
 extern _ConnectionPtr	g_pDBConnection;
 
