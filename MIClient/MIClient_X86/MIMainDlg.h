@@ -34,7 +34,6 @@ protected:
 public:
 	afx_msg void OnBnClickedConnect();
 	virtual BOOL OnInitDialog();
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	void SendCurPacket();
 	afx_msg void OnBnClickedAdd();
 	afx_msg void OnBnClickedEdit();
@@ -45,8 +44,9 @@ public:
 
 	int CmdConnect();
 	int CmdGetRecordNum(int &num);
-	int CmdGetRecordAt(int index, struct UserData &data);
+	int CmdGetAllIDs(int *pID, int &num);
+	int CmdGetRecordByID(int ID, struct UserData &data);
 	int CmdAppendRecord(struct UserData data);
-	int CmdDeleteRecordAt(int index);
-	int CmdModifyRecordAt(int index, struct UserData data);
+	int CmdDeleteRecordByID(int ID);
+	int CmdModifyRecordByID(int ID, struct UserData data);
 };
