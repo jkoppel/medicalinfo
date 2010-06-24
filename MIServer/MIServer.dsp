@@ -160,6 +160,14 @@ SOURCE=.\MySocket.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\PatientDlg.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\PatientListDlg.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\StdAfx.cpp
 # ADD CPP /Yc"stdafx.h"
 # End Source File
@@ -206,6 +214,14 @@ SOURCE=.\MIServerThread.h
 # Begin Source File
 
 SOURCE=.\MySocket.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\PatientDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\PatientListDlg.h
 # End Source File
 # Begin Source File
 
