@@ -123,6 +123,19 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			Cmd_DeleteRecordAt(index);
 			m_peer.Send(CString("OK||\r\n"));
 			break;
+		case 6:
+			strTmp = g_strList.GetNext(p);
+			sscanf(strTmp, "%d", &index);
+
+			strTmp = g_strList.GetNext(p);
+			sscanf(strTmp, "%d", &data.id);
+
+			strTmp = g_strList.GetNext(p);
+			sprintf(data.Name, "%s", strTmp.GetBuffer(strTmp.GetLength()));
+
+			Cmd_ModifyRecordAt(index, data);
+			m_peer.Send(CString("OK||\r\n"));
+			break;
 		default:
 			break;
 	}
