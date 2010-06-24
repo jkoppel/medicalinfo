@@ -1,0 +1,253 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (P.R.C.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#include ""res\\MIClient_X86.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
+    "#include ""afxres.rc""     // 标准组件\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\MIClient_X86.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_MICLIENT_DIALOG DIALOG  0, 0, 160, 127
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "GenClient"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Send",IDOK,109,112,50,14
+    PUSHBUTTON      "Exit",IDCANCEL,2,112,50,14
+    LTEXT           "Port:",IDC_STATIC,93,14,16,8
+    EDITTEXT        IDC_NETRECV,0,49,159,25,ES_MULTILINE
+    LTEXT           "Received:",IDC_STATIC,3,40,34,8
+    LTEXT           "Send:",IDC_STATIC,3,76,20,8
+    EDITTEXT        IDC_NETSEND,0,84,159,25,ES_MULTILINE
+    LTEXT           "Address:",IDC_STATIC,0,11,28,8
+    EDITTEXT        IDC_ADDRESS,0,23,85,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PORT,87,23,31,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Connect",IDC_CONNECT,121,22,38,14
+    CONTROL         "TCP",IDC_TCP,"Button",BS_AUTORADIOBUTTON | WS_GROUP,99,3,28,10
+    CONTROL         "UDP",IDC_UDP,"Button",BS_AUTORADIOBUTTON,128,3,31,10
+END
+
+IDD_PROGRESS_INFO DIALOG  0, 0, 120, 0
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "正在连接服务器..."
+FONT 8, "MS Sans Serif"
+BEGIN
+END
+
+IDD_CONNECT DIALOG  0, 0, 160, 34
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "连接服务器"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "端口:",IDC_STATIC,84,3,24,8
+    LTEXT           "服务器地址:",IDC_STATIC,5,3,63,8
+    EDITTEXT        IDC_ADDRESS,5,15,74,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PORT,82,15,31,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "连接",IDC_CONNECT,116,15,38,12
+END
+
+IDD_MICLIENT_MAIN DIALOG  0, 0, 160, 190
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "医疗信息远程录入系统"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "连接",IDC_CONNECT,2,0,25,14
+    PUSHBUTTON      "添加",IDC_ADD,54,0,25,14,WS_DISABLED
+    PUSHBUTTON      "编辑",IDC_EDIT,80,0,25,14,WS_DISABLED
+    PUSHBUTTON      "删除",IDC_DELETE,106,0,25,14,WS_DISABLED
+    PUSHBUTTON      "查找",IDC_SEARCH,132,0,25,14,WS_DISABLED
+    CONTROL         "",IDC_LIST_PATIENT,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,0,15,159,161
+END
+
+IDD_REC_ADDMOD DIALOG  0, 0, 143, 74
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "添加/编辑"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "用户ID:",IDC_STATIC,7,10,27,8
+    EDITTEXT        IDC_ID,35,7,101,14,ES_AUTOHSCROLL
+    LTEXT           "用户名:",IDC_STATIC,7,34,28,8
+    EDITTEXT        IDC_NAME,35,31,101,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "确定",IDOK,21,53,42,14
+    PUSHBUTTON      "取消",IDCANCEL,79,53,42,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080403a8"
+        BEGIN
+            VALUE "CompanyName", "TODO: <公司名>"
+            VALUE "FileDescription", "TODO: <文件说明>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "MIClient_X86.exe"
+            VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
+            VALUE "OriginalFilename", "MIClient_X86.exe"
+            VALUE "ProductName", "TODO: <产品名>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 936
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_MICLIENT_DIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 159
+        BOTTOMMARGIN, 126
+    END
+
+    IDD_CONNECT, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 154
+        BOTTOMMARGIN, 27
+    END
+
+    IDD_MICLIENT_MAIN, DIALOG
+    BEGIN
+        RIGHTMARGIN, 159
+        BOTTOMMARGIN, 189
+    END
+
+    IDD_REC_ADDMOD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 136
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 67
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDP_SOCKETS_INIT_FAILED "Windows 套接字初始化失败。"
+END
+
+#endif    // Chinese (P.R.C.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE 4, 2
+#pragma code_page(936)
+#include "res\MIClient_X86.rc2"  // 非 Microsoft Visual C++ 编辑的资源
+#include "afxres.rc"     // 标准组件
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
