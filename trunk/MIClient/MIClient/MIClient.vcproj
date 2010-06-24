@@ -229,10 +229,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MIClientDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\MIMainDlg.cpp"
 				>
 			</File>
@@ -292,10 +288,6 @@
 			</File>
 			<File
 				RelativePath=".\MIClient.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MIClientDlg.h"
 				>
 			</File>
 			<File
