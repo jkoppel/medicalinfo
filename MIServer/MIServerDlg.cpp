@@ -84,6 +84,7 @@ BOOL CMIServerDlg::OnInitDialog()
 		Printf("数据库连接失败，确认数据库CaseData.mdb是否在当前路径下!");
 		return FALSE;
 	}
+
 	m_bIsDBConnected = TRUE;
 	GetDlgItem(IDC_TESTDB)->EnableWindow(TRUE);
 	
