@@ -182,11 +182,7 @@ bool CCESocket::Connect(CString &addr, UINT remotePort)
 {
 	char hostStr[257];
 	int wHostLen;
-#ifdef _WIN32_WCE
 	LPTSTR wHost;
-#else
-	char wHost[200];
-#endif
 	ulong hostByIP;
 	HOSTENT *hostByName;
 
@@ -225,14 +221,12 @@ bool CCESocket::Connect(CString &addr, UINT remotePort)
 	wHostLen = addr.GetLength();
 	if(wHostLen > 256)
 		wHostLen = 256;
-#ifdef _WIN32_WCE
 	wHost = addr.GetBuffer(wHostLen);
+#ifdef _WCE_SECTION
 	wcstombs(hostStr, wHost, 256);
 #else
-	sprintf_s(wHost, "%s", addr.GetBuffer(wHostLen));
-	wHost[wHostLen] = '\0';
-	strcpy_s(hostStr, wHost);
-	addr.ReleaseBuffer();
+	size_t i;
+	wcstombs_s(&i, hostStr, 256, wHost, 256);
 #endif
 	
 	//Builds destination address
