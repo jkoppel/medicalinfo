@@ -25,6 +25,7 @@ protected:
 	UINT m_nPort;
 	CListCtrl m_lstPatient;
 	struct UserData m_pUserData[1000];
+	int m_nRecNum;
 protected:
 	afx_msg LRESULT OnDisconnect(WPARAM wParam, LPARAM lParam);
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -47,4 +48,5 @@ public:
 	int CmdGetRecordAt(int index, struct UserData &data);
 	int CmdAppendRecord(struct UserData data);
 	int CmdDeleteRecordAt(int index);
+	int CmdModifyRecordAt(int index, struct UserData data);
 };
