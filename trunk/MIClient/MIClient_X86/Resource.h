@@ -1,9 +1,8 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by MIClient.rc
+// Used by MIClient_X86.rc
 //
 #define IDOK2                           2
-#define IDD_MICLIENT_DIALOG             102
 #define IDR_MAINFRAME                   128
 #define IDD_PROGRESS_INFO               129
 #define IDD_CONNECT                     130
@@ -15,10 +14,6 @@
 #define IDC_ADDRESS                     1001
 #define IDC_PORT                        1002
 #define IDC_CONNECT                     1003
-#define IDC_NETRECV                     1004
-#define IDC_NETSEND                     1005
-#define IDC_TCP                         1006
-#define IDC_UDP                         1007
 #define IDC_LIST_PATIENT                1010
 #define IDC_ADD                         1011
 #define IDC_ID                          1011
