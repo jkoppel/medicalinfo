@@ -3,18 +3,30 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MIClient", "MIClient\MIClient.vcproj", "{D00354BC-8DC4-4131-9659-5B7CCA5018AC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MIClient_X86", "MIClient_X86\MIClient_X86.vcproj", "{BC6D3E58-C592-44A1-B577-C2A91863430F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|MKL (ARMV4I) = Debug|MKL (ARMV4I)
+		Debug|Win32 = Debug|Win32
 		Release|MKL (ARMV4I) = Release|MKL (ARMV4I)
+		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Debug|MKL (ARMV4I).ActiveCfg = Debug|MKL (ARMV4I)
 		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Debug|MKL (ARMV4I).Build.0 = Debug|MKL (ARMV4I)
-		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Debug|MKL (ARMV4I).Deploy.0 = Debug|MKL (ARMV4I)
+		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Debug|Win32.ActiveCfg = Debug|MKL (ARMV4I)
 		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Release|MKL (ARMV4I).ActiveCfg = Release|MKL (ARMV4I)
 		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Release|MKL (ARMV4I).Build.0 = Release|MKL (ARMV4I)
 		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Release|MKL (ARMV4I).Deploy.0 = Release|MKL (ARMV4I)
+		{D00354BC-8DC4-4131-9659-5B7CCA5018AC}.Release|Win32.ActiveCfg = Release|MKL (ARMV4I)
+		{BC6D3E58-C592-44A1-B577-C2A91863430F}.Debug|MKL (ARMV4I).ActiveCfg = Debug|Win32
+		{BC6D3E58-C592-44A1-B577-C2A91863430F}.Debug|MKL (ARMV4I).Build.0 = Debug|Win32
+		{BC6D3E58-C592-44A1-B577-C2A91863430F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BC6D3E58-C592-44A1-B577-C2A91863430F}.Debug|Win32.Build.0 = Debug|Win32
+		{BC6D3E58-C592-44A1-B577-C2A91863430F}.Release|MKL (ARMV4I).ActiveCfg = Release|Win32
+		{BC6D3E58-C592-44A1-B577-C2A91863430F}.Release|Win32.ActiveCfg = Release|Win32
+		{BC6D3E58-C592-44A1-B577-C2A91863430F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
