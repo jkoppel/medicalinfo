@@ -19,6 +19,9 @@
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>			// MFC support for Windows Common Controls
 #endif // _AFX_NO_AFXCMN_SUPPORT
+#import "c:\program files\common files\system\ado\msado15.dll" \
+	no_namespace \
+rename ("EOF", "adoEOF")
 
 
 //{{AFX_INSERT_LOCATION}}
