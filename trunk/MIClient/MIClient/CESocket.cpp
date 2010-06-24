@@ -222,12 +222,11 @@ bool CCESocket::Connect(CString &addr, UINT remotePort)
 	if(wHostLen > 256)
 		wHostLen = 256;
 	wHost = addr.GetBuffer(wHostLen);
-#ifdef _WIN32_WCE
+#ifdef _WCE_SECTION
 	wcstombs(hostStr, wHost, 256);
 #else
-	wHost[wHostLen] = '\0';
-	strcpy(hostStr, wHost);
-	addr.ReleaseBuffer();
+	size_t i;
+	wcstombs_s(&i, hostStr, 256, wHost, 256);
 #endif
 	
 	//Builds destination address
