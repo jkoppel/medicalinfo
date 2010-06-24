@@ -25,21 +25,21 @@ int DataFile_Create(const char *path, unsigned int RecLength)
 	}
 
 	//创建文件
-	pFile = fopen(path, "wb+");
+	fopen_s(&pFile, path, "wb+");
 	if(pFile==NULL){
 		return FAIL;
 	}
 
 	//写入记录个数(=0)
 	RecNum = 0;
-	count = fwrite(&RecNum, 4, 1, pFile);
+	count = (int)fwrite(&RecNum, 4, 1, pFile);
 	if(count!=1){
 		fclose(pFile);
 		return FAIL;
 	}
 
 	//写入记录长度
-	count = fwrite(&RecLength, 4, 1, pFile);
+	count = (int)fwrite(&RecLength, 4, 1, pFile);
 	fclose(pFile);
 
 	return (count==1) ? SUCC : FAIL;
@@ -61,7 +61,7 @@ int DataFile_Delete(const char *path)
 
 	//删除文件
 	
-	//ret = unlink(path);//deleted by hwy, TODO
+	ret = _unlink(path);//deleted by hwy, TODO
 	return (ret==0) ? SUCC : FAIL;
 }
 
@@ -84,20 +84,20 @@ int DataFile_AppendRec(const char *path,
 	}
 
 	//打开文件
-	pFile = fopen(path, "rb+");
+	fopen_s(&pFile, path, "rb+");
 	if(pFile==NULL){
 		return FAIL;
 	}
 
 	//读取记录个数
-	count = fread(&RecNum, 4, 1, pFile);
+	count = (int)fread(&RecNum, 4, 1, pFile);
 	if(count!=1 && !(count==0 && feof(pFile))){
 		fclose(pFile);
 		return FAIL;
 	}
 
 	//读取记录长度
-	count = fread(&RecLength, 4, 1, pFile);
+	count = (int)fread(&RecLength, 4, 1, pFile);
 	if(count!=1 && !(count==0 && feof(pFile))){
 		fclose(pFile);
 		return FAIL;
@@ -111,7 +111,7 @@ int DataFile_AppendRec(const char *path,
 	}
 
 	//写入记录
-	count = fwrite(RecData, RecLength, 1, pFile);
+	count = (int)fwrite(RecData, RecLength, 1, pFile);
 	if(count!=1){
 		fclose(pFile);
 		return FAIL;
@@ -120,7 +120,7 @@ int DataFile_AppendRec(const char *path,
 	//将记录个数增1
 	RecNum ++;
 	fseek(pFile, 0, SEEK_SET);
-	count = fwrite(&RecNum, 4, 1, pFile);
+	count = (int)fwrite(&RecNum, 4, 1, pFile);
 	fclose(pFile);
 
 	return (count==1) ? SUCC : FAIL;
@@ -145,19 +145,19 @@ int DataFile_DeleteRec(const char *path, unsigned int index)
 	}
 
 	//打开文件
-	pFile = fopen(path, "rb+");
+	fopen_s(&pFile, path, "rb+");
 	if(pFile==NULL){
 		return FAIL;
 	}
 	//读取记录个数
-	count = fread(&RecNum, 4, 1, pFile);
+	count = (int)fread(&RecNum, 4, 1, pFile);
 	if(count!=1 && !(count==0 && feof(pFile))){
 		fclose(pFile);
 		return FAIL;
 	}
 
 	//读取记录长度
-	count = fread(&RecLength, 4, 1, pFile);
+	count = (int)fread(&RecLength, 4, 1, pFile);
 	if(count!=1 && !(count==0 && feof(pFile))){
 		fclose(pFile);
 		return FAIL;
@@ -181,7 +181,7 @@ int DataFile_DeleteRec(const char *path, unsigned int index)
 			return FAIL;
 		}
 		//读取数据
-		count = fread(RecData, RecLength, 1, pFile);
+		count = (int)fread(RecData, RecLength, 1, pFile);
 		if(count!=1 && !(count==0 && feof(pFile))){
 			fclose(pFile);
 			delete []RecData;
@@ -195,7 +195,7 @@ int DataFile_DeleteRec(const char *path, unsigned int index)
 			return FAIL;
 		}
 		//写入数据
-		count = fwrite(RecData, RecLength, 1, pFile);
+		count = (int)fwrite(RecData, RecLength, 1, pFile);
     	if(count!=1){
 	    	fclose(pFile);
 			delete []RecData;
@@ -205,7 +205,7 @@ int DataFile_DeleteRec(const char *path, unsigned int index)
 	//记录个数-1
 	RecNum --;
 	fseek(pFile, 0, SEEK_SET);
-	count = fwrite(&RecNum, 4, 1, pFile);
+	count = (int)fwrite(&RecNum, 4, 1, pFile);
 	fclose(pFile);
 	delete []RecData;
 	return (count==1) ? SUCC : FAIL;
@@ -233,20 +233,20 @@ int DataFile_ReadRec(const char *path,
 	}
 
 	//打开文件
-	pFile = fopen(path, "rb");
+	fopen_s(&pFile, path, "rb");
 	if(pFile==NULL){
 		return FAIL;
 	}
 
 	//读取记录个数
-	count = fread(&RecNum, 4, 1, pFile);
+	count = (int)fread(&RecNum, 4, 1, pFile);
 	if(count!=1 && !(count==0 && feof(pFile))){
 		fclose(pFile);
 		return FAIL;
 	}
 
 	//读取记录长度
-	count = fread(&RecLength, 4, 1, pFile);
+	count = (int)fread(&RecLength, 4, 1, pFile);
 	if(count!=1 && !(count==0 && feof(pFile))){
 		fclose(pFile);
 		return FAIL;
@@ -266,7 +266,7 @@ int DataFile_ReadRec(const char *path,
 	}
 
 	//读取数据
-	count = fread(RecData, RecLength, 1, pFile);
+	count = (int)fread(RecData, RecLength, 1, pFile);
 	fclose(pFile);
 	
 	return (count==1 || (count==0 && feof(pFile))) ? SUCC : FAIL;
@@ -289,13 +289,13 @@ int DataFile_GetRecNum(const char *path, unsigned int &RecNum)
 	}
 
 	//打开文件
-	pFile = fopen(path, "rb");
+	fopen_s(&pFile, path, "rb");
 	if(pFile==NULL){
 		return FAIL;
 	}
 
 	//读取记录个数
-	count = fread(&RecNum, 4, 1, pFile);
+	count = (int)fread(&RecNum, 4, 1, pFile);
 	fclose(pFile);
 	
 	return (count==1 || (count==0 && feof(pFile))) ? SUCC : FAIL;
@@ -320,20 +320,20 @@ int DataFile_ModRec(const char *path,unsigned int index,const void *RecData)
 	}
 
 	//打开文件
-	pFile = fopen(path, "rb+");
+	fopen_s(&pFile, path, "rb+");
 	if(pFile==NULL){
 		return FAIL;
 	}
 
 	//读取记录个数
-	count = fread(&RecNum, 4, 1, pFile);
+	count = (int)fread(&RecNum, 4, 1, pFile);
 	if(count!=1 && !(count==0 && feof(pFile))){
 		fclose(pFile);
 		return FAIL;
 	}
 
 	//读取记录长度
-	count = fread(&RecLength, 4, 1, pFile);
+	count = (int)fread(&RecLength, 4, 1, pFile);
 	if(count!=1 && !(count==0 && feof(pFile))){
 		fclose(pFile);
 		return FAIL;
@@ -352,7 +352,7 @@ int DataFile_ModRec(const char *path,unsigned int index,const void *RecData)
 		return FAIL;
 	}
 	//写入数据
-	count = fwrite(RecData, RecLength, 1, pFile);
+	count = (int)fwrite(RecData, RecLength, 1, pFile);
    	if(count!=1){
 		fclose(pFile);
 		return FAIL;
