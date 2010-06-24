@@ -5,6 +5,7 @@
 #include "MIServer.h"
 #include "MIServerDlg.h"
 #include "GlobalFuncs.h"
+#include "PatientListDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -25,6 +26,8 @@ CMIServerDlg::CMIServerDlg(CWnd* pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_bIsDBConnected = FALSE;
+	g_pDBConnection = NULL;
 }
 
 void CMIServerDlg::DoDataExchange(CDataExchange* pDX)
@@ -45,9 +48,11 @@ BEGIN_MESSAGE_MAP(CMIServerDlg, CDialog)
 	ON_BN_CLICKED(IDC_START, OnStartServer)
 	ON_BN_CLICKED(IDC_CLOSE, OnCloseServer)
 	ON_BN_CLICKED(IDC_EXIT, OnExit)
+	ON_BN_CLICKED(IDC_TESTDB, OnTestdb)
 	ON_MESSAGE(ON_RECEIVE, OnReceiveData)
 	ON_MESSAGE(ON_CLOSE, OnDisconnected)
 	ON_MESSAGE(ON_ACCEPT, OnAccept)
+	ON_WM_CLOSE()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -62,8 +67,27 @@ BOOL CMIServerDlg::OnInitDialog()
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
+
+	// 初始化COM,创建ADO连接等操作
+	AfxOleInit();
+	g_pDBConnection.CreateInstance(__uuidof(Connection));
 	
-	m_server = new CMySocket(this);
+	// 在ADO操作中建议语句中要常用try...catch()来捕获错误信息，
+	// 因为它有时会经常出现一些意想不到的错误。jingzhou xu
+	try                 
+	{	
+		// 打开本地Access库Demo.mdb
+		g_pDBConnection->Open("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=CaseData.mdb","","",adModeUnknown);
+	}
+	catch(_com_error e)
+	{
+		Printf("数据库连接失败，确认数据库CaseData.mdb是否在当前路径下!");
+		return FALSE;
+	}
+	m_bIsDBConnected = TRUE;
+	GetDlgItem(IDC_TESTDB)->EnableWindow(TRUE);
+	
+	m_pSocketServer = new CMySocket(this);
 	m_bServerType.SetCheck(1);
 	m_sPort = _T("5000");
 	UpdateData(FALSE);
@@ -120,14 +144,14 @@ LRESULT CMIServerDlg::OnAccept(WPARAM wParam, LPARAM lParam)
 
 LRESULT CMIServerDlg::OnReceiveData(WPARAM wParam, LPARAM lParam)
 {
-	while(m_server->GetDataSize() > 0 && m_server->ReadString(m_sRecv))
+	while(m_pSocketServer->GetDataSize() > 0 && m_pSocketServer->ReadString(m_sRecv))
 		UpdateData(FALSE);
 	return 0;
 }
 
 LRESULT CMIServerDlg::OnDisconnected(WPARAM wParam, LPARAM lParam)
 {
-	if(m_server->GetSocketType() == SOCK_DGRAM)
+	if(m_pSocketServer->GetSocketType() == SOCK_DGRAM)
 	{
 		m_sRecv = "Remote host disconnected";
 		UpdateData(FALSE);
@@ -143,18 +167,18 @@ void CMIServerDlg::OnStartServer()
 	UpdateData();
 
 	if(m_bServerType.GetCheck())
-		created = m_server->Create(SOCK_STREAM);
+		created = m_pSocketServer->Create(SOCK_STREAM);
 	else
-		created = m_server->Create(SOCK_DGRAM);
+		created = m_pSocketServer->Create(SOCK_DGRAM);
 
 	if(created)
-		if(m_server->Accept(atoi(m_sPort)))
+		if(m_pSocketServer->Accept(atoi(m_sPort)))
 			GetDlgItem(IDC_START)->EnableWindow(FALSE);
 }
 
 void CMIServerDlg::OnCloseServer() 
 {
-	m_server->Disconnect();
+	m_pSocketServer->Disconnect();
 	GetDlgItem(IDC_START)->EnableWindow(TRUE);
 }
 
@@ -164,10 +188,27 @@ void CMIServerDlg::OnOK()
 	UpdateData();
 	m_sSend += "\r\n";
 	len = m_sSend.GetLength();
-	m_server->Send(m_sSend, len);
+	m_pSocketServer->Send(m_sSend, len);
 }
 
 void CMIServerDlg::OnExit() 
 {
 	PostQuitMessage(0);	
+}
+
+void CMIServerDlg::OnTestdb() 
+{
+	if(m_bIsDBConnected){
+		CPatientListDlg dlg;
+		dlg.DoModal();
+	}
+}
+
+void CMIServerDlg::OnClose() 
+{
+	if(g_pDBConnection->State)
+        g_pDBConnection->Close();
+	g_pDBConnection= NULL;     
+	
+	CDialog::OnClose();
 }

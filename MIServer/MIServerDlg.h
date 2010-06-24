@@ -45,7 +45,8 @@ public:
 // Implementation
 protected:
 	HICON m_hIcon;
-	CMySocket *m_server;
+	CMySocket *m_pSocketServer;
+	BOOL m_bIsDBConnected;
 
 	// Generated message map functions
 	//{{AFX_MSG(CMIServerDlg)
@@ -56,6 +57,8 @@ protected:
 	afx_msg void OnCloseServer();
 	virtual void OnOK();
 	afx_msg void OnExit();
+	afx_msg void OnTestdb();
+	afx_msg void OnClose();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
