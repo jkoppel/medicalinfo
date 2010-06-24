@@ -32,6 +32,8 @@ extern int Cmd_AppendRecord(struct UserData rec);
 
 extern int Cmd_DeleteRecordAt(int index);
 
+extern int Cmd_ModifyRecordAt(int index, struct UserData rec);
+
 extern _ConnectionPtr	g_pDBConnection;
 
 

@@ -198,3 +198,8 @@ int Cmd_DeleteRecordAt(int index)
 {
 	return DataFile_DeleteRec(DATAFILE, index);
 }
+
+int Cmd_ModifyRecordAt(int index, struct UserData rec)
+{
+	return DataFile_ModRec(DATAFILE, index, &rec);
+}
