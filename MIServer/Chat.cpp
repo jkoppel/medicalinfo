@@ -78,11 +78,15 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 
 	char cmd[100];
 	char buf[100][256];
-	int index, num, cmdID;
+	int ID, num, cmdID, *pID;
 	CString strTmp;
 	struct UserData data;
 	POSITION p;
 
+	if((m_sRecv.Find("CMD")!=0) || (m_sRecv.Find("\r\n")!=m_sRecv.GetLength()-2)){
+		m_peer.Send(CString("ER||\r\n"));
+		return -1;
+	}
 	ParseSeparatorString(m_sRecv);
 	p = g_strList.GetHeadPosition();
 	strTmp = g_strList.GetNext(p);
@@ -90,53 +94,89 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 
 	cmdID = int(cmd[3]-'0');
 	switch(cmdID){
-		case 1:
+		case 1://联机，测试双方通信是否正常
 			m_peer.Send(CString("OK||\r\n"));
 			break;
-		case 2:
-			num = Cmd_GetRecordNum();
+		case 2://获取记录总数
+			num = -1;
+			if(!Cmd_GetRecordNum(num)){//读取错误
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
 			sprintf(buf[0], "%s||%d||%s", "OK", num, "\r\n");
 			m_peer.Send(CString(buf[0]));
 			break;
-		case 3:
+		case 3://获取第n条记录
+			if(!p){
+				m_peer.Send(CString("ER||\r\n"));
+				return -1;
+			}
 			strTmp = g_strList.GetNext(p);
-			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &index);
+			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
 
-			Cmd_GetRecordAt(index, data);
-			sprintf(buf[0], "%s||%04d||%s||%s", "OK", data.id, data.Name, "\r\n");
-			m_peer.Send(CString(buf[0]));
+			if(!Cmd_GetRecordByID(ID, data)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
+			MakeSeparatorStringFromRec(data, strTmp);
+			m_peer.Send(strTmp);
 			break;
-		case 4:
-			strTmp = g_strList.GetNext(p);
-			sscanf(strTmp, "%d", &data.id);
+		case 4://添加一条记录
+			if(!ParseSeparatorStringToRec(m_sRecv, data)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
 
-			strTmp = g_strList.GetNext(p);
-			sprintf(data.Name, "%s", strTmp.GetBuffer(strTmp.GetLength()));
+			if(!Cmd_AppendRecord(data)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
 
-			Cmd_AppendRecord(data);
 			m_peer.Send(CString("OK||\r\n"));
 			break;
-		case 5:
+		case 5://删除一条记录
+			if(!p){
+				m_peer.Send(CString("ER||\r\n"));
+				return -1;
+			}
 			strTmp = g_strList.GetNext(p);
-			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &index);
+			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
 
-			Cmd_DeleteRecordAt(index);
+			if(!Cmd_DeleteRecordByID(ID)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
 			m_peer.Send(CString("OK||\r\n"));
 			break;
-		case 6:
-			strTmp = g_strList.GetNext(p);
-			sscanf(strTmp, "%d", &index);
+		case 6://修改一条记录
+			if(!ParseSeparatorStringToRec(m_sRecv, data)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
 
-			strTmp = g_strList.GetNext(p);
-			sscanf(strTmp, "%d", &data.id);
+			if(!Cmd_ModifyRecordByID(data.ID, data)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
 
-			strTmp = g_strList.GetNext(p);
-			sprintf(data.Name, "%s", strTmp.GetBuffer(strTmp.GetLength()));
-
-			Cmd_ModifyRecordAt(index, data);
 			m_peer.Send(CString("OK||\r\n"));
+			break;
+		case 7:
+			if(!Cmd_GetRecordNum(num)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
+			pID = new int[num+10];
+			if(!Cmd_GetAllIDs(pID, num)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
+			MakeIDToSeparatorString(pID, num, strTmp);
+			m_peer.Send(strTmp);
+			delete []pID;
 			break;
 		default:
+			m_peer.Send(CString("ER||\r\n"));
 			break;
 	}
 
