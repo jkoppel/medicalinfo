@@ -1,6 +1,7 @@
 #ifndef _GLOBALFUNCS_H_
 #define _GLOBALFUNCS_H_
 
+#include "StdAfx.h"
 #include "MIBase.h"
 
 extern void GetAppDataDir(char *buf);
@@ -30,6 +31,8 @@ extern int Cmd_GetRecordAt(int index, struct UserData &rec);
 extern int Cmd_AppendRecord(struct UserData rec);
 
 extern int Cmd_DeleteRecordAt(int index);
+
+extern _ConnectionPtr	g_pDBConnection;
 
 
 #endif

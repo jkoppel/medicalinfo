@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+_ConnectionPtr	g_pDBConnection;
+
 BOOL FolderExist(CString strPath)
 {
      WIN32_FIND_DATA   wfd;
