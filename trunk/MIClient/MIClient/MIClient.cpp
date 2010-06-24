@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "MIClient.h"
 #include "MIMainDlg.h"
-#include "MIClientDlg.h"
 #include "GlobalFuncs.h"
 #include "ProgressInfo.h"
 
