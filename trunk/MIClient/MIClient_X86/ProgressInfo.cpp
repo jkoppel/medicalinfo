@@ -67,7 +67,7 @@ void CProgressInfo::Show(const char *Promt)
 
 	GetDesktopWindow()->GetWindowRect(&rect);
 
-	width = strlen(Promt) * 6;
+	width = (int)strlen(Promt) * 6;
 	if(width<180){
 		width = 180;
 	}
