@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "MIClient.h"
 #include "ProgressInfo.h"
-//#include "..\\MainFrm.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -65,7 +64,10 @@ void CProgressInfo::Show(const char *Promt)
 
 	SetWindowText(CString(Promt));
 
-	GetDesktopWindow()->GetWindowRect(&rect);
+	rect.right = 239;
+	rect.left = 0;
+	rect.top = 0;
+	rect.bottom = 319;
 
 	width = (int)strlen(Promt) * 6;
 	if(width<180){
