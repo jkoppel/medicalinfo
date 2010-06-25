@@ -12,6 +12,8 @@ extern void ShowMsg(CString msg);
 extern CStringList g_strList;
 extern void MakeSeparatorString(CString &destStr);
 extern void ParseSeparatorString(CString str);
+extern void MakeAddOrModRecordCmd(BOOL IsAdd, struct UserData data, CString &str);
+extern int ParseRecvDataToRec(CString str, struct UserData &data);
 
 #endif
 
