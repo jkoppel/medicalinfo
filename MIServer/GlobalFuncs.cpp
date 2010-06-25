@@ -122,6 +122,9 @@ void MakeSeparatorString(CString &str)
 
 	for(p=g_strList.GetHeadPosition();p!=NULL;num--){
 		CString tmp = g_strList.GetNext(p);
+		if(tmp.IsEmpty()){
+			tmp = " ";
+		}
 		if(num>1){
 			str += tmp + CString("||");
 		}
@@ -174,7 +177,7 @@ void CreateDataFile()
 	}
 }
 
-void MakeSeparatorStringFromRec(struct UserData data, CString &str)
+void MakeSendCmdFromRec(struct UserData data, CString &str)
 {
 	char buf[100];
 
@@ -221,7 +224,7 @@ void MakeSeparatorStringFromRec(struct UserData data, CString &str)
 	MakeSeparatorString(str);
 }
 
-int ParseSeparatorStringToRec(CString str, struct UserData &data)
+int ParseRecvDataToRec(CString str, struct UserData &data)
 {
 	//´æµ½String List
 	ParseSeparatorString(str);
@@ -232,7 +235,7 @@ int ParseSeparatorStringToRec(CString str, struct UserData &data)
 		return FALSE;
 	}
 
-	str = g_strList.GetNext(p);//skip "OK"
+	str = g_strList.GetNext(p);//skip "CMD*"
 	if(!p){
 		return FALSE;
 	}
@@ -323,6 +326,12 @@ int ParseSeparatorStringToRec(CString str, struct UserData &data)
 
 	str = g_strList.GetNext(p);
 	sprintf(data.Tel, "%s", str.GetBuffer(str.GetLength()));
+	if(!p){
+		return FALSE;
+	}
+
+	str = g_strList.GetNext(p);
+	sprintf(data.ClinicalDiagnosis, "%s", str.GetBuffer(str.GetLength()));
 	if(!p){
 		return FALSE;
 	}
@@ -470,13 +479,11 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 	BOOL ret = FALSE;
 	_variant_t var;
 
-	while(!pHandlerRecordset->adoEOF){
+	memset(&rec, 0, sizeof(rec));
+	if(!pHandlerRecordset->adoEOF){
 		var = pHandlerRecordset->GetCollect("ID");
 		if(var.vt != VT_NULL){
 			rec.ID = (UINT)(long)(var);
-		}
-		else{
-			break;
 		}
 
 		var = pHandlerRecordset->GetCollect("Address");
@@ -484,16 +491,10 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Address, "%s", str.GetBuffer(str.GetLength()));
 		}
-		else{
-			break;
-		}
 
 		var = pHandlerRecordset->GetCollect("Age");
 		if(var.vt != VT_NULL){
 			rec.Age = (UINT)(long)(var);
-		}
-		else{
-			break;
 		}
 
 		var = pHandlerRecordset->GetCollect("Birth_date");
@@ -501,17 +502,11 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.BirthDate, "%s", str.GetBuffer(str.GetLength()));
 		}
-		else{
-			break;
-		}
 
 		var = pHandlerRecordset->GetCollect("Check_Date");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.CheckDate, "%s", str.GetBuffer(str.GetLength()));
-		}
-		else{
-			break;
 		}
 
 		var = pHandlerRecordset->GetCollect("City");
@@ -519,17 +514,11 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.City, "%s", str.GetBuffer(str.GetLength()));
 		}
-		else{
-			break;
-		}
 
 		var = pHandlerRecordset->GetCollect("Clinical_Diagnosis");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.ClinicalDiagnosis, "%s", str.GetBuffer(str.GetLength()));
-		}
-		else{
-			break;
 		}
 
 		var = pHandlerRecordset->GetCollect("Department");
@@ -537,17 +526,11 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Department, "%s", str.GetBuffer(str.GetLength()));
 		}
-		else{
-			break;
-		}
 
 		var = pHandlerRecordset->GetCollect("Hazards");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Hazards, "%s", str.GetBuffer(str.GetLength()));
-		}
-		else{
-			break;
 		}
 
 		var = pHandlerRecordset->GetCollect("Name");
@@ -555,17 +538,11 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Name, "%s", str.GetBuffer(str.GetLength()));
 		}
-		else{
-			break;
-		}
 
 		var = pHandlerRecordset->GetCollect("Number");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sscanf(str.GetBuffer(str.GetLength()), "%d", &rec.Number);
-		}
-		else{
-			break;
 		}
 
 		var = pHandlerRecordset->GetCollect("Height");
@@ -573,17 +550,11 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			str = (LPCSTR)_bstr_t(var);
 			sscanf(str.GetBuffer(str.GetLength()), "%d", &rec.Height);
 		}
-		else{
-			break;
-		}
 
 		var = pHandlerRecordset->GetCollect("Past_History");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.PastHistory, "%s", str.GetBuffer(str.GetLength()));
-		}
-		else{
-			break;
 		}
 
 		var = pHandlerRecordset->GetCollect("People");
@@ -591,17 +562,11 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.People, "%s", str.GetBuffer(str.GetLength()));
 		}
-		else{
-			break;
-		}
 
 		var = pHandlerRecordset->GetCollect("Pharmacy");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Pharmacy, "%s", str.GetBuffer(str.GetLength()));
-		}
-		else{
-			break;
 		}
 
 		var = pHandlerRecordset->GetCollect("Province");
@@ -609,17 +574,11 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Province, "%s", str.GetBuffer(str.GetLength()));
 		}
-		else{
-			break;
-		}
 
 		var = pHandlerRecordset->GetCollect("ScancodeID");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.ScancodeID, "%s", str.GetBuffer(str.GetLength()));
-		}
-		else{
-			break;
 		}
 
 		var = pHandlerRecordset->GetCollect("Sex");
@@ -627,17 +586,11 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Sex, "%s", str.GetBuffer(str.GetLength()));
 		}
-		else{
-			break;
-		}
 
 		var = pHandlerRecordset->GetCollect("Tel");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Tel, "%s", str.GetBuffer(str.GetLength()));
-		}
-		else{
-			break;
 		}
 
 		var = pHandlerRecordset->GetCollect("Type_Of_Work");
@@ -645,17 +598,11 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.TypeOfWork, "%s", str.GetBuffer(str.GetLength()));
 		}
-		else{
-			break;
-		}
 
 		var = pHandlerRecordset->GetCollect("Weight");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Weight, "%s", str.GetBuffer(str.GetLength()));
-		}
-		else{
-			break;
 		}
 
 		var = pHandlerRecordset->GetCollect("ZipCode");
@@ -663,12 +610,8 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.ZipCode, "%s", str.GetBuffer(str.GetLength()));
 		}
-		else{
-			break;
-		}
 
 		ret = TRUE;
-		break;
 	}
 
 	pHandlerRecordset->Close();
@@ -678,8 +621,15 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 	return ret;
 }
 
-BOOL Cmd_AppendRecord(struct UserData rec)
+BOOL Cmd_AppendRecord(struct UserData &rec)
 {
+	int num1, num2;
+	int *pID;
+
+	if(!Cmd_GetRecordNum(num1)){
+		return FALSE;
+	}
+
 	CString strSql;
 	strSql.Format("INSERT INTO Case_Data(ScancodeID,[Number],Name,Sex,Age,Birth_date,People,Department,Type_Of_Work,Province,City,Address,ZipCode,Tel,Clinical_Diagnosis,Height,Weight,Check_Date,Hazards,Pharmacy,Past_History) VALUES('%s',%d,'%s','%s',%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',%d,'%s','%s','%s','%s','%s')",
 					rec.ScancodeID,
@@ -706,10 +656,18 @@ BOOL Cmd_AppendRecord(struct UserData rec)
 	_variant_t vAffected;
 	g_pDBConnection->Execute(_bstr_t(strSql),&vAffected,adCmdText);
 
-	if(Cmd_GetRecordByID(rec.ID, rec)){
-		return TRUE;
+	pID = new int[num1+10];
+	if(!Cmd_GetAllIDs(pID, num2)){
+		delete []pID;
+		return FALSE;
 	}
-	return FALSE;
+	if(num2!=num1+1){
+		delete []pID;
+		return FALSE;
+	}
+	rec.ID = pID[num1];
+	delete []pID;
+	return TRUE;
 }
 
 BOOL Cmd_DeleteRecordByID(int ID)
@@ -720,16 +678,13 @@ BOOL Cmd_DeleteRecordByID(int ID)
 
 	strSql.Format("%s%d", "DELETE FROM Case_Data WHERE ID=", ID);
 	g_pDBConnection->Execute(_bstr_t(strSql),&vAffected,adCmdText);
-	if(!Cmd_GetRecordByID(ID, rec)){
-		return TRUE;
-	}
-	return FALSE;
+	return TRUE;
 }
 
 BOOL Cmd_ModifyRecordByID(int ID, struct UserData rec)
 {
 	CString strSql;
-	strSql.Format("UPDATE Case_Data SET ScancodeID='%s',[Number]=%d,Name='%s',Sex='%s',Age=%d,Birth_date='%s',People='%s',Department='%s',Type_Of_Work='%s',Province='%s',City='%s',Address='%s',ZipCode='%s',Tel='%s',Clinical_Diagnosis='%s',Height=%d,Weight='%s',Check_Date='%s',Hazards='%s',Pharmacy='%s',Past_History='%s' WHERE ID=%s",
+	strSql.Format("UPDATE Case_Data SET ScancodeID='%s',[Number]=%d,Name='%s',Sex='%s',Age=%d,Birth_date='%s',People='%s',Department='%s',Type_Of_Work='%s',Province='%s',City='%s',Address='%s',ZipCode='%s',Tel='%s',Clinical_Diagnosis='%s',Height=%d,Weight='%s',Check_Date='%s',Hazards='%s',Pharmacy='%s',Past_History='%s' WHERE ID=%d",
 					rec.ScancodeID,
 					rec.Number,
 					rec.Name,
