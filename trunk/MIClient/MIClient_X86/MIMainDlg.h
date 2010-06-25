@@ -38,15 +38,15 @@ public:
 	afx_msg void OnBnClickedAdd();
 	afx_msg void OnBnClickedEdit();
 	afx_msg void OnBnClickedDelete();
-	afx_msg void OnBnClickedSearch();
 
 	void InitListBox();
+	void UpdateRowData(int index, struct UserData data);
 
 	int CmdConnect();
 	int CmdGetRecordNum(int &num);
 	int CmdGetAllIDs(int *pID, int &num);
 	int CmdGetRecordByID(int ID, struct UserData &data);
-	int CmdAppendRecord(struct UserData data);
+	int CmdAppendRecord(struct UserData &data);
 	int CmdDeleteRecordByID(int ID);
 	int CmdModifyRecordByID(int ID, struct UserData data);
 };
