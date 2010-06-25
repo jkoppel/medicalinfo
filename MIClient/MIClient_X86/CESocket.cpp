@@ -10,6 +10,7 @@
 #include "CESocket.h"
 #include <stdlib.h>
 #include <afxmt.h>
+#include "GlobalFuncs.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -289,24 +290,11 @@ void CCESocket::Disconnect()
 
 int CCESocket::Send(CString& str)
 {
-	int sentBytes, len;
-	char* buf;
-	LPTSTR strBuf;
+	int sentBytes;
+	char buf[2048];
 
-	len = str.GetLength();
-	strBuf = str.GetBuffer(len);
-#ifdef _WIN32_WCE
-	buf = new char[len];
-	wcstombs(buf, strBuf, len);
-#else
-	buf = (char*) strBuf;
-#endif
-
-	sentBytes = Send(buf, len);
-
-#ifdef _WIN32_WCE
-	delete[] buf;
-#endif
+	CString2Char(str, buf);
+	sentBytes = Send(buf, (int)strlen(buf));
 
 	return sentBytes;
 }
@@ -314,17 +302,10 @@ int CCESocket::Send(CString& str)
 int CCESocket::SendLine(CString& str)
 {
 	int sentBytes, len;
-	char* buf;
-	LPTSTR strBuf;
+	char buf[2048];
 
-	len = str.GetLength();
-	strBuf = str.GetBuffer(len);
-	buf = new char[len+2];
-#ifdef _WIN32_WCE
-	wcstombs(buf, strBuf, len);
-#else
-	memcpy(buf, strBuf, len);
-#endif
+	CString2Char(str, buf);
+	len = (int)strlen(buf);
 
 	switch(m_eolFormat)
 	{
@@ -343,7 +324,6 @@ int CCESocket::SendLine(CString& str)
 			break;
 	}
 
-	delete[] buf;
 	return sentBytes;
 }
 
