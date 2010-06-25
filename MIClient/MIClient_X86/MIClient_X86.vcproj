@@ -222,7 +222,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\PatientDataDlg.cpp"
+				RelativePath=".\PatientDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PatientTab1.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PatientTab2.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PatientTab3.cpp"
 				>
 			</File>
 			<File
@@ -290,7 +302,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\PatientDataDlg.h"
+				RelativePath=".\PatientDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PatientTab1.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PatientTab2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PatientTab3.h"
 				>
 			</File>
 			<File
@@ -330,5 +354,9 @@
 		</File>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="MIClient_X86.rc"
+		/>
 	</Globals>
 </VisualStudioProject>
