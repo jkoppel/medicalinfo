@@ -43,8 +43,8 @@ struct UserData{
 	char PastHistory[MAX_UDATA_STR_LENGTH+1];
 };
 
-extern void MakeSeparatorStringFromRec(struct UserData data, CString &str);
-extern int ParseSeparatorStringToRec(CString str, struct UserData &data);
+extern void MakeSendCmdFromRec(struct UserData data, CString &str);
+extern int ParseRecvDataToRec(CString str, struct UserData &data);
 
 extern void CreateDataFile();
 
@@ -56,7 +56,7 @@ extern void MakeIDToSeparatorString(int *pID, int num, CString &str);
 
 extern BOOL Cmd_GetRecordByID(int ID, struct UserData &rec);
 
-extern BOOL Cmd_AppendRecord(struct UserData rec);
+extern BOOL Cmd_AppendRecord(struct UserData &rec);
 
 extern BOOL Cmd_DeleteRecordByID(int ID);
 
