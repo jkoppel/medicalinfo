@@ -77,7 +77,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 	}
 
 	char cmd[100];
-	char buf[100][256];
+	char buf[2048];
 	int ID, num, cmdID, *pID;
 	CString strTmp;
 	struct UserData data;
@@ -103,10 +103,10 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
-			sprintf(buf[0], "%s||%d||%s", "OK", num, "\r\n");
-			m_peer.Send(CString(buf[0]));
+			sprintf(buf, "%s||%d||%s", "OK", num, "\r\n");
+			m_peer.Send(CString(buf));
 			break;
-		case 3://获取第n条记录
+		case 3://根据ID号获取记录
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
@@ -118,11 +118,11 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
-			MakeSeparatorStringFromRec(data, strTmp);
+			MakeSendCmdFromRec(data, strTmp);
 			m_peer.Send(strTmp);
 			break;
 		case 4://添加一条记录
-			if(!ParseSeparatorStringToRec(m_sRecv, data)){
+			if(!ParseRecvDataToRec(m_sRecv, data)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
@@ -132,7 +132,8 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 				break;
 			}
 
-			m_peer.Send(CString("OK||\r\n"));
+			sprintf(buf, "%s||%d||%s", "OK", data.ID, "\r\n");
+			m_peer.Send(CString(buf));
 			break;
 		case 5://删除一条记录
 			if(!p){
@@ -149,7 +150,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			m_peer.Send(CString("OK||\r\n"));
 			break;
 		case 6://修改一条记录
-			if(!ParseSeparatorStringToRec(m_sRecv, data)){
+			if(!ParseRecvDataToRec(m_sRecv, data)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
