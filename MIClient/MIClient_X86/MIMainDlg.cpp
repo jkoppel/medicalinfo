@@ -18,7 +18,14 @@ IMPLEMENT_DYNAMIC(CMIMainDlg, CDialog)
 CMIMainDlg::CMIMainDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CMIMainDlg::IDD, pParent)
 {
-	m_strAddress = CString("192.168.0.109");
+	char buf[100];
+	int len = 100;
+	hostent *name;
+
+	gethostname(buf, len);
+	name = gethostbyname(buf);
+	m_strAddress = inet_ntoa(*(in_addr *)name->h_addr_list[0]);
+	//m_strAddress = CString(buf);//CString("192.168.0.109");
 	m_nPort = 5000;
 	m_nRecNum = 0;
 }
