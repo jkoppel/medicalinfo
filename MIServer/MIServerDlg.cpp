@@ -59,6 +59,8 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CMIServerDlg message handlers
 
+#define USE_UDL_FILE	1
+
 BOOL CMIServerDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
@@ -71,13 +73,19 @@ BOOL CMIServerDlg::OnInitDialog()
 	// 初始化COM,创建ADO连接等操作
 	AfxOleInit();
 	g_pDBConnection.CreateInstance(__uuidof(Connection));
+#ifdef	USE_UDL_FILE
+	g_pDBConnection->ConnectionString = "File Name=miserver.udl";
+#endif
 	
 	// 在ADO操作中建议语句中要常用try...catch()来捕获错误信息，
 	// 因为它有时会经常出现一些意想不到的错误。jingzhou xu
 	try                 
 	{	
-		// 打开本地Access库Demo.mdb
+#ifndef _USE_UDL_FILE
+		g_pDBConnection->Open("","","",NULL);
+#else
 		g_pDBConnection->Open("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=CaseData.mdb","","",adModeUnknown);
+#endif
 	}
 	catch(_com_error e)
 	{
