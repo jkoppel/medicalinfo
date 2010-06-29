@@ -76,7 +76,6 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 		GetDlgItem(IDC_RECV)->SetWindowText(m_sRecv);
 	}
 
-	char cmd[100];
 	char buf[2048];
 	int ID, num, cmdID, *pID;
 	int order, org_order, dst_order;
@@ -91,17 +90,13 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 	ParseSeparatorString(m_sRecv);
 	p = g_strList.GetHeadPosition();
 	strTmp = g_strList.GetNext(p);
-	sprintf(cmd, "%s", strTmp.GetBuffer(strTmp.GetLength()));
-
-	if(cmd[3]>='A' && cmd[3]<='F'){
-		cmd[3] -= 'A' - '9' - 1;
-	}
-	cmdID = int(cmd[3]-'0');
+	strTmp = strTmp.Right(strTmp.GetLength()-3);//SKIP CMD
+	sscanf(strTmp, "%d", &cmdID);
 	switch(cmdID){
-		case 1://联机，测试双方通信是否正常
+		case CMD_CONNECT://联机，测试双方通信是否正常
 			m_peer.Send(CString("OK||\r\n"));
 			break;
-		case 2://获取记录总数
+		case CMD_GETRECORDNUM://获取记录总数
 			num = -1;
 			if(!Cmd_GetRecordNum(num)){//读取错误
 				m_peer.Send(CString("ER||\r\n"));
@@ -110,7 +105,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s||%d||%s", "OK", num, "\r\n");
 			m_peer.Send(CString(buf));
 			break;
-		case 3://根据ID号获取记录
+		case CMD_GETRECORDBYID://根据ID号获取记录
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
@@ -125,7 +120,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			MakeSendCmdFromRec(data, strTmp);
 			m_peer.Send(strTmp);
 			break;
-		case 4://添加一条记录
+		case CMD_APPENDRECORD://添加一条记录
 			if(!ParseRecvDataToRec(m_sRecv, data)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
@@ -139,7 +134,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s||%d||%s", "OK", data.ID, "\r\n");
 			m_peer.Send(CString(buf));
 			break;
-		case 5://删除一条记录
+		case CMD_DELETERECORDBYID://删除一条记录
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
@@ -153,7 +148,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			}
 			m_peer.Send(CString("OK||\r\n"));
 			break;
-		case 6://修改一条记录
+		case CMD_EDITRECORDBYID://修改一条记录
 			if(!ParseRecvDataToRec(m_sRecv, data)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
@@ -166,7 +161,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 
 			m_peer.Send(CString("OK||\r\n"));
 			break;
-		case 7:
+		case CMD_GETALLID:
 			if(!Cmd_GetRecordNum(num)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
@@ -180,7 +175,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			m_peer.Send(strTmp);
 			delete []pID;
 			break;
-		case 8:
+		case CMD_GETNEXTFREEORDER:
 			if(!Cmd_GetNextFreeOrder(order)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
@@ -188,7 +183,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s||%d||%s", "OK", order, "\r\n");
 			m_peer.Send(CString(buf));
 			break;
-		case 9:
+		case CMD_GETORDERBYID:
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
@@ -203,7 +198,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s||%d||%s", "OK", order, "\r\n");
 			m_peer.Send(CString(buf));
 			break;
-		case 10:
+		case CMD_SETORDERBYID:
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
@@ -225,7 +220,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s", "OK||\r\n");
 			m_peer.Send(CString(buf));
 			break;
-		case 11:
+		case CMD_MOVEORDER:
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
@@ -241,6 +236,36 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &dst_order);
 
 			if(!Cmd_MoveOrder(org_order, dst_order)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
+			sprintf(buf, "%s", "OK||\r\n");
+			m_peer.Send(CString(buf));
+			break;
+		case CMD_MOVEORDERPREV:
+			if(!p){
+				m_peer.Send(CString("ER||\r\n"));
+				return -1;
+			}
+			strTmp = g_strList.GetNext(p);
+			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &order);
+
+			if(!Cmd_MoveOrderPrev(order)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
+			sprintf(buf, "%s", "OK||\r\n");
+			m_peer.Send(CString(buf));
+			break;
+		case CMD_MOVEORDERNEXT:
+			if(!p){
+				m_peer.Send(CString("ER||\r\n"));
+				return -1;
+			}
+			strTmp = g_strList.GetNext(p);
+			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &order);
+
+			if(!Cmd_MoveOrderNext(order)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
