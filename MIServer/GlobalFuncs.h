@@ -80,6 +80,10 @@ extern BOOL Cmd_SetOrderByID(int ID, int order);
 
 extern BOOL Cmd_MoveOrder(int org_order, int dst_order);
 
+extern BOOL Cmd_MoveOrderPrev(int order);
+
+extern BOOL Cmd_MoveOrderNext(int order);
+
 extern _ConnectionPtr	g_pDBConnection;
 
 
