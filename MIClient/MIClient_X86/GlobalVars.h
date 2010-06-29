@@ -22,6 +22,7 @@ extern char g_RecvData[1024];
 #define MAX_UDATA_STR_LENGTH	50
 struct UserData{
 	int ID;
+	int Order;
 	char ScancodeID[MAX_UDATA_STR_LENGTH+1];
 	int Number;
 	char Name[MAX_UDATA_STR_LENGTH+1];
