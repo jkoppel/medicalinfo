@@ -79,6 +79,7 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 	char cmd[100];
 	char buf[2048];
 	int ID, num, cmdID, *pID;
+	int order, org_order, dst_order;
 	CString strTmp;
 	struct UserData data;
 	POSITION p;
@@ -92,6 +93,9 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 	strTmp = g_strList.GetNext(p);
 	sprintf(cmd, "%s", strTmp.GetBuffer(strTmp.GetLength()));
 
+	if(cmd[3]>='A' && cmd[3]<='F'){
+		cmd[3] -= 'A' - '9' - 1;
+	}
 	cmdID = int(cmd[3]-'0');
 	switch(cmdID){
 		case 1://联机，测试双方通信是否正常
@@ -175,6 +179,73 @@ LRESULT CChat::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			MakeIDToSeparatorString(pID, num, strTmp);
 			m_peer.Send(strTmp);
 			delete []pID;
+			break;
+		case 8:
+			if(!Cmd_GetNextFreeOrder(order)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
+			sprintf(buf, "%s||%d||%s", "OK", order, "\r\n");
+			m_peer.Send(CString(buf));
+			break;
+		case 9:
+			if(!p){
+				m_peer.Send(CString("ER||\r\n"));
+				return -1;
+			}
+			strTmp = g_strList.GetNext(p);
+			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
+
+			if(!Cmd_GetOrderByID(ID, order)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
+			sprintf(buf, "%s||%d||%s", "OK", order, "\r\n");
+			m_peer.Send(CString(buf));
+			break;
+		case 10:
+			if(!p){
+				m_peer.Send(CString("ER||\r\n"));
+				return -1;
+			}
+			strTmp = g_strList.GetNext(p);
+			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
+
+			if(!p){
+				m_peer.Send(CString("ER||\r\n"));
+				return -1;
+			}
+			strTmp = g_strList.GetNext(p);
+			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &order);
+
+			if(!Cmd_SetOrderByID(ID, order)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
+			sprintf(buf, "%s", "OK||\r\n");
+			m_peer.Send(CString(buf));
+			break;
+		case 11:
+			if(!p){
+				m_peer.Send(CString("ER||\r\n"));
+				return -1;
+			}
+			strTmp = g_strList.GetNext(p);
+			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &org_order);
+
+			if(!p){
+				m_peer.Send(CString("ER||\r\n"));
+				return -1;
+			}
+			strTmp = g_strList.GetNext(p);
+			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &dst_order);
+
+			if(!Cmd_MoveOrder(org_order, dst_order)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
+			sprintf(buf, "%s", "OK||\r\n");
+			m_peer.Send(CString(buf));
 			break;
 		default:
 			m_peer.Send(CString("ER||\r\n"));
