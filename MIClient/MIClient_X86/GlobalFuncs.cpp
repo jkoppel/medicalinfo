@@ -7,9 +7,12 @@
 #include <string.h>
 
 
+//关闭提示条
 extern void HideProgressInfo();
+//提示对话框
 extern int MyMessageBox(LPCTSTR lpszText, LPCTSTR lpszCaption, UINT nType = MB_OK);
 
+///将CString转弯char *
 void CString2Char(CString source, char *dest)
 {
 	int length;
@@ -24,23 +27,27 @@ void CString2Char(CString source, char *dest)
 		0,0);
 }
 
-void Char2CString(char *, CString)
+///将char *转为CString
+void Char2CString(const char * buf, CString dst)
 {
+	dst = CString(buf);
 }
 
-void ShowMsg(char msg[])
+///显示消息
+void ShowMsg(const char *msg)
 {
 	HideProgressInfo();
 	MyMessageBox(CString(msg), CString("消息"), MB_ICONINFORMATION);
 }
 
+///显示消息
 void ShowMsg(CString msg)
 {
 	HideProgressInfo();
 	MyMessageBox(msg, CString("消息"), MB_ICONINFORMATION);
 }
 
-CStringList g_strList;
+///将全局变量g_strList内部的所有字符串组装成待发送的命令，关键字用"||"分格，空字符串用" "替代
 void MakeSeparatorString(CString &str)
 {
 	int num = (int)g_strList.GetCount();
@@ -62,6 +69,7 @@ void MakeSeparatorString(CString &str)
 	}
 }
 
+///解析用"||"分隔的字符串成各个子字符串并存储到全局变量g_strList
 void ParseSeparatorString(CString str)
 {
 	int offset;
@@ -81,6 +89,7 @@ void ParseSeparatorString(CString str)
 	}
 }
 
+///测试
 void DebugSeparatorString()
 {
 	CString str, str1;
@@ -98,6 +107,7 @@ void DebugSeparatorString()
 	MakeSeparatorString(str1);
 }
 
+///将用户数据组装成待发送的添加或修改命令
 void MakeAddOrModRecordCmd(BOOL IsAdd, struct UserData data, CString &str)
 {
 	char buf[100];
@@ -105,11 +115,12 @@ void MakeAddOrModRecordCmd(BOOL IsAdd, struct UserData data, CString &str)
 	g_strList.RemoveAll();
 
 	if(IsAdd){
-		g_strList.AddTail(CString("CMD4"));
+		sprintf_s(buf, "%s%d", "CMD", CMD_APPENDRECORD);
 	}
 	else{
-		g_strList.AddTail(CString("CMD6"));
+		sprintf_s(buf, "%s%d", "CMD", CMD_EDITRECORDBYID);
 	}
+	g_strList.AddTail(CString(buf));
 
 	sprintf_s(buf, "%d", data.ID);
 	g_strList.AddTail(CString(buf));
