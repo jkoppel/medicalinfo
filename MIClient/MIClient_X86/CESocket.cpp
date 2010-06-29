@@ -62,10 +62,6 @@ CCESocket::~CCESocket()
 {
 	int watchDog;
 
-//	HANDLE readThread, acceptThread;
-// 	readThread = m_readThread;
-// 	acceptThread = m_acceptThread;
-
 	Disconnect();
 
 	watchDog = 0;
@@ -334,6 +330,10 @@ int CCESocket::Send(const char* buf, int len)
 
 	if(!m_bWSAStarted)
 		return SOCKET_ERROR;
+
+	if(len==0){
+		len = (int)strlen(buf);
+	}
 
 	//We cannot send data if the socket's not connected
 	if(m_socketState < CONNECTED)

@@ -139,7 +139,7 @@ public:
 	 *  @return Number of bytes sent or SOCKET_ERROR if an error occurs.
 	 *  @remarks You cannot send data with a listening TCP socket.
 	 */
-	int Send(const char* buf, int len);
+	int Send(const char* buf, int len=0);
 
 	//! Send a string to a remote host.
 	/*! @param[in] str String to send.
