@@ -8,41 +8,20 @@
 #define SUCC		0
 ///失败
 #define FAIL		-1
-///是
-#define YES			1
-///否
-#define NO			0
-///OK
-#define OK			2
-///取消
-#define CANCEL		3
 
-///服务器消息
-struct SServerMsg
-{
-	UINT m_msgType;
-	char m_msgBuff[2048];
-};
-
-///病人信息
-struct SUserInfo
-{
-	UINT m_infoID;
-	char m_infoNick[64];
-	char m_infoName[64];
-	UINT m_infoPSW;
-	UINT m_infoAge;
-	UINT m_infoSex;
-	UINT m_infoPicture;
-	UINT m_infoIsOnLine;
-	UINT m_infoFriendList[64];
-	UINT m_infoBlackList [64];
-	char m_infoAddr[20];
-	UINT m_infoPort;
-	UINT m_infoTime;
-	void * m_infoSocket;
-};
-
+#define CMD_CONNECT					1
+#define CMD_GETRECORDNUM			2
+#define CMD_GETALLID				3
+#define CMD_GETRECORDBYID			4
+#define CMD_APPENDRECORD			5
+#define CMD_EDITRECORDBYID			6
+#define CMD_DELETERECORDBYID		7
+#define CMD_GETNEXTFREEORDER		8
+#define CMD_GETORDERBYID			9
+#define CMD_SETORDERBYID			10
+#define CMD_MOVEORDER				11
+#define CMD_MOVEORDERPREV			12
+#define CMD_MOVEORDERNEXT			13
 
 #endif//_MIBASE_H_
 
