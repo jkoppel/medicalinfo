@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (P.R.C.) resources
+// 中文(中华人民共和国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -96,18 +96,18 @@ EXSTYLE WS_EX_APPWINDOW
 CAPTION "医疗信息远程录入系统"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    PUSHBUTTON      "连接",IDC_CONNECT,2,0,25,14
-    PUSHBUTTON      "添加",IDC_ADD,28,0,25,14,WS_DISABLED
-    PUSHBUTTON      "编辑",IDC_EDIT,54,0,25,14,WS_DISABLED
-    PUSHBUTTON      "删除",IDC_DELETE,80,0,25,14,WS_DISABLED
+    PUSHBUTTON      "连接",IDC_CONNECT,0,0,25,14
+    PUSHBUTTON      "添加",IDC_ADD,26,0,25,14,WS_DISABLED
+    PUSHBUTTON      "编辑",IDC_EDIT,52,0,25,14,WS_DISABLED
+    PUSHBUTTON      "删除",IDC_DELETE,78,0,25,14,WS_DISABLED
     CONTROL         "",IDC_LIST_PATIENT,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,0,15,157,139
-    PUSHBUTTON      "第一页",IDC_PAGE_FIRST,0,155,32,14
-    PUSHBUTTON      "上一页",IDC_PAGE_PREV,34,155,32,14
-    PUSHBUTTON      "下一页",IDC_PAGE_NEXT,68,155,32,14
-    PUSHBUTTON      "最后一页",IDC_PAGE_LAST,102,155,32,14
-    PUSHBUTTON      "上移",IDC_MOVEPREV,106,0,25,14,WS_DISABLED
-    PUSHBUTTON      "下移",IDC_MOVENEXT,132,0,25,14,WS_DISABLED
-    PUSHBUTTON      "切换",IDC_SWITCH_PAGEMODE,136,155,21,14
+    PUSHBUTTON      "第一页",IDC_PAGE_FIRST,0,155,30,14
+    PUSHBUTTON      "上一页",IDC_PAGE_PREV,30,155,30,14
+    PUSHBUTTON      "下一页",IDC_PAGE_NEXT,60,155,30,14
+    PUSHBUTTON      "最后一页",IDC_PAGE_LAST,90,155,33,14
+    PUSHBUTTON      "上移",IDC_MOVEPREV,104,0,25,14,WS_DISABLED
+    PUSHBUTTON      "下移",IDC_MOVENEXT,130,0,25,14,WS_DISABLED
+    PUSHBUTTON      "切换模式",IDC_SWITCH_PAGEMODE,123,155,34,14
 END
 
 IDD_PATIENT DIALOGEX 0, 0, 151, 165
@@ -294,7 +294,7 @@ BEGIN
     IDP_SOCKETS_INIT_FAILED "Windows 套接字初始化失败。"
 END
 
-#endif    // Chinese (P.R.C.) resources
+#endif    // 中文(中华人民共和国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
