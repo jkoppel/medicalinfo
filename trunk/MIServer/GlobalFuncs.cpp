@@ -415,7 +415,7 @@ BOOL Cmd_GetAllIDs(int *pID, int &num)
 
 	pHandlerRecordset.CreateInstance(__uuidof(Recordset));
 	try{
-		pHandlerRecordset->Open("SELECT ID FROM Case_Data",// 查询表中所有字段
+		pHandlerRecordset->Open("SELECT ID,Order FROM Case_Data ORDER BY [Order] ASC",// 查询表中所有字段
 		g_pDBConnection.GetInterfacePtr(),	 // 获取库接库的IDispatch指针
 		adOpenDynamic,
 		adLockOptimistic,
@@ -441,15 +441,23 @@ BOOL Cmd_GetAllIDs(int *pID, int &num)
 
 		pHandlerRecordset->MoveNext();
 	}
+
+	pHandlerRecordset->Close();
+	pHandlerRecordset.Release();
+	pHandlerRecordset = NULL;
+
 	return TRUE;
 }
 
 void MakeIDToSeparatorString(int *pID, int num, CString &str)
 {
+	char buf[100];
+
 	str.Empty();
 	str += "OK||";
+	sprintf(buf, "%d||", num);
+	str += buf;
 	for(int i=0;i<num;i++){
-		char buf[100];
 		sprintf(buf, "%d%s", pID[i], "||");
 		str += buf;
 	}
@@ -473,6 +481,7 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 		adCmdText);
 	}
 	catch(_com_error *e){
+		Printf(e->ErrorMessage());
 		return FALSE;
 	}  
 
@@ -621,17 +630,248 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 	return ret;
 }
 
+BOOL Cmd_GetRecordByOrder(int order, struct UserData &rec)
+{
+	_RecordsetPtr	pHandlerRecordset;
+	char buf[256];
+	CString str;
+
+	sprintf(buf, "%s%d", "SELECT * FROM Case_Data WHERE order=", order);
+
+	pHandlerRecordset.CreateInstance(__uuidof(Recordset));
+	try{
+		pHandlerRecordset->Open(buf,// 查询表中所有字段
+		g_pDBConnection.GetInterfacePtr(),	 // 获取库接库的IDispatch指针
+		adOpenDynamic,
+		adLockOptimistic,
+		adCmdText);
+	}
+	catch(_com_error *e){
+		Printf(e->ErrorMessage());
+		return FALSE;
+	}  
+
+	BOOL ret = FALSE;
+	_variant_t var;
+
+	memset(&rec, 0, sizeof(rec));
+	if(!pHandlerRecordset->adoEOF){
+		var = pHandlerRecordset->GetCollect("ID");
+		if(var.vt != VT_NULL){
+			rec.ID = (UINT)(long)(var);
+		}
+
+		var = pHandlerRecordset->GetCollect("Address");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.Address, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Age");
+		if(var.vt != VT_NULL){
+			rec.Age = (UINT)(long)(var);
+		}
+
+		var = pHandlerRecordset->GetCollect("Birth_date");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.BirthDate, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Check_Date");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.CheckDate, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("City");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.City, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Clinical_Diagnosis");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.ClinicalDiagnosis, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Department");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.Department, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Hazards");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.Hazards, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Name");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.Name, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Number");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sscanf(str.GetBuffer(str.GetLength()), "%d", &rec.Number);
+		}
+
+		var = pHandlerRecordset->GetCollect("Height");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sscanf(str.GetBuffer(str.GetLength()), "%d", &rec.Height);
+		}
+
+		var = pHandlerRecordset->GetCollect("Past_History");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.PastHistory, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("People");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.People, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Pharmacy");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.Pharmacy, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Province");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.Province, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("ScancodeID");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.ScancodeID, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Sex");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.Sex, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Tel");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.Tel, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Type_Of_Work");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.TypeOfWork, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("Weight");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.Weight, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		var = pHandlerRecordset->GetCollect("ZipCode");
+		if(var.vt != VT_NULL){
+			str = (LPCSTR)_bstr_t(var);
+			sprintf(rec.ZipCode, "%s", str.GetBuffer(str.GetLength()));
+		}
+
+		ret = TRUE;
+	}
+
+	pHandlerRecordset->Close();
+	pHandlerRecordset.Release();
+	pHandlerRecordset = NULL;
+
+	return ret;
+}
+
+BOOL Cmd_GetOrders(int order1, int order2, struct IDAndOrder *pIDAndOrder, int &num)
+{
+	_RecordsetPtr	pHandlerRecordset;
+	CString str;
+	char buf[100];
+	int tmp;
+
+	if(order1>order2){
+		tmp = order1;
+		order2 = order1;
+		order1 = tmp;
+	}
+
+	sprintf(buf, "%s%d%s%d", "SELECT ID,Order FROM Case_Data WHERE Order>=", order1, " AND Order<=", order2, " ORDER BY [Order] ASC");
+
+	pHandlerRecordset.CreateInstance(__uuidof(Recordset));
+	try{
+		pHandlerRecordset->Open(buf,// 查询表中所有字段
+		g_pDBConnection.GetInterfacePtr(),	 // 获取库接库的IDispatch指针
+		adOpenDynamic,
+		adLockOptimistic,
+		adCmdText);
+	}
+	catch(_com_error *e){
+		Printf(e->ErrorMessage());
+		return FALSE;
+	}  
+
+	_variant_t var;
+
+	num = 0;
+	while(!pHandlerRecordset->adoEOF){
+		var = pHandlerRecordset->GetCollect("ID");
+		if(var.vt != VT_NULL){
+			pIDAndOrder[num].ID = (UINT)(long)(var);
+		}
+		else{
+			break;
+		}
+
+		var = pHandlerRecordset->GetCollect("Order");
+		if(var.vt != VT_NULL){
+			pIDAndOrder[num].Order = (UINT)(long)(var);
+		}
+		else{
+			break;
+		}
+
+		num ++;
+
+		pHandlerRecordset->MoveNext();
+	}
+
+	pHandlerRecordset->Close();
+	pHandlerRecordset.Release();
+	pHandlerRecordset = NULL;
+
+	return TRUE;
+}
+
 BOOL Cmd_AppendRecord(struct UserData &rec)
 {
-	int num1, num2;
+	int num1, num2, order;
 	int *pID;
 
 	if(!Cmd_GetRecordNum(num1)){
 		return FALSE;
 	}
+	if(!Cmd_GetNextFreeOrder(order)){
+		return FALSE;
+	}
+	rec.Order = order;
 
 	CString strSql;
-	strSql.Format("INSERT INTO Case_Data(ScancodeID,[Number],Name,Sex,Age,Birth_date,People,Department,Type_Of_Work,Province,City,Address,ZipCode,Tel,Clinical_Diagnosis,Height,Weight,Check_Date,Hazards,Pharmacy,Past_History) VALUES('%s',%d,'%s','%s',%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',%d,'%s','%s','%s','%s','%s')",
+	strSql.Format("INSERT INTO Case_Data([Order],ScancodeID,[Number],Name,Sex,Age,Birth_date,People,Department,Type_Of_Work,Province,City,Address,ZipCode,Tel,Clinical_Diagnosis,Height,Weight,Check_Date,Hazards,Pharmacy,Past_History) VALUES(%d,'%s',%d,'%s','%s',%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',%d,'%s','%s','%s','%s','%s')",
+					rec.Order,
 					rec.ScancodeID,
 					rec.Number,
 					rec.Name,
@@ -674,7 +914,6 @@ BOOL Cmd_DeleteRecordByID(int ID)
 {
 	CString strSql;
 	_variant_t vAffected;
-	struct UserData rec;
 
 	strSql.Format("%s%d", "DELETE FROM Case_Data WHERE ID=", ID);
 	g_pDBConnection->Execute(_bstr_t(strSql),&vAffected,adCmdText);
@@ -710,5 +949,157 @@ BOOL Cmd_ModifyRecordByID(int ID, struct UserData rec)
 				);
 	_variant_t vAffected;
 	g_pDBConnection->Execute(_bstr_t(strSql),&vAffected,adCmdText);
+	return TRUE;
+}
+
+BOOL Cmd_GetNextFreeOrder(int &order)
+{
+	BOOL ret;
+	int num;
+	if(!Cmd_GetRecordNum(num)){
+		return FALSE;
+	}
+
+	if(num==0){
+		order = 1;
+		return TRUE;
+	}
+
+	_RecordsetPtr	pHandlerRecordset;
+
+	pHandlerRecordset.CreateInstance(__uuidof(Recordset));
+	try{
+		pHandlerRecordset->Open("SELECT MAX(Order) FROM Case_Data",// 查询表中所有字段
+		g_pDBConnection.GetInterfacePtr(),	 // 获取库接库的IDispatch指针
+		adOpenDynamic,
+		adLockOptimistic,
+		adCmdText);
+	}
+	catch(_com_error *e){
+		Printf(e->ErrorMessage());
+		return FALSE;
+	}  
+
+	ret = FALSE;
+	_variant_t var;
+
+	if(!pHandlerRecordset->adoEOF){
+		var = pHandlerRecordset->GetCollect((long)0);
+
+		if(var.vt != VT_NULL){
+			order = (int)(long)(var) + 1;
+			ret = TRUE;
+		}
+	}
+
+	pHandlerRecordset->Close();
+	pHandlerRecordset.Release();
+	pHandlerRecordset = NULL;
+
+	return ret;
+}
+
+BOOL Cmd_GetOrderByID(int ID, int &order)
+{
+	BOOL ret;
+	_RecordsetPtr	pHandlerRecordset;
+	char buf[100];
+
+	sprintf(buf, "%s%d", "SELECT Order FROM Case_Data WHERE ID=", ID);
+	pHandlerRecordset.CreateInstance(__uuidof(Recordset));
+	try{
+		pHandlerRecordset->Open(buf,// 查询表中所有字段
+		g_pDBConnection.GetInterfacePtr(),	 // 获取库接库的IDispatch指针
+		adOpenDynamic,
+		adLockOptimistic,
+		adCmdText);
+	}
+	catch(_com_error *e){
+		Printf(e->ErrorMessage());
+		return FALSE;
+	}  
+
+	ret = FALSE;
+	_variant_t var;
+
+	if(!pHandlerRecordset->adoEOF){
+		var = pHandlerRecordset->GetCollect("Order");
+
+		if(var.vt != VT_NULL){
+			order = (int)(long)(var) + 1;
+			ret = TRUE;
+		}
+	}
+
+	pHandlerRecordset->Close();
+	pHandlerRecordset.Release();
+	pHandlerRecordset = NULL;
+
+	return ret;
+}
+
+BOOL Cmd_SetOrderByID(int ID, int order)
+{
+	CString strSql;
+	strSql.Format("UPDATE Case_Data SET Order=%d WHERE ID=%d", order, ID);
+	_variant_t vAffected;
+	g_pDBConnection->Execute(_bstr_t(strSql),&vAffected,adCmdText);
+	return TRUE;
+}
+
+BOOL Cmd_MoveOrder(int org_order, int dst_order)
+{
+	_RecordsetPtr	pHandlerRecordset;
+	CString str;
+	struct UserData data;
+	int num, num1;
+	struct IDAndOrder *pOrder = NULL;
+
+	if(org_order<=0){
+		return FALSE;
+	}
+	if(dst_order<=0){
+		return FALSE;
+	}
+
+	if(!Cmd_GetRecordByOrder(org_order, data)){
+		return FALSE;
+	}
+
+	if(!Cmd_GetRecordByOrder(dst_order, data)){
+		return FALSE;
+	}
+
+	if(!Cmd_GetRecordNum(num1)){
+		return FALSE;
+	}
+
+	pOrder = new struct IDAndOrder[num1];
+
+	if(!Cmd_GetOrders(org_order, dst_order, pOrder, num)){
+		delete []pOrder;
+		return FALSE;
+	}
+
+	if(org_order<=dst_order){
+		for(int i=1;i<num;i++){
+			if(!Cmd_SetOrderByID(pOrder[i].ID, pOrder[i-1].Order)){
+				delete []pOrder;
+				return FALSE;
+			}
+		}
+		Cmd_SetOrderByID(pOrder[0].ID, dst_order);
+	}
+	else{
+		for(int i=num-2;i>=0;i--){
+			if(!Cmd_SetOrderByID(pOrder[i].ID, pOrder[i+1].Order)){
+				delete []pOrder;
+				return FALSE;
+			}
+		}
+		Cmd_SetOrderByID(pOrder[num-1].ID, dst_order);
+	}
+
+	delete []pOrder;
 	return TRUE;
 }
