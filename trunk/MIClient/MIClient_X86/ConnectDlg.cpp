@@ -15,7 +15,7 @@ IMPLEMENT_DYNAMIC(CConnectDlg, CDialog)
 
 CConnectDlg::CConnectDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CConnectDlg::IDD, pParent)
-	, m_strAddress(_T("192.168.0.11"))
+	, m_strAddress(_T(""))
 	, m_nPort(5000)
 {
 
