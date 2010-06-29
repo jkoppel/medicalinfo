@@ -31,7 +31,7 @@ void CClientSocket::OnReceive()
 {
 	CString str, temp;
 	while(g_pClientSocket->GetDataSize() > 0 && g_pClientSocket->ReadString(temp)){
-		str += temp+CString("\r\n");
+		str += temp;
 	}
 	CString2Char(str, g_RecvData);
 	g_bIsDataComing = TRUE;
