@@ -1026,7 +1026,7 @@ BOOL Cmd_GetOrderByID(int ID, int &order)
 		var = pHandlerRecordset->GetCollect("Order");
 
 		if(var.vt != VT_NULL){
-			order = (int)(long)(var) + 1;
+			order = (int)(long)(var);
 			ret = TRUE;
 		}
 	}
@@ -1041,7 +1041,7 @@ BOOL Cmd_GetOrderByID(int ID, int &order)
 BOOL Cmd_SetOrderByID(int ID, int order)
 {
 	CString strSql;
-	strSql.Format("UPDATE Case_Data SET Order=%d WHERE ID=%d", order, ID);
+	strSql.Format("UPDATE Case_Data SET [Order]=%d WHERE ID=%d", order, ID);
 	_variant_t vAffected;
 	g_pDBConnection->Execute(_bstr_t(strSql),&vAffected,adCmdText);
 	return TRUE;
@@ -1101,5 +1101,149 @@ BOOL Cmd_MoveOrder(int org_order, int dst_order)
 	}
 
 	delete []pOrder;
+	return TRUE;
+}
+
+BOOL Cmd_MoveOrderPrev(int order)
+{
+	_RecordsetPtr	pHandlerRecordset;
+	CString str;
+	char buf[256];
+	struct IDAndOrder iao[2];
+
+	sprintf(buf, "%s%d%s", "SELECT ID,[Order] FROM Case_Data WHERE [Order]<=", order, " ORDER BY [Order] DESC");
+	pHandlerRecordset.CreateInstance(__uuidof(Recordset));
+	try{
+		pHandlerRecordset->Open(buf,// 查询表中字段
+		g_pDBConnection.GetInterfacePtr(),	 // 获取库接库的IDispatch指针
+		adOpenDynamic,
+		adLockOptimistic,
+		adCmdText);
+	}
+	catch(_com_error *e){
+		Printf(e->ErrorMessage());
+		return FALSE;
+	}  
+
+	BOOL ret = FALSE;
+	_variant_t var;
+
+	int num = 0;
+	while(!pHandlerRecordset->adoEOF){
+		var = pHandlerRecordset->GetCollect("ID");
+		if(var.vt != VT_NULL){
+			iao[num].ID = (UINT)(long)(var);
+		}
+		else{
+			break;
+		}
+
+		var = pHandlerRecordset->GetCollect("Order");
+		if(var.vt != VT_NULL){
+			iao[num].Order = (UINT)(long)(var);
+		}
+		else{
+			break;
+		}
+
+		num ++;
+		if(num==2){
+			break;
+		}
+
+		pHandlerRecordset->MoveNext();
+	}
+
+	pHandlerRecordset->Close();
+	pHandlerRecordset.Release();
+	pHandlerRecordset = NULL;
+
+	if(num<2){
+		return FALSE;
+	}
+
+	if(iao[0].Order!=order){
+		return FALSE;
+	}
+
+	if(!Cmd_SetOrderByID(iao[0].ID, iao[1].Order)){
+		return FALSE;
+	}
+	if(!Cmd_SetOrderByID(iao[1].ID, iao[0].Order)){
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL Cmd_MoveOrderNext(int order)
+{
+	_RecordsetPtr	pHandlerRecordset;
+	CString str;
+	char buf[256];
+	struct IDAndOrder iao[2];
+
+	sprintf(buf, "%s%d%s", "SELECT ID,[Order] FROM Case_Data WHERE [Order]>=", order, " ORDER BY [Order] ASC");
+	pHandlerRecordset.CreateInstance(__uuidof(Recordset));
+	try{
+		pHandlerRecordset->Open(buf,// 查询表中字段
+		g_pDBConnection.GetInterfacePtr(),	 // 获取库接库的IDispatch指针
+		adOpenDynamic,
+		adLockOptimistic,
+		adCmdText);
+	}
+	catch(_com_error *e){
+		Printf(e->ErrorMessage());
+		return FALSE;
+	}  
+
+	BOOL ret = FALSE;
+	_variant_t var;
+
+	int num = 0;
+	while(!pHandlerRecordset->adoEOF){
+		var = pHandlerRecordset->GetCollect("ID");
+		if(var.vt != VT_NULL){
+			iao[num].ID = (UINT)(long)(var);
+		}
+		else{
+			break;
+		}
+
+		var = pHandlerRecordset->GetCollect("Order");
+		if(var.vt != VT_NULL){
+			iao[num].Order = (UINT)(long)(var);
+		}
+		else{
+			break;
+		}
+
+		num ++;
+		if(num==2){
+			break;
+		}
+
+		pHandlerRecordset->MoveNext();
+	}
+
+	pHandlerRecordset->Close();
+	pHandlerRecordset.Release();
+	pHandlerRecordset = NULL;
+
+	if(num<2){
+		return FALSE;
+	}
+
+	if(iao[0].Order!=order){
+		return FALSE;
+	}
+
+	if(!Cmd_SetOrderByID(iao[0].ID, iao[1].Order)){
+		return FALSE;
+	}
+	if(!Cmd_SetOrderByID(iao[1].ID, iao[0].Order)){
+		return FALSE;
+	}
+
 	return TRUE;
 }
