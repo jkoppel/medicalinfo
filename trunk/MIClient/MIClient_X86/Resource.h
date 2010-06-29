@@ -11,6 +11,7 @@
 #define IDD_PATIENT_TAB1                135
 #define IDD_PATIENT_TAB2                136
 #define IDD_PATIENT_TAB3                137
+#define IDB_DRAGDROP                    137
 #define SOCK_ONRECEIVE                  200
 #define SOCK_ONCLOSE                    201
 #define IDP_SOCKETS_INIT_FAILED         501
@@ -22,6 +23,8 @@
 #define IDC_EDIT                        1012
 #define IDC_DELETE                      1013
 #define IDC_TAB                         1014
+#define IDC_MOVEPREV                    1014
+#define IDC_MOVENEXT                    1015
 #define IDC_SEARCH                      1016
 #define IDC_EDIT_SCANCODEID             1017
 #define IDC_EDIT_NUMBER                 1018
@@ -44,14 +47,19 @@
 #define IDC_EDIT_HAZARDS                1035
 #define IDC_EDIT_PHARMACY               1036
 #define IDC_EDIT_PASTHISTORY            1037
+#define IDC_PAGE_FIRST                  1039
+#define IDC_PAGE_PREV                   1040
+#define IDC_PAGE_NEXT                   1041
+#define IDC_PAGE_LAST                   1042
+#define IDC_SWITCH_PAGEMODE             1043
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_RESOURCE_VALUE        138
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1039
+#define _APS_NEXT_CONTROL_VALUE         1040
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
