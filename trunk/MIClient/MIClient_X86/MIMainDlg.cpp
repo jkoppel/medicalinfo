@@ -86,6 +86,8 @@ void CMIMainDlg::SetConnectStatus(BOOL status)
 		GetDlgItem(IDC_ADD)->EnableWindow();
 		GetDlgItem(IDC_DELETE)->EnableWindow();
 		GetDlgItem(IDC_EDIT)->EnableWindow();
+		GetDlgItem(IDC_MOVEPREV)->EnableWindow();
+		GetDlgItem(IDC_MOVENEXT)->EnableWindow();
 		g_bIsConnected = TRUE;
 	}
 	else{
@@ -93,6 +95,8 @@ void CMIMainDlg::SetConnectStatus(BOOL status)
 		GetDlgItem(IDC_ADD)->EnableWindow(FALSE);
 		GetDlgItem(IDC_DELETE)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_MOVEPREV)->EnableWindow(FALSE);
+		GetDlgItem(IDC_MOVENEXT)->EnableWindow(FALSE);
 		m_lstPatient.DeleteAllItems();
 		g_pClientSocket->Disconnect();
 		g_bIsConnected = FALSE;
@@ -145,8 +149,8 @@ void CMIMainDlg::OnBnClickedConnect()
 
 				if(CmdConnect()){
 					if(CmdGetRecordNum(num)){
+						m_nRecNum = num;
 						if(num==0){
-							m_nRecNum = 0;
 							m_lstPatient.DeleteAllItems();
 							ShowMsg("连接成功");
 							return;
@@ -318,8 +322,11 @@ int ReceiveData()
 ///连接命令
 int CMIMainDlg::CmdConnect()
 {
+	char buf[256];
+
 	g_bIsDataComing = FALSE;
-	g_pClientSocket->Send("CMD1||\r\n", (int)strlen("CMD1||\r\n"));
+	sprintf_s(buf, "%s%d%s", "CMD", CMD_CONNECT, "||\r\n");
+	g_pClientSocket->Send(buf);
 	if(!ReceiveData()){
 		return FALSE;
 	}
@@ -328,15 +335,16 @@ int CMIMainDlg::CmdConnect()
 
 int CMIMainDlg::CmdGetRecordNum(int &num)
 {
-	g_bIsDataComing = FALSE;
-	g_pClientSocket->Send("CMD2||\r\n", (int)strlen("CMD2||\r\n"));
-	if(!ReceiveData()){
-		return FALSE;
-	}
-
 	char buf[256];
 	CString strTmp;
 	POSITION p;
+
+	g_bIsDataComing = FALSE;
+	sprintf_s(buf, "%s%d%s", "CMD", CMD_GETRECORDNUM, "||\r\n");
+	g_pClientSocket->Send(buf);
+	if(!ReceiveData()){
+		return FALSE;
+	}
 
 	ParseSeparatorString(CString(g_RecvData));
 	p = g_strList.GetHeadPosition();
@@ -359,16 +367,17 @@ int CMIMainDlg::CmdGetRecordNum(int &num)
 
 int CMIMainDlg::CmdGetAllIDs(int *pID, int &num)
 {
-	g_bIsDataComing = FALSE;
-	g_pClientSocket->Send("CMD7||\r\n", (int)strlen("CMD7||\r\n"));
-	if(!ReceiveData()){
-		return FALSE;
-	}
-
 	char buf[256];
 	CString strTmp;
 	POSITION p;
 	num = 0;
+
+	g_bIsDataComing = FALSE;
+	sprintf_s(buf, "%s%d%s", "CMD", CMD_GETALLID, "||\r\n");
+	g_pClientSocket->Send(buf);
+	if(!ReceiveData()){
+		return FALSE;
+	}
 
 	ParseSeparatorString(CString(g_RecvData));
 	p = g_strList.GetHeadPosition();
@@ -419,10 +428,11 @@ int CMIMainDlg::CmdGetAllIDs(int *pID, int &num)
 
 int CMIMainDlg::CmdGetRecordByID(int ID, struct UserData &data)
 {
+	char buf[256];
+
 	g_bIsDataComing = FALSE;
-	char buf[1000];
-	sprintf_s(buf, "%s||%d||%s", "CMD3", ID, "\r\n");
-	g_pClientSocket->Send(buf, (int)strlen(buf));
+	sprintf_s(buf, "%s%d%s%d%s", "CMD", CMD_GETRECORDBYID, "||", ID, "||\r\n");
+	g_pClientSocket->Send(buf);
 	if(!ReceiveData()){
 		return FALSE;
 	}
@@ -469,9 +479,10 @@ int CMIMainDlg::CmdAppendRecord(struct UserData &data)
 
 int CMIMainDlg::CmdDeleteRecordByID(int ID)
 {
+	char buf[256];
+
 	g_bIsDataComing = FALSE;
-	char buf[100];
-	sprintf_s(buf, "%s||%d||%s", "CMD5", ID, "\r\n");
+	sprintf_s(buf, "%s%d%s%d%s", "CMD", CMD_DELETERECORDBYID, "||", ID, "||\r\n");
 	g_pClientSocket->Send(buf, (int)strlen(buf));
 	if(!ReceiveData()){
 		return FALSE;
@@ -481,7 +492,6 @@ int CMIMainDlg::CmdDeleteRecordByID(int ID)
 
 int CMIMainDlg::CmdModifyRecordByID(int ID, struct UserData data)
 {
-	g_bIsDataComing = FALSE;
 	CString cmdStr;
 
 	if(ID!=data.ID){
@@ -490,6 +500,7 @@ int CMIMainDlg::CmdModifyRecordByID(int ID, struct UserData data)
 
 	MakeAddOrModRecordCmd(FALSE, data, cmdStr);
 
+	g_bIsDataComing = FALSE;
 	g_pClientSocket->Send(cmdStr);
 	if(!ReceiveData()){
 		return FALSE;
@@ -504,7 +515,7 @@ int CMIMainDlg::CmdGetNextFreeOrder(int &order)
 	CString cmdStr;
 	char buf[256];
 
-	sprintf_s(buf, "%s", "CMD8||\r\n");
+	sprintf_s(buf, "%s%d%s", "CMD", CMD_GETNEXTFREEORDER, "||\r\n");
 	g_pClientSocket->Send(buf, (int)strlen(buf));
 
 	g_pClientSocket->Send(cmdStr);
@@ -536,9 +547,10 @@ int CMIMainDlg::CmdGetNextFreeOrder(int &order)
 
 int CMIMainDlg::CmdGetOrderByID(int ID, int &order)
 {
-	g_bIsDataComing = FALSE;
 	char buf[256];
-	sprintf_s(buf, "%s||%d||%s", "CMD9", ID, "\r\n");
+
+	g_bIsDataComing = FALSE;
+	sprintf_s(buf, "%s%d%s%d%s", "CMD", CMD_GETORDERBYID, "||", ID, "||\r\n");
 	g_pClientSocket->Send(buf, (int)strlen(buf));
 	if(!ReceiveData()){
 		return FALSE;
@@ -568,9 +580,10 @@ int CMIMainDlg::CmdGetOrderByID(int ID, int &order)
 
 int CMIMainDlg::CmdSetOrderByID(int ID, int order)
 {
-	g_bIsDataComing = FALSE;
 	char buf[256];
-	sprintf_s(buf, "%s||%d||%s", "CMDA", ID, "\r\n");
+
+	g_bIsDataComing = FALSE;
+	sprintf_s(buf, "%s%d%s%d%s", "CMD", CMD_SETORDERBYID, "||", ID, "||\r\n");
 	g_pClientSocket->Send(buf, (int)strlen(buf));
 	if(!ReceiveData()){
 		return FALSE;
@@ -596,9 +609,68 @@ int CMIMainDlg::CmdSetOrderByID(int ID, int order)
 
 int CMIMainDlg::CmdMoveOrder(int org_order, int dst_order)
 {
-	g_bIsDataComing = FALSE;
 	char buf[256];
-	sprintf_s(buf, "%s||%d||%d||%s", "CMDB", org_order, dst_order, "\r\n");
+
+	g_bIsDataComing = FALSE;
+	sprintf_s(buf, "%s%d%s%d%s%d%s", "CMD", CMD_MOVEORDER, "||", org_order, "||", dst_order, "||\r\n");
+	g_pClientSocket->Send(buf, (int)strlen(buf));
+	if(!ReceiveData()){
+		return FALSE;
+	}
+
+	CString strTmp;
+	POSITION p;
+
+	ParseSeparatorString(CString(g_RecvData));
+	p = g_strList.GetHeadPosition();
+
+	if(!p){
+		return FALSE;
+	}
+
+	g_strList.GetNext(p);//cmd
+	if(!p){
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+int CMIMainDlg::CmdMoveOrderPrev(int order)
+{
+	char buf[256];
+
+	g_bIsDataComing = FALSE;
+	sprintf_s(buf, "%s%d%s%d%s", "CMD", CMD_MOVEORDERPREV, "||", order, "||\r\n");
+	g_pClientSocket->Send(buf, (int)strlen(buf));
+	if(!ReceiveData()){
+		return FALSE;
+	}
+
+	CString strTmp;
+	POSITION p;
+
+	ParseSeparatorString(CString(g_RecvData));
+	p = g_strList.GetHeadPosition();
+
+	if(!p){
+		return FALSE;
+	}
+
+	g_strList.GetNext(p);//cmd
+	if(!p){
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+int CMIMainDlg::CmdMoveOrderNext(int order)
+{
+	char buf[256];
+
+	g_bIsDataComing = FALSE;
+	sprintf_s(buf, "%s%d%s%d%s", "CMD", CMD_MOVEORDERNEXT, "||", order, "||\r\n");
 	g_pClientSocket->Send(buf, (int)strlen(buf));
 	if(!ReceiveData()){
 		return FALSE;
@@ -640,8 +712,18 @@ void CMIMainDlg::OnBnClickedAdd()
 		}
 		ret = CmdAppendRecord(data);
 		if(ret){
-			m_lstPatient.InsertItem(m_nRecNum, CString("病人记录"));
-			UpdateRowData(m_nRecNum++, data);
+			if(!m_bPageMode){
+				m_lstPatient.InsertItem(m_nRecNum, CString("病人记录"));
+				UpdateRowData(m_nRecNum++, data);
+			}
+			else{
+				m_nRecNum ++;
+				m_nPageNum = (m_nRecNum+PAGE_SIZE-1)/PAGE_SIZE;
+				m_nCurrPageIndex = m_nPageNum - 1;
+				UpdateCurrPage();
+			}
+			m_lstPatient.SetItemState(m_lstPatient.GetItemCount()-1,LVNI_SELECTED,LVNI_SELECTED);
+
 			ShowMsg("添加成功");
 		}
 		else{
@@ -716,8 +798,19 @@ void CMIMainDlg::OnBnClickedDelete()
 
 	ret = CmdDeleteRecordByID(ID);
 	if(ret){
-		m_lstPatient.DeleteItem(index);
-		m_nRecNum--;
+		if(!m_bPageMode){
+			m_lstPatient.DeleteItem(index);
+			m_nRecNum--;
+		}
+		else{
+			m_nRecNum --;
+			m_nPageNum = (m_nRecNum + PAGE_SIZE -1)/PAGE_SIZE;
+			if(m_nCurrPageIndex==m_nPageNum){
+				m_nCurrPageIndex --;
+			}
+			UpdateCurrPage();
+		}
+
 		ShowMsg("删除成功");
 	}
 	else{
@@ -728,15 +821,114 @@ void CMIMainDlg::OnBnClickedDelete()
 
 void CMIMainDlg::OnBnClickedMoveprev()
 {
-	if(!m_bPageMode){
+	int index;
+
+	index = (int)m_lstPatient.GetFirstSelectedItemPosition()-1;
+	if(index<0){
+		ShowMsg("请选择记录");
 		return;
+	}
+
+	if(!m_bPageMode && index==0){
+		return;
+	}
+	if(m_bPageMode && m_nCurrPageIndex==0 && index==0){
+		return;
+	}
+
+	CString str;
+	char buf[100];
+	int ID, order;
+	struct UserData data;
+
+	str = m_lstPatient.GetItemText(index, 0);
+	CString2Char(str, buf);
+	sscanf_s(buf, "%d", &ID);
+
+	if(!CmdGetOrderByID(ID, order)){
+		ShowMsg("上移失败");
+		return;
+	}
+
+	if(!CmdMoveOrderPrev(order)){
+		ShowMsg("上移失败");
+		return;
+	}
+	if(!CmdGetRecordByID(ID, data)){
+		ShowMsg("上移失败");
+		return;
+	}
+	if(index>0){
+		m_lstPatient.DeleteItem(index);
+		m_lstPatient.InsertItem(index-1, CString("病人记录"));
+		UpdateRowData(index-1, data);
+		m_lstPatient.SetItemState(index-1, LVNI_SELECTED, LVNI_SELECTED);
+	}
+	else{
+		m_nCurrPageIndex--;
+		UpdateCurrPage();
+		m_lstPatient.SetItemState(PAGE_SIZE-1, LVNI_SELECTED, LVNI_SELECTED);
 	}
 }
 
 void CMIMainDlg::OnBnClickedMovenext()
 {
-	if(!m_bPageMode){
+	int index, page_size;
+
+	index = (int)m_lstPatient.GetFirstSelectedItemPosition()-1;
+	if(index<0){
+		ShowMsg("请选择记录");
 		return;
+	}
+
+	if(!m_bPageMode && index==m_nRecNum-1){
+		return;
+	}
+	if(m_bPageMode && m_nCurrPageIndex==m_nPageNum-1 && index==m_nRecNum-m_nCurrPageIndex*PAGE_SIZE-1){
+		return;
+	}
+
+	CString str;
+	char buf[100];
+	int ID, order;
+	struct UserData data;
+
+	str = m_lstPatient.GetItemText(index, 0);
+	CString2Char(str, buf);
+	sscanf_s(buf, "%d", &ID);
+
+	if(!CmdGetOrderByID(ID, order)){
+		ShowMsg("下移失败");
+		return;
+	}
+
+	if(!CmdMoveOrderNext(order)){
+		ShowMsg("下移失败");
+		return;
+	}
+	if(!CmdGetRecordByID(ID, data)){
+		ShowMsg("下移失败");
+		return;
+	}
+
+	if(m_bPageMode){
+		if(m_nCurrPageIndex<m_nPageNum-1){
+			page_size = PAGE_SIZE;
+		}
+		else{
+			page_size = m_nRecNum-m_nCurrPageIndex*PAGE_SIZE;
+		}
+	}
+	if(!m_bPageMode || index < page_size-1){
+		m_lstPatient.DeleteItem(index);
+		m_lstPatient.InsertItem(index+1, CString("病人记录"));
+		UpdateRowData(index+1, data);
+		m_lstPatient.SetItemState(index+1, LVNI_SELECTED, LVNI_SELECTED);
+	}
+	else{
+		m_nCurrPageIndex++;
+		UpdateCurrPage();
+		m_lstPatient.SetItemState(0, LVNI_SELECTED, LVNI_SELECTED);
 	}
 }
 
