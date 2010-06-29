@@ -76,6 +76,9 @@ void ParseSeparatorString(CString str)
 		str = str.Right(str.GetLength()-offset-2);
 		offset = str.Find(CString("||"));
 	}
+	if(str.GetLength()>0){
+		g_strList.AddTail(str);
+	}
 }
 
 void DebugSeparatorString()
