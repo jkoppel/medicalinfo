@@ -72,6 +72,8 @@ public:
 	int CmdGetOrderByID(int ID, int &order);
 	int CmdSetOrderByID(int ID, int order);
 	int CmdMoveOrder(int org_order, int dst_order);
+	int CmdMoveOrderPrev(int order);
+	int CmdMoveOrderNext(int order);
 public:
 	afx_msg void OnBnClickedMoveprev();
 public:
