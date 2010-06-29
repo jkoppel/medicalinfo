@@ -20,6 +20,7 @@ extern void ParseSeparatorString(CString str);
 #define MAX_UDATA_STR_LENGTH	50
 struct UserData{
 	int ID;
+	int Order;
 	char ScancodeID[MAX_UDATA_STR_LENGTH+1];
 	int Number;
 	char Name[MAX_UDATA_STR_LENGTH+1];
@@ -43,6 +44,11 @@ struct UserData{
 	char PastHistory[MAX_UDATA_STR_LENGTH+1];
 };
 
+struct IDAndOrder{
+	int ID;
+	int Order;
+};
+
 extern void MakeSendCmdFromRec(struct UserData data, CString &str);
 extern int ParseRecvDataToRec(CString str, struct UserData &data);
 
@@ -56,11 +62,23 @@ extern void MakeIDToSeparatorString(int *pID, int num, CString &str);
 
 extern BOOL Cmd_GetRecordByID(int ID, struct UserData &rec);
 
+extern BOOL Cmd_GetRecordByOrder(int order, struct UserData &rec);
+
+extern BOOL Cmd_GetOrders(int order1, int order2, struct IDAndOrder *pIDAndOrder, int &num);
+
 extern BOOL Cmd_AppendRecord(struct UserData &rec);
 
 extern BOOL Cmd_DeleteRecordByID(int ID);
 
 extern BOOL Cmd_ModifyRecordByID(int ID, struct UserData rec);
+
+extern BOOL Cmd_GetNextFreeOrder(int &order);
+
+extern BOOL Cmd_GetOrderByID(int ID, int &order);
+
+extern BOOL Cmd_SetOrderByID(int ID, int order);
+
+extern BOOL Cmd_MoveOrder(int org_order, int dst_order);
 
 extern _ConnectionPtr	g_pDBConnection;
 
