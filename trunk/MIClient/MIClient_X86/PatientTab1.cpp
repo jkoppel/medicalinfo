@@ -41,6 +41,13 @@ void CPatientTab1::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_PEOPLE, m_strPeople);
 	DDX_Text(pDX, IDC_EDIT_DEPARTMENT, m_strDepartment);
 	DDX_Text(pDX, IDC_EDIT_TYPEOFWORK, m_strTypeOfWork);
+	DDV_MaxChars(pDX, m_strScancodeID, 50);
+	DDV_MaxChars(pDX, m_strName, 50);
+	DDV_MaxChars(pDX, m_strSex, 50);
+	DDV_MaxChars(pDX, m_strBirthDate, 50);
+	DDV_MaxChars(pDX, m_strPeople, 50);
+	DDV_MaxChars(pDX, m_strDepartment, 50);
+	DDV_MaxChars(pDX, m_strTypeOfWork, 50);
 }
 
 

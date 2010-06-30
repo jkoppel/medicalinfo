@@ -41,6 +41,14 @@ void CPatientTab2::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_WEIGHT, m_strWeight);
 	DDX_Text(pDX, IDC_EDIT_CHECKDATE, m_strCheckDate);
 	DDX_Text(pDX, IDC_EDIT_HAZARDS, m_strHazards);
+	DDV_MaxChars(pDX, m_strProvince, 50);
+	DDV_MaxChars(pDX, m_strCity, 50);
+	DDV_MaxChars(pDX, m_strAddress, 50);
+	DDV_MaxChars(pDX, m_strZipCode, 50);
+	DDV_MaxChars(pDX, m_strTel, 50);
+	DDV_MaxChars(pDX, m_strWeight, 50);
+	DDV_MaxChars(pDX, m_strCheckDate, 50);
+	DDV_MaxChars(pDX, m_strHazards, 100);
 }
 
 
