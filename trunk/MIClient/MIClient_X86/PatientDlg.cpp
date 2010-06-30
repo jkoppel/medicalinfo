@@ -52,11 +52,11 @@ BOOL CPatientDlg::OnInitDialog()
 	m_dlgTab3.SetParent(GetDlgItem(IDC_TAB));
 
 	CRect rs; 
-	m_dlgTab1.GetClientRect(&rs);
+	m_dlgTab3.GetClientRect(&rs);
 	rs.top+=25;
 	rs.bottom+=24;
 	rs.left+=5;
-	rs.right-=5;
+	rs.right+=5;
 
 	m_dlgTab1.MoveWindow(&rs);
 	m_dlgTab2.MoveWindow(&rs);
