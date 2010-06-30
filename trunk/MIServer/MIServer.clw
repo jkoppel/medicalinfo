@@ -2,7 +2,7 @@
 
 [General Info]
 Version=1
-LastClass=CMIServerDlg
+LastClass=CPatientDlg
 LastTemplate=CDialog
 NewFileInclude1=#include "stdafx.h"
 NewFileInclude2=#include "miserver.h"
@@ -17,9 +17,9 @@ Class5=CMIServerThread
 
 ResourceCount=6
 Resource1=IDD_SERVERTHREAD
-Resource2=IDD_MISERVER_DIALOG
+Resource2=IDD_PATIENT_LIST
 Resource3=IDD_CHATTHREAD
-Resource4=IDD_PATIENT_LIST
+Resource4=IDD_MISERVER_DIALOG
 Resource5=IDD_CHAT
 Class6=CPatientListDlg
 Class7=CPatientDlg
@@ -176,5 +176,5 @@ ImplementationFile=PatientDlg.cpp
 BaseClass=CDialog
 Filter=D
 VirtualFilter=dWC
-LastObject=IDCANCEL
+LastObject=IDC_EDIT_SCANCODEID
 
