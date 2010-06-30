@@ -125,6 +125,8 @@ void MakeAddOrModRecordCmd(BOOL IsAdd, struct UserData data, CString &str)
 	sprintf_s(buf, "%d", data.ID);
 	g_strList.AddTail(CString(buf));
 
+	//注意：这里的命令不包括Order字段
+
 	g_strList.AddTail(CString(data.ScancodeID));
 
 	sprintf_s(buf, "%d", data.Number);
@@ -182,6 +184,13 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	str = g_strList.GetNext(p);
 	CString2Char(str, buf);
 	sscanf_s(buf, "%d", &data.ID);
+	if(!p){
+		return FALSE;
+	}
+
+	str = g_strList.GetNext(p);
+	CString2Char(str, buf);
+	sscanf_s(buf, "%d", &data.Order);
 	if(!p){
 		return FALSE;
 	}
