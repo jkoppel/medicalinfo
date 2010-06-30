@@ -89,7 +89,8 @@ BOOL CMIServerDlg::OnInitDialog()
 	}
 	catch(_com_error e)
 	{
-		Printf("数据库连接失败，确认数据库CaseData.mdb是否在当前路径下!");
+		AfxMessageBox("数据库连接失败，确认miserver.udl是否在当前路径下!");
+		g_pDBConnection.Release();
 		return FALSE;
 	}
 
@@ -215,9 +216,12 @@ void CMIServerDlg::OnTestdb()
 
 void CMIServerDlg::OnClose() 
 {
-	if(g_pDBConnection->State)
-        g_pDBConnection->Close();
-	g_pDBConnection= NULL;     
+	if(m_bIsDBConnected){
+		if(g_pDBConnection->State)
+			g_pDBConnection->Close();
+		g_pDBConnection= NULL;
+	}
+	m_bIsDBConnected = FALSE;
 	
 	CDialog::OnClose();
 }
