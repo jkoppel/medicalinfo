@@ -100,6 +100,9 @@ void CMIMainDlg::SetConnectStatus(BOOL status)
 		m_lstPatient.DeleteAllItems();
 		g_pClientSocket->Disconnect();
 		g_bIsConnected = FALSE;
+		m_nRecNum = 0;
+		m_nCurrPageIndex = 0;
+		m_nPageNum = 0;
 	}
 }
 
@@ -258,15 +261,17 @@ void CMIMainDlg::UpdateCurrPage()
 	int *pID = NULL;
 	struct UserData data;
 
-	if(!CmdGetRecordNum(num)){
+	num = m_nRecNum;
+	if(num<=0){
 		return;
 	}
-	if(num==0){
-		return;
-	}
+
+	g_ProgressInfo.Show("ÕýÔÚ¸üÐÂÊý¾Ý");
+
 	pID = new int[num+10];
 	if(!CmdGetAllIDs(pID, num)){
 		delete []pID;
+		g_ProgressInfo.Hide();
 		return;
 	}
 
@@ -289,6 +294,7 @@ void CMIMainDlg::UpdateCurrPage()
 		}
 	}
 	delete []pID;
+	g_ProgressInfo.Hide();
 }
 
 
@@ -838,23 +844,18 @@ void CMIMainDlg::OnBnClickedMoveprev()
 
 	CString str;
 	char buf[100];
-	int ID, order;
+	int ID;
 	struct UserData data;
 
 	str = m_lstPatient.GetItemText(index, 0);
 	CString2Char(str, buf);
 	sscanf_s(buf, "%d", &ID);
 
-	if(!CmdGetOrderByID(ID, order)){
-		ShowMsg("ÉÏÒÆÊ§°Ü");
-		return;
-	}
-
-	if(!CmdMoveOrderPrev(order)){
-		ShowMsg("ÉÏÒÆÊ§°Ü");
-		return;
-	}
 	if(!CmdGetRecordByID(ID, data)){
+		ShowMsg("ÉÏÒÆÊ§°Ü");
+		return;
+	}
+	if(!CmdMoveOrderPrev(data.Order)){
 		ShowMsg("ÉÏÒÆÊ§°Ü");
 		return;
 	}
@@ -890,27 +891,22 @@ void CMIMainDlg::OnBnClickedMovenext()
 
 	CString str;
 	char buf[100];
-	int ID, order;
+	int ID;
 	struct UserData data;
 
 	str = m_lstPatient.GetItemText(index, 0);
 	CString2Char(str, buf);
 	sscanf_s(buf, "%d", &ID);
 
-	if(!CmdGetOrderByID(ID, order)){
-		ShowMsg("ÏÂÒÆÊ§°Ü");
-		return;
-	}
-
-	if(!CmdMoveOrderNext(order)){
-		ShowMsg("ÏÂÒÆÊ§°Ü");
-		return;
-	}
 	if(!CmdGetRecordByID(ID, data)){
 		ShowMsg("ÏÂÒÆÊ§°Ü");
 		return;
 	}
 
+	if(!CmdMoveOrderNext(data.Order)){
+		ShowMsg("ÏÂÒÆÊ§°Ü");
+		return;
+	}
 	if(m_bPageMode){
 		if(m_nCurrPageIndex<m_nPageNum-1){
 			page_size = PAGE_SIZE;
@@ -1172,16 +1168,40 @@ void CMIMainDlg::DropItemOnList(CListCtrl* pDragList, CListCtrl* pDropList)
 	lvi.plvi->pszText = szLabel;
 	lvi.plvi->cchTextMax = 255;
 
+	char buf[20];
+	int ID_src, ID_dst;
+	int order_src, order_dst;
+	CString str;
+
 	// Get item that was dragged
 	pDragList->GetItem (lvi.plvi);
 	lvi.sCol2 = pDragList->GetItemText(lvi.plvi->iItem, 1);
-	CString str = pDragList->GetItemText(lvi.plvi->iItem, 0);
-	char buf[20];
-	int ID;
+
+	if(m_nDragIndex==m_nDropIndex){
+		return;
+	}
+
+	str = pDragList->GetItemText(lvi.plvi->iItem, 0);
 	struct UserData data;
 	CString2Char(str, buf);
-	sscanf_s(buf, "%d", &ID);
-	CmdGetRecordByID(ID, data);
+	sscanf_s(buf, "%d", &ID_src);
+	if(!CmdGetRecordByID(ID_src, data)){
+		return;
+	}
+
+	str = pDropList->GetItemText(m_nDropIndex, 0);
+	CString2Char(str, buf);
+	sscanf_s(buf, "%d", &ID_dst);
+
+	if(!CmdGetOrderByID(ID_src, order_src)){
+		return;
+	}
+	if(!CmdGetOrderByID(ID_dst, order_dst)){
+		return;
+	}
+	if(!CmdMoveOrder(order_src, order_dst)){
+		return;
+	}
 
 	// Delete the original item (for Move operation)
 	// This is optional. If you want to implement a Copy operation, don't delete.
@@ -1191,8 +1211,6 @@ void CMIMainDlg::DropItemOnList(CListCtrl* pDragList, CListCtrl* pDropList)
 	if(pDragList == pDropList)
 	{
 		pDragList->DeleteItem (m_nDragIndex);
-		if(m_nDragIndex < m_nDropIndex) m_nDropIndex--; //decrement drop index to account for item
-														//being deleted above it
 	}
 
 	// Insert item into pDropList
