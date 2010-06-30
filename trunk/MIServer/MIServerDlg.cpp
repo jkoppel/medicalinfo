@@ -94,7 +94,7 @@ BOOL CMIServerDlg::OnInitDialog()
 	}
 
 	m_bIsDBConnected = TRUE;
-	GetDlgItem(IDC_TESTDB)->EnableWindow(TRUE);
+	//GetDlgItem(IDC_TESTDB)->EnableWindow(TRUE);
 	
 	m_pSocketServer = new CMySocket(this);
 	m_bServerType.SetCheck(1);
