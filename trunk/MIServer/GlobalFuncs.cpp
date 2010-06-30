@@ -188,6 +188,9 @@ void MakeSendCmdFromRec(struct UserData data, CString &str)
 	sprintf(buf, "%d", data.ID);
 	g_strList.AddTail(buf);
 
+	sprintf(buf, "%d", data.Order);
+	g_strList.AddTail(buf);
+
 	g_strList.AddTail(data.ScancodeID);
 
 	sprintf(buf, "%d", data.Number);
@@ -495,6 +498,11 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			rec.ID = (UINT)(long)(var);
 		}
 
+		var = pHandlerRecordset->GetCollect("Order");
+		if(var.vt != VT_NULL){
+			rec.Order = (UINT)(long)(var);
+		}
+
 		var = pHandlerRecordset->GetCollect("Address");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
@@ -636,7 +644,7 @@ BOOL Cmd_GetRecordByOrder(int order, struct UserData &rec)
 	char buf[256];
 	CString str;
 
-	sprintf(buf, "%s%d", "SELECT * FROM Case_Data WHERE order=", order);
+	sprintf(buf, "%s%d", "SELECT * FROM Case_Data WHERE [Order]=", order);
 
 	pHandlerRecordset.CreateInstance(__uuidof(Recordset));
 	try{
@@ -805,11 +813,11 @@ BOOL Cmd_GetOrders(int order1, int order2, struct IDAndOrder *pIDAndOrder, int &
 
 	if(order1>order2){
 		tmp = order1;
-		order2 = order1;
-		order1 = tmp;
+		order1 = order2;
+		order2 = tmp;
 	}
 
-	sprintf(buf, "%s%d%s%d", "SELECT ID,Order FROM Case_Data WHERE Order>=", order1, " AND Order<=", order2, " ORDER BY [Order] ASC");
+	sprintf(buf, "%s%d%s%d%s", "SELECT ID,Order FROM Case_Data WHERE [Order]>=", order1, " AND [Order]<=", order2, " ORDER BY [Order] ASC");
 
 	pHandlerRecordset.CreateInstance(__uuidof(Recordset));
 	try{
@@ -1082,7 +1090,7 @@ BOOL Cmd_MoveOrder(int org_order, int dst_order)
 	}
 
 	if(org_order<=dst_order){
-		for(int i=1;i<num;i++){
+		for(int i=num-1;i>=1;i--){
 			if(!Cmd_SetOrderByID(pOrder[i].ID, pOrder[i-1].Order)){
 				delete []pOrder;
 				return FALSE;
@@ -1091,7 +1099,7 @@ BOOL Cmd_MoveOrder(int org_order, int dst_order)
 		Cmd_SetOrderByID(pOrder[0].ID, dst_order);
 	}
 	else{
-		for(int i=num-2;i>=0;i--){
+		for(int i=0;i<num-1;i++){
 			if(!Cmd_SetOrderByID(pOrder[i].ID, pOrder[i+1].Order)){
 				delete []pOrder;
 				return FALSE;
