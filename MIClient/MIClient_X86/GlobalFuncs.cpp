@@ -17,7 +17,7 @@ void CString2Char(CString source, char *dest)
 {
 	int length;
 	length = source.GetLength(); 
-	memset(dest, 0, 2*length+1);
+	memset(dest, 0, length+1);
 	WideCharToMultiByte(
 		CP_ACP, WC_COMPOSITECHECK|WC_DEFAULTCHAR,
 		source.GetBuffer(length),
@@ -110,7 +110,7 @@ void DebugSeparatorString()
 ///将用户数据组装成待发送的添加或修改命令
 void MakeAddOrModRecordCmd(BOOL IsAdd, struct UserData data, CString &str)
 {
-	char buf[100];
+	char buf[1024];
 
 	g_strList.RemoveAll();
 
@@ -165,7 +165,7 @@ void MakeAddOrModRecordCmd(BOOL IsAdd, struct UserData data, CString &str)
 
 int ParseRecvDataToRec(CString str, struct UserData &data)
 {
-	char buf[256];
+	char buf[1024];
 
 	//存到String List
 	ParseSeparatorString(str);
