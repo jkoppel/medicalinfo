@@ -29,9 +29,9 @@ void CPatientTab3::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_CLINICALDIAGNOSIS, m_strClinicalDiagnosis);
 	DDX_Text(pDX, IDC_EDIT_PHARMACY, m_strPharmacy);
 	DDX_Text(pDX, IDC_EDIT_PASTHISTORY, m_strPastHistory);
-	DDV_MaxChars(pDX, m_strClinicalDiagnosis, 200);
-	DDV_MaxChars(pDX, m_strPharmacy, 200);
-	DDV_MaxChars(pDX, m_strPastHistory, 200);
+	DDV_MaxChars(pDX, m_strClinicalDiagnosis, 50);
+	DDV_MaxChars(pDX, m_strPharmacy, 50);
+	DDV_MaxChars(pDX, m_strPastHistory, 50);
 }
 
 
