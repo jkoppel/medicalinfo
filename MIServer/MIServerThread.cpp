@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "MIServerThread.h"
 #include "ChatThread.h"
+#include "GlobalFuncs.h"
+
+#define USE_UDL_FILE		1
 
 ///构造函数
 CMIServerThread::CMIServerThread(CWnd* pParent)
@@ -13,11 +16,10 @@ CMIServerThread::CMIServerThread(CWnd* pParent)
 
 BEGIN_MESSAGE_MAP(CMIServerThread, CDialog)
 	//{{AFX_MSG_MAP(CMIServerThread)
-	ON_WM_SHOWWINDOW()
-	ON_WM_TIMER()
 	ON_MESSAGE(ON_RECEIVE, OnReceiveData)
 	ON_MESSAGE(ON_CLOSE, OnDisconnected)
 	ON_MESSAGE(ON_ACCEPT, OnAccept)
+	ON_WM_CLOSE()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -29,45 +31,44 @@ CMIServerThread::~CMIServerThread()
 	m_pSocketServer = NULL;
 }
 
-///显示窗口，重载该函数是为了使窗口不被重画
-void CMIServerThread::OnShowWindow(BOOL bShow, UINT nStatus) 
-{
-	if(GetStyle() & WS_VISIBLE){ 
-		CDialog::OnShowWindow(bShow, nStatus); 
-	}
-	else{ 
-		long Style = ::GetWindowLong(*this, GWL_STYLE); 
-		::SetWindowLong(*this, GWL_STYLE, Style | WS_VISIBLE); 
-		CDialog::OnShowWindow(SW_HIDE, nStatus); 
-	} 	
-}
-
-///在窗口没有被重画的情况下，用定时器将窗口隐藏
-void CMIServerThread::OnTimer(UINT nIDEvent) 
-{
-	if(nIDEvent==100){
-		this->KillTimer(nIDEvent);
-		this->ShowWindow(SW_HIDE);
-	}
-	
-	if(nIDEvent==101){
-		this->StartServer();
-		this->KillTimer(nIDEvent);
-	}
-
-	CDialog::OnTimer(nIDEvent);
-}
-
 ///初始化对话框
 BOOL CMIServerThread::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	m_pSocketServer = new CMySocket(this);
+	SetWindowPos(&wndNoTopMost,0,0,0,0,SWP_HIDEWINDOW);  //设置显示方式为最上，且不显示。
+	ModifyStyleEx(WS_EX_APPWINDOW,WS_EX_TOOLWINDOW);  //设置在任务栏中不显示
+	this->SetWindowText(""); //这样在任务管理器的任务名称里不会显示了。
 
-	//设置定时器
-	this->SetTimer(100, 1, NULL);
-	this->SetTimer(101, 2, NULL);
+	//启动服务器
+	m_pSocketServer = new CMySocket(this);
+	m_sPort = _T("5000");
+	StartServer();
+
+	// 初始化COM,创建ADO连接等操作
+	AfxOleInit();
+	g_pDBConnection.CreateInstance(__uuidof(Connection));
+#ifdef	USE_UDL_FILE
+	g_pDBConnection->ConnectionString = "File Name=miserver.udl";
+#endif
+	
+	// 在ADO操作中建议语句中要常用try...catch()来捕获错误信息，
+	// 因为它有时会经常出现一些意想不到的错误。jingzhou xu
+	try                 
+	{	
+#ifdef USE_UDL_FILE
+		g_pDBConnection->Open("","","",NULL);
+#else
+		g_pDBConnection->Open("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=CaseData.mdb","","",adModeUnknown);
+#endif
+	}
+	catch(_com_error e)
+	{
+		Printf("数据库连接失败，确认miserver.udl是否在当前路径下!");
+		g_pDBConnection.Release();
+		return FALSE;
+	}
+	g_bIsDBConnected = TRUE;
 
 	return TRUE;
 }
@@ -87,8 +88,6 @@ LRESULT CMIServerThread::OnAccept(WPARAM wParam, LPARAM lParam)
 ///接收到数据
 LRESULT CMIServerThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 {
-	while(m_pSocketServer->GetDataSize() > 0 && m_pSocketServer->ReadString(m_sRecv))
-		UpdateData(FALSE);
 	return 0;
 }
 
@@ -126,3 +125,14 @@ void CMIServerThread::StopServer()
 	m_pSocketServer->Disconnect();
 }
 
+void CMIServerThread::OnClose() 
+{
+	if(g_bIsDBConnected){
+		if(g_pDBConnection->State)
+			g_pDBConnection->Close();
+		g_pDBConnection= NULL;
+	}
+	g_bIsDBConnected = FALSE;
+	
+	CDialog::OnClose();
+}
