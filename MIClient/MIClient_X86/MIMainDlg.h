@@ -31,7 +31,6 @@ protected:
 	CString m_strAddress;
 	UINT m_nPort;
 	CListCtrl m_lstPatient;
-	struct UserData m_pUserData[1000];
 	int m_nRecNum;
 	BOOL m_bPageMode;
 	int m_nCurrPageIndex;
