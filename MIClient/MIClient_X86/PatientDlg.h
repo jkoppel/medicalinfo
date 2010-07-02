@@ -30,6 +30,7 @@ public:
 	CPatientTab2 m_dlgTab2;
 	CPatientTab3 m_dlgTab3;
 	struct UserData m_Data;
+	CString m_sTitle;
 public:
 	afx_msg void OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult);
 
