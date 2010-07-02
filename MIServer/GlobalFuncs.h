@@ -85,6 +85,7 @@ extern BOOL Cmd_MoveOrderPrev(int order);
 extern BOOL Cmd_MoveOrderNext(int order);
 
 extern _ConnectionPtr	g_pDBConnection;
+extern BOOL g_bIsDBConnected;
 
 
 #endif
