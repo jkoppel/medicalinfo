@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "MIServer.h"
 
-#define _DEBUG_VER_
+//#define _DEBUG_VER_
 #ifdef _DEBUG_VER_
 #include "MIServerDlg.h"
 #else
