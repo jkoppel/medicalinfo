@@ -26,7 +26,7 @@ CMIServerDlg::CMIServerDlg(CWnd* pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	m_bIsDBConnected = FALSE;
+	g_bIsDBConnected = FALSE;
 	g_pDBConnection = NULL;
 }
 
@@ -70,6 +70,11 @@ BOOL CMIServerDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
+	m_pSocketServer = new CMySocket(this);
+	m_bServerType.SetCheck(1);
+	m_sPort = _T("5000");
+	UpdateData(FALSE);
+
 	// 初始化COM,创建ADO连接等操作
 	AfxOleInit();
 	g_pDBConnection.CreateInstance(__uuidof(Connection));
@@ -81,7 +86,7 @@ BOOL CMIServerDlg::OnInitDialog()
 	// 因为它有时会经常出现一些意想不到的错误。jingzhou xu
 	try                 
 	{	
-#ifndef _USE_UDL_FILE
+#ifdef USE_UDL_FILE
 		g_pDBConnection->Open("","","",NULL);
 #else
 		g_pDBConnection->Open("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=CaseData.mdb","","",adModeUnknown);
@@ -94,14 +99,9 @@ BOOL CMIServerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	m_bIsDBConnected = TRUE;
+	g_bIsDBConnected = TRUE;
 	//GetDlgItem(IDC_TESTDB)->EnableWindow(TRUE);
 	
-	m_pSocketServer = new CMySocket(this);
-	m_bServerType.SetCheck(1);
-	m_sPort = _T("5000");
-	UpdateData(FALSE);
-
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -208,7 +208,7 @@ void CMIServerDlg::OnExit()
 
 void CMIServerDlg::OnTestdb() 
 {
-	if(m_bIsDBConnected){
+	if(g_bIsDBConnected){
 		CPatientListDlg dlg;
 		dlg.DoModal();
 	}
@@ -216,12 +216,12 @@ void CMIServerDlg::OnTestdb()
 
 void CMIServerDlg::OnClose() 
 {
-	if(m_bIsDBConnected){
+	if(g_bIsDBConnected){
 		if(g_pDBConnection->State)
 			g_pDBConnection->Close();
 		g_pDBConnection= NULL;
 	}
-	m_bIsDBConnected = FALSE;
+	g_bIsDBConnected = FALSE;
 	
 	CDialog::OnClose();
 }
