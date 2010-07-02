@@ -6,6 +6,9 @@
 #include "PatientDlg.h"
 #include "GlobalFuncs.h"
 #include "GlobalVars.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 // CPatientDlg dialog
@@ -39,6 +42,8 @@ END_MESSAGE_MAP()
 BOOL CPatientDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+
+	SetWindowText(m_sTitle);;
 
 	m_ctrlPatientTab.InsertItem(0, CString("资料1"));
 	m_ctrlPatientTab.InsertItem(1, CString("资料2"));
@@ -130,7 +135,7 @@ void CPatientDlg::SetData(struct UserData data)
 
 void CPatientDlg::GetData(struct UserData &data)
 {
-	char buf[256];
+	char buf[1024];
 
 	CString2Char(m_dlgTab1.m_strScancodeID, buf);
 	sprintf_s(data.ScancodeID, "%s", buf);
@@ -164,20 +169,26 @@ void CPatientDlg::GetData(struct UserData &data)
 	CString2Char(m_dlgTab2.m_strCheckDate, buf);
 	sprintf_s(data.CheckDate, "%s", buf);
 	CString2Char(m_dlgTab2.m_strHazards, buf);
-	sprintf_s(data.Hazards, "%s", buf);
+	_snprintf_s(data.Hazards, sizeof(data.Hazards), "%s", buf);
 	CString2Char(m_dlgTab3.m_strClinicalDiagnosis, buf);
-	sprintf_s(data.ClinicalDiagnosis, "%s", buf);
+	_snprintf_s(data.ClinicalDiagnosis, sizeof(data.ClinicalDiagnosis), "%s", buf);
 	CString2Char(m_dlgTab3.m_strPharmacy, buf);
-	sprintf_s(data.Pharmacy, "%s", buf);
+	_snprintf_s(data.Pharmacy, sizeof(data.Pharmacy), "%s", buf);
 	CString2Char(m_dlgTab3.m_strPastHistory, buf);
-	sprintf_s(data.PastHistory, "%s", buf);
+	_snprintf_s(data.PastHistory, sizeof(data.PastHistory), "%s", buf);
 }
 
 void CPatientDlg::OnBnClickedOk()
 {
-	m_dlgTab1.UpdateData(TRUE);
-	m_dlgTab2.UpdateData(TRUE);
-	m_dlgTab3.UpdateData(TRUE);
+	if(!m_dlgTab1.UpdateData(TRUE)){
+		return;
+	}
+	if(!m_dlgTab2.UpdateData(TRUE)){
+		return;
+	}
+	if(!m_dlgTab3.UpdateData(TRUE)){
+		return;
+	}
 
 	if(m_dlgTab1.m_strName.IsEmpty()){
 		AfxMessageBox(CString("请输入姓名"));
