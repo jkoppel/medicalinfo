@@ -40,13 +40,13 @@ struct UserData{
 	char Address[MAX_UDATA_STR_LENGTH+1];	//住址
 	char ZipCode[MAX_UDATA_STR_LENGTH+1];	//邮编
 	char Tel[MAX_UDATA_STR_LENGTH+1];		//电话
-	char ClinicalDiagnosis[MAX_UDATA_STR_LENGTH+1];//临床诊断
+	char ClinicalDiagnosis[MAX_UDATA_STR_LENGTH*4+1];//临床诊断
 	int Height;								//身高
 	char Weight[MAX_UDATA_STR_LENGTH+1];	//体重
 	char CheckDate[MAX_UDATA_STR_LENGTH+1];	//检查日期
-	char Hazards[MAX_UDATA_STR_LENGTH+1];	//危险因素
-	char Pharmacy[MAX_UDATA_STR_LENGTH+1];	//用药
-	char PastHistory[MAX_UDATA_STR_LENGTH+1];//既往病史
+	char Hazards[MAX_UDATA_STR_LENGTH*4+1];	//危险因素
+	char Pharmacy[MAX_UDATA_STR_LENGTH*4+1];	//用药
+	char PastHistory[MAX_UDATA_STR_LENGTH*4+1];//既往病史
 };
 
 #define CMD_CONNECT					1
