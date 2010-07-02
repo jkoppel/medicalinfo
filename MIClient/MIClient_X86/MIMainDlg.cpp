@@ -706,6 +706,7 @@ void CMIMainDlg::OnBnClickedAdd()
 	struct UserData data;
 	CPatientDlg dlg;
 
+	dlg.m_sTitle = CString("添加病人资料");
 	if(dlg.DoModal()==IDOK){
 		memset(&data, 0, sizeof(data));
 		dlg.GetData(data);
@@ -763,6 +764,7 @@ void CMIMainDlg::OnBnClickedEdit()
 	}
 
 	CPatientDlg dlg;
+	dlg.m_sTitle = CString("编辑病人资料");
 	memcpy(&dlg.m_Data, &data, sizeof(data));
 	if(dlg.DoModal()==IDOK){
 		g_ProgressInfo.Show("正在保存...");
