@@ -46,7 +46,6 @@ public:
 protected:
 	HICON m_hIcon;
 	CMySocket *m_pSocketServer;
-	BOOL m_bIsDBConnected;
 
 	// Generated message map functions
 	//{{AFX_MSG(CMIServerDlg)
