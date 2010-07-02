@@ -7,6 +7,7 @@
 #include <string.h>
 
 _ConnectionPtr	g_pDBConnection;
+BOOL g_bIsDBConnected = FALSE;
 
 BOOL FolderExist(CString strPath)
 {
