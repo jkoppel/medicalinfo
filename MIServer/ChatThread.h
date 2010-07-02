@@ -41,11 +41,11 @@ public:
 // Implementation
 protected:
 	CMySocket m_peer;
+	void SendError(int ErrNo);
 
 	// Generated message map functions
 	//{{AFX_MSG(CChatThread)
-	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnClose();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
