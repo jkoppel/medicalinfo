@@ -224,6 +224,7 @@ BOOL CCESocket::Connect(CString &addr, UINT remotePort)
 	wHost = addr.GetBuffer(wHostLen);
 #ifdef _WIN32_WCE
 	wcstombs(hostStr, wHost, 256);
+	addr.ReleaseBuffer();
 #else
 	wHost[wHostLen] = '\0';
 	strcpy(hostStr, wHost);
@@ -309,6 +310,7 @@ int CCESocket::Send(CString& str)
 	delete[] buf;
 #endif
 
+	str.ReleaseBuffer();
 	return sentBytes;
 }
 
@@ -345,6 +347,7 @@ int CCESocket::SendLine(CString& str)
 	}
 
 	delete[] buf;
+	str.ReleaseBuffer();
 	return sentBytes;
 }
 
