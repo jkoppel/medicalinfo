@@ -94,6 +94,7 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			}
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
+			strTmp.ReleaseBuffer();
 
 			if(!Cmd_GetRecordByID(ID, data)){
 				m_peer.Send(CString("ER||\r\n"));
@@ -123,6 +124,7 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			}
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
+			strTmp.ReleaseBuffer();
 
 			if(!Cmd_DeleteRecordByID(ID)){
 				m_peer.Send(CString("ER||\r\n"));
@@ -172,6 +174,7 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			}
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
+			strTmp.ReleaseBuffer();
 
 			if(!Cmd_GetOrderByID(ID, order)){
 				m_peer.Send(CString("ER||\r\n"));
@@ -187,6 +190,7 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			}
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
+			strTmp.ReleaseBuffer();
 
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
@@ -194,6 +198,7 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			}
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &order);
+			strTmp.ReleaseBuffer();
 
 			if(!Cmd_SetOrderByID(ID, order)){
 				m_peer.Send(CString("ER||\r\n"));
@@ -209,6 +214,7 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			}
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &org_order);
+			strTmp.ReleaseBuffer();
 
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
@@ -216,6 +222,7 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			}
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &dst_order);
+			strTmp.ReleaseBuffer();
 
 			if(!Cmd_MoveOrder(org_order, dst_order)){
 				m_peer.Send(CString("ER||\r\n"));
@@ -231,6 +238,7 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			}
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &order);
+			strTmp.ReleaseBuffer();
 
 			if(!Cmd_MoveOrderPrev(order)){
 				m_peer.Send(CString("ER||\r\n"));
@@ -246,6 +254,7 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			}
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &order);
+			strTmp.ReleaseBuffer();
 
 			if(!Cmd_MoveOrderNext(order)){
 				m_peer.Send(CString("ER||\r\n"));
