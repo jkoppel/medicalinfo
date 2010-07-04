@@ -5,10 +5,10 @@
 #include "MIClient.h"
 #include "MIMainDlg.h"
 #include "ConnectDlg.h"
-#include "GlobalVars.h"
-#include "GlobalFuncs.h"
-#include "ProgressInfo.h"
-#include "PatientDlg.h"
+#include "..\\Common\\GlobalVars.h"
+#include "..\\Common\\GlobalFuncs.h"
+#include "..\\Common\\ProgressInfo.h"
+#include "..\\Common\\PatientDlg.h"
 
 
 // CMIMainDlg dialog
@@ -261,6 +261,8 @@ void CMIMainDlg::UpdateCurrPage()
 	int *pID = NULL;
 	struct UserData data;
 
+	m_lstPatient.DeleteAllItems();
+
 	num = m_nRecNum;
 	if(num<=0){
 		return;
@@ -285,7 +287,6 @@ void CMIMainDlg::UpdateCurrPage()
 		curr_page_size = num;
 	}
 
-	m_lstPatient.DeleteAllItems();
 	for(index=0;index<curr_page_size;index++){
 		ret = CmdGetRecordByID(pID[offset+index], data);
 		if(ret){

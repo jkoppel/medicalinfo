@@ -1,8 +1,8 @@
 #pragma once
 #include "afxwin.h"
 #include "afxcmn.h"
-#include "GlobalFuncs.h"
-#include "GlobalVars.h"
+#include "..\\Common\\GlobalFuncs.h"
+#include "..\\Common\\GlobalVars.h"
 
 
 // CMIMainDlg dialog
