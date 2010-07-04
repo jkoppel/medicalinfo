@@ -21,6 +21,8 @@ BEGIN_MESSAGE_MAP(CEDPView, CView)
 	ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
+	ON_WM_CREATE()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 // CEDPView ¹¹Ôì/Îö¹¹
@@ -32,6 +34,7 @@ CEDPView::CEDPView()
 	m_pntClientAreaRef.y = 0;
 	m_nClientAreaWidth = 0;
 	m_nClientAreaHeight = 0;
+	m_pTab = NULL;
 }
 
 CEDPView::~CEDPView()
@@ -105,6 +108,10 @@ void CEDPView::OnInitialUpdate()
 {
 	CView::OnInitialUpdate();
 
+	m_pTab->InsertItem(0, "TAB1");
+	m_pTab->InsertItem(1, "TAB2");
+	m_pTab->InsertItem(2, "TAB3");
+	m_pTab->InsertItem(3, "TAB4");
 }
 
 void CEDPView::DrawData()
@@ -281,3 +288,33 @@ void CEDPView::DrawData()
 	pDC->SelectObject(oldFont);
 }
 
+
+int CEDPView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CView::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	m_pTab = new CLBTabCtrl();
+	ASSERT(m_pTab);
+
+	// note:  TVS_NOTOOLTIPS is set in CXHtmlTree::PreCreateWindow()
+
+	DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_TABSTOP;// | WS_BORDER;
+
+	CRect rect(0,0,100,100);
+
+	VERIFY(m_pTab->Create(dwStyle, rect, this, IDC_TREE));
+
+	return 0;
+}
+
+void CEDPView::OnSize(UINT nType, int cx, int cy)
+{
+	CView::OnSize(nType, cx, cy);
+
+	if (m_pTab && ::IsWindow(m_pTab->m_hWnd))
+	{
+		// stretch tree to fill window
+		m_pTab->MoveWindow(0, 0, cx, 22);
+	}
+}

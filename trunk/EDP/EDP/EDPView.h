@@ -6,6 +6,7 @@
 
 #include "EDPDoc.h"
 #include "GlobalFuncs.h"
+#include "LBTabCtrl\\LBTabCtrl.h"
 
 class CEDPView : public CView
 {
@@ -45,6 +46,8 @@ protected:
 	int m_nXSpan;				//横轴一格对应的像素大小
 	int m_nYSpan;				//纵轴一格对应的像素大小
 
+	CLBTabCtrl *m_pTab;
+
 	void DrawData();			//显示数据
 
 // 生成的消息映射函数
@@ -52,6 +55,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual void OnInitialUpdate();
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 };
 
 #ifndef _DEBUG  // EDPView.cpp 中的调试版本
