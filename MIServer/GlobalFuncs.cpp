@@ -246,132 +246,154 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 
 	str = g_strList.GetNext(p);
 	sscanf(str.GetBuffer(str.GetLength()), "%d", &data.ID);
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.ScancodeID, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sscanf(str.GetBuffer(str.GetLength()), "%d", &data.Number);
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.Name, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.Sex, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sscanf(str.GetBuffer(str.GetLength()), "%d", &data.Age);
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.BirthDate, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.People, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.Department, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.TypeOfWork, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.Province, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.City, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.Address, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.ZipCode, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.Tel, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.ClinicalDiagnosis, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sscanf(str.GetBuffer(str.GetLength()), "%d", &data.Height);
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.Weight, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.CheckDate, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.Hazards, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.Pharmacy, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
 	}
 
 	str = g_strList.GetNext(p);
 	sprintf(data.PastHistory, "%s", str.GetBuffer(str.GetLength()));
+	str.ReleaseBuffer();
 
 	return TRUE;
 }
@@ -508,6 +530,7 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Address, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Age");
@@ -519,114 +542,133 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.BirthDate, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Check_Date");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.CheckDate, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("City");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.City, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Clinical_Diagnosis");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.ClinicalDiagnosis, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Department");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Department, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Hazards");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Hazards, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Name");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Name, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Number");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sscanf(str.GetBuffer(str.GetLength()), "%d", &rec.Number);
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Height");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sscanf(str.GetBuffer(str.GetLength()), "%d", &rec.Height);
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Past_History");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.PastHistory, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("People");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.People, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Pharmacy");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Pharmacy, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Province");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Province, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("ScancodeID");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.ScancodeID, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Sex");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Sex, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Tel");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Tel, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Type_Of_Work");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.TypeOfWork, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Weight");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Weight, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("ZipCode");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.ZipCode, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		ret = TRUE;
@@ -674,6 +716,7 @@ BOOL Cmd_GetRecordByOrder(int order, struct UserData &rec)
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Address, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Age");
@@ -685,114 +728,133 @@ BOOL Cmd_GetRecordByOrder(int order, struct UserData &rec)
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.BirthDate, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Check_Date");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.CheckDate, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("City");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.City, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Clinical_Diagnosis");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.ClinicalDiagnosis, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Department");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Department, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Hazards");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Hazards, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Name");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Name, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Number");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sscanf(str.GetBuffer(str.GetLength()), "%d", &rec.Number);
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Height");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sscanf(str.GetBuffer(str.GetLength()), "%d", &rec.Height);
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Past_History");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.PastHistory, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("People");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.People, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Pharmacy");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Pharmacy, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Province");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Province, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("ScancodeID");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.ScancodeID, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Sex");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Sex, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Tel");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Tel, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Type_Of_Work");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.TypeOfWork, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("Weight");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.Weight, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		var = pHandlerRecordset->GetCollect("ZipCode");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
 			sprintf(rec.ZipCode, "%s", str.GetBuffer(str.GetLength()));
+			str.ReleaseBuffer();
 		}
 
 		ret = TRUE;
