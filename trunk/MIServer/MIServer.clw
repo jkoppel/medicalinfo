@@ -17,10 +17,10 @@ Class5=CMIServerThread
 
 ResourceCount=6
 Resource1=IDD_MISERVER_DIALOG
-Resource2=IDD_SERVERTHREAD
-Resource3=IDD_CHAT
-Resource4=IDD_CHATTHREAD
-Resource5=IDD_PATIENT_LIST
+Resource2=IDD_PATIENT_LIST
+Resource3=IDD_CHATTHREAD
+Resource4=IDD_SERVERTHREAD
+Resource5=IDD_CHAT
 Class6=CPatientListDlg
 Class7=CPatientDlg
 Resource6=IDD_PATIENT_ADDMOD
