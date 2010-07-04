@@ -14,12 +14,12 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CLeftView
 
-IMPLEMENT_DYNCREATE(CLeftView, CTreeView)
+IMPLEMENT_DYNCREATE(CLeftView, CView)
 
 CLeftView::CLeftView()
 {
-	m_lstState.DeleteImageList();
-	m_lstFolder.DeleteImageList();
+	m_ilDataFile.DeleteImageList();
+	m_pTree = NULL;
 }
 
 CLeftView::~CLeftView()
@@ -27,11 +27,13 @@ CLeftView::~CLeftView()
 }
 
 
-BEGIN_MESSAGE_MAP(CLeftView, CTreeView)
+BEGIN_MESSAGE_MAP(CLeftView, CView)
 	//{{AFX_MSG_MAP(CLeftView)
 	ON_NOTIFY_REFLECT(NM_DBLCLK, OnDblclk)
 	ON_NOTIFY_REFLECT(TVN_SELCHANGED, OnSelchanged)
 	//}}AFX_MSG_MAP
+	ON_WM_CREATE()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -49,12 +51,12 @@ void CLeftView::OnDraw(CDC* pDC)
 #ifdef _DEBUG
 void CLeftView::AssertValid() const
 {
-	CTreeView::AssertValid();
+	CView::AssertValid();
 }
 
 void CLeftView::Dump(CDumpContext& dc) const
 {
-	CTreeView::Dump(dc);
+	CView::Dump(dc);
 }
 #endif //_DEBUG
 
@@ -63,24 +65,17 @@ void CLeftView::Dump(CDumpContext& dc) const
 
 void CLeftView::OnInitialUpdate() 
 {
-	CTreeView::OnInitialUpdate();
+	CView::OnInitialUpdate();
 
-	m_lstState.DeleteImageList();
-	m_lstState.Create(IDB_BITMAP_STATE, 13, 1, RGB(255,255,255));
-	CTreeCtrl& ctlTree=(CTreeCtrl&)GetTreeCtrl();
-	ctlTree.SetBkColor(RGB(210, 230, 190));
-	ctlTree.SetImageList (&m_lstState, TVSIL_NORMAL);
-	//m_lstFolder.Create(IDB_BITMAP_FODER,16, 1, RGB(255,255,255));
-	
-	/*
-	m_lstState.Create (16,16,ILC_COLOR|ILC_MASK,3,3);
-	m_lstState.Add (AfxGetApp()->LoadIcon (IDI_CK));
-	m_lstState.Add (AfxGetApp()->LoadIcon (IDI_BASE_INFO));
-	m_lstState.Add (AfxGetApp()->LoadIcon (IDI_INPUT));
-	CTreeCtrl& ctlTree=(CTreeCtrl&)GetTreeCtrl();
-	ctlTree.SetBkColor (RGB(210,230,190));
-	ctlTree.SetImageList (&m_lstState, TVSIL_NORMAL);
-	*/
+	// create image list for level 0 items
+	m_ilDataFile.DeleteImageList();
+	m_ilDataFile.Create(IDB_BITMAP_DATAFILE, 16, 1, RGB(255,255,255));
+	m_pTree->SetImageList(&m_ilDataFile, TVSIL_NORMAL);
+
+	m_pTree->Initialize(TRUE, TRUE);
+	m_pTree->SetSmartCheckBox(TRUE);
+	m_pTree->SetHtml(TRUE);
+	m_pTree->SetImages(TRUE);
 
 	int i=0;
 
@@ -89,47 +84,22 @@ void CLeftView::OnInitialUpdate()
 	TV_INSERTSTRUCT tvThree;//树叶
 	tvRoot.hParent=NULL;
 	tvRoot.item.pszText="根目录/";
-	tvRoot.item.mask=TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE;
-    tvRoot.item.iImage=1;
-	tvRoot.item.iSelectedImage=2;
-	HTREEITEM item_root=ctlTree.InsertItem (&tvRoot);
-    int ii;
-	CString strSecond[]={"目录1"};
-	CString strThree[1][1]={{"文件1"}};
-	for(i=0;i<2;i++)
-	{
-		tvSecond.hParent=item_root;
-		tvSecond.item.pszText=(LPTSTR)(LPCTSTR)strSecond[i];
-		tvSecond.item.mask=TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE;
-        tvSecond.item.iImage=1;
-	    tvSecond.item.iSelectedImage=2;
-		HTREEITEM item_second=ctlTree.InsertItem (&tvSecond);
-		switch(i)
-		{
-		case 0:
-			ii=3;
-			break;
-        case 1:
-			ii=2;
-			break;
-		default:
-			break;
+	tvRoot.item.mask=TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+    tvRoot.item.iImage=8;
+	tvRoot.item.iSelectedImage=8;
+	HTREEITEM item_root=m_pTree->InsertItem(&tvRoot);
+	m_pTree->SetTextColor(RGB(255, 0, 0));
 
-		}
-		for(int j=0;j<ii;j++)
-		{tvThree.hParent=item_second;
-		tvThree.item.pszText=(LPTSTR)(LPCTSTR)strThree[i][j];
-		tvThree.item.mask=TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE;
-        tvThree.item.iImage=1;
-	    tvThree.item.iSelectedImage=2;
-	    ctlTree.InsertItem (&tvThree);
-		}
+	tvRoot.hParent = item_root;
+	item_root = m_pTree->InsertItem(&tvRoot);
+	m_pTree->SetTextColor(RGB(0, 255, 0));
+
+	for(int i=0;i<9;i++){
+		tvRoot.item.iImage=i;
+		tvRoot.item.iSelectedImage=i;
+		item_root = m_pTree->InsertItem(&tvRoot);
+		m_pTree->SetItemTextColor(item_root, RGB(((i/6)%2)*255, ((i/3)%2)*255, ((i/5)%2)*255));
 	}
-	//设置列表视图的风格
-	ctlTree.Expand(item_root,TVE_EXPAND);
-	DWORD dwStyle=GetWindowLong(ctlTree.m_hWnd ,GWL_STYLE);
-	dwStyle|=TVS_HASBUTTONS|TVS_HASLINES|TVS_LINESATROOT;
-	::SetWindowLong (ctlTree.m_hWnd ,GWL_STYLE,dwStyle);
 }
 
 
@@ -141,6 +111,40 @@ void CLeftView::OnDblclk(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CLeftView::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult) 
 {
-	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	NM_TREEVIEW* pNMView = (NM_TREEVIEW*)pNMHDR;
 	*pResult = 0;
+}
+
+int CLeftView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	TRACE(_T("in CLeftView::OnCreate\n"));
+
+	if (CView::OnCreate(lpCreateStruct) == -1)
+		return -1;
+	
+	m_pTree = new CXHtmlTree();
+	ASSERT(m_pTree);
+
+	// note:  TVS_NOTOOLTIPS is set in CXHtmlTree::PreCreateWindow()
+
+	DWORD dwStyle = TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | 
+					TVS_EDITLABELS | TVS_SHOWSELALWAYS | /*TVS_NOTOOLTIPS |*/
+					WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | WS_BORDER;
+
+	CRect rect(0,0,100,100);
+
+	VERIFY(m_pTree->Create(dwStyle, rect, this, IDC_TREE));
+
+	return 0;
+}
+
+void CLeftView::OnSize(UINT nType, int cx, int cy)
+{
+	CView::OnSize(nType, cx, cy);
+
+	if (m_pTree && ::IsWindow(m_pTree->m_hWnd))
+	{
+		// stretch tree to fill window
+		m_pTree->MoveWindow(0, 0, cx, cy);
+	}
 }
