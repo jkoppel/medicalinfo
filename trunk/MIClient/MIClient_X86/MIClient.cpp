@@ -4,8 +4,8 @@
 #include "stdafx.h"
 #include "MIClient.h"
 #include "MIMainDlg.h"
-#include "GlobalFuncs.h"
-#include "ProgressInfo.h"
+#include "..\\Common\\GlobalFuncs.h"
+#include "..\\Common\\ProgressInfo.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
