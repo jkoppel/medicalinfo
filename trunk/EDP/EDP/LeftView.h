@@ -12,8 +12,9 @@
 
 #include   <afxcview.h>
 #include "EDPView.h"
+#include "XHtmlTree\\XHtmlTree.h"
 
-class CLeftView : public CTreeView
+class CLeftView : public CView
 {
 protected:
 	CLeftView();           // protected constructor used by dynamic creation
@@ -45,13 +46,17 @@ protected:
 	// Generated message map functions
 protected:
 	CEDPView* m_pDrawView;
-	CImageList m_lstState, m_lstFolder;
+	CImageList m_ilDataFile;
+	CXHtmlTree *m_pTree;
 
 	//{{AFX_MSG(CLeftView)
 	afx_msg void OnDblclk(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 };
 
 /////////////////////////////////////////////////////////////////////////////
