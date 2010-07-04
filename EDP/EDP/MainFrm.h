@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include "SplitterWndEx.h"
+
+
 class CMainFrame : public CFrameWnd
 {
 	
@@ -13,7 +16,8 @@ protected: // 仅从序列化创建
 
 // 属性
 public:
-	CSplitterWnd m_wndSplitter;
+	CSplitterWndEx m_wndSplitter;
+	CSplitterWndEx m_wndSplitter2; 
 
 // 操作
 public:
@@ -39,6 +43,8 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	DECLARE_MESSAGE_MAP()
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
+public:
+	afx_msg void OnSettings();
 };
 
 
