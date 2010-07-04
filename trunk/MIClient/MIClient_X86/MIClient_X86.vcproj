@@ -190,27 +190,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\CESocket.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ClientSocket.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ConnectDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DataFile.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\GlobalFuncs.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\GlobalVars.cpp"
 				>
 			</File>
 			<File
@@ -219,26 +199,6 @@
 			</File>
 			<File
 				RelativePath=".\MIMainDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PatientDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PatientTab1.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PatientTab2.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PatientTab3.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ProgressInfo.cpp"
 				>
 			</File>
 			<File
@@ -270,35 +230,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\CESocket.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ClientSocket.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ConnectDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\containers.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DataFile.h"
-				>
-			</File>
-			<File
-				RelativePath=".\GlobalFuncs.h"
-				>
-			</File>
-			<File
-				RelativePath=".\GlobalVars.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MIBase.h"
 				>
 			</File>
 			<File
@@ -307,26 +239,6 @@
 			</File>
 			<File
 				RelativePath=".\MIMainDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PatientDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PatientTab1.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PatientTab2.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PatientTab3.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ProgressInfo.h"
 				>
 			</File>
 			<File
@@ -363,6 +275,106 @@
 				RelativePath=".\res\MIClient_X86.rc2"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Common Files"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath="..\common\CESocket.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\ClientSocket.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\containers.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\DataFile.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\GlobalFuncs.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\GlobalVars.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\MIBase.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\PatientDlg.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\PatientTab1.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\PatientTab2.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\PatientTab3.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\ProgressInfo.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath="..\common\CESocket.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\common\ClientSocket.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\common\DataFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\common\GlobalFuncs.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\common\GlobalVars.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\common\PatientDlg.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\common\PatientTab1.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\common\PatientTab2.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\common\PatientTab3.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\common\ProgressInfo.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
