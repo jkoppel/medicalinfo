@@ -4,9 +4,9 @@
 #include "stdafx.h"
 #include "MIClient.h"
 #include "ConnectDlg.h"
-#include "GlobalVars.h"
-#include "GlobalFuncs.h"
-#include "ProgressInfo.h"
+#include "..\\Common\\GlobalVars.h"
+#include "..\\Common\\GlobalFuncs.h"
+#include "..\\Common\\ProgressInfo.h"
 
 
 // CConnectDlg dialog
