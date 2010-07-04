@@ -30,7 +30,7 @@ struct TestRecord
 	double  fRealOffset[MAX_SPEED_NUM];		// 检测结果行程数组，单位: m
 	double  fPym[MAX_SPEED_NUM];			// 最大压缩力，单位：N
 	double  fPfm[MAX_SPEED_NUM];			// 最大拉伸力，单位：N
-	int    iNumOfForce[MAX_SPEED_NUM];		// 每个速度下测量的力的个数，最多MAX_SPEED_NUM
+	int		iNumOfForce[MAX_SPEED_NUM];		// 每个速度下测量的力的个数，最多MAX_SPEED_NUM
 	double  fDataFreq[MAX_SPEED_NUM];		// 检测结果采样频率，单位: Hz
 	double  fForce[MAX_SPEED_NUM][MAX_FORCE_NUM]; // 与速度数组对应的每个速度下测量到的力数组，单位: N
 	double  fDisplacement[MAX_SPEED_NUM][MAX_FORCE_NUM];// 与速度数组对应的每个速度下测量到的位移数组，单位: m
