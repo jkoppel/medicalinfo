@@ -66,3 +66,5 @@
 #endif
 
 #include <altcecrt.h>
+
+#include "..\\Common\\MIBase.h"
