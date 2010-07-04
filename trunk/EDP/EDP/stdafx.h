@@ -53,7 +53,12 @@
 
 #include <afxsock.h>		// MFC Ì×½Ó×ÖÀ©Õ¹
 
+#include <afxmt.h>
 
+#define XHTMLHTML
+#define XHTMLTOOLTIPS
+#define XHTMLXML
+#define XHTMLDRAGDROP
 
 
 
