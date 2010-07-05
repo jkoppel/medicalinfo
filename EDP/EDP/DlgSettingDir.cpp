@@ -79,6 +79,7 @@ void CDlgSettingDir::OnBnClickedOk()
 	for(int i=0;i<m_ctrlListDir.GetCount();i++){
 		m_ctrlListDir.GetText(i, dir);
 		fputs(dir, pFile);
+		fprintf(pFile, "%s", "\r\n");
 	};
 	fclose(pFile);
 
