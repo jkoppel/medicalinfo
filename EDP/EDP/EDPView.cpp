@@ -234,11 +234,16 @@ void CEDPView::DrawData()
 	pDC->DrawText("Force [N]", &rect, DT_SINGLELINE | DT_LEFT );
 
 	//画曲线
+	/*
 	CEDPDoc *pDoc = GetDocument();
 	if(!pDoc->m_bDataExists){
 		return;
 	}
 	pRec = &pDoc->m_rec;
+	*/
+
+	for(int k=0;k<g_iRecNum;k++){
+		pRec = &g_pRec[i].test_rec;
 
 
 	//pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
@@ -246,11 +251,6 @@ void CEDPView::DrawData()
 	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
 	for(i=0;i<pRec->iNumOfSpeed;i++){
 		double min = pRec->fDisplacement[i][0], max = pRec->fDisplacement[i][0], sum = 0.0, avg = 0.0;
-#if 0
-		min = 0.12758;
-		max = 0.227466;
-		avg = 0.177522;
-#else
 		//计算均值及幅度
 		for(j=0;j<pRec->iNumOfForce[i];j++){
 			sum += pRec->fDisplacement[i][j];
@@ -262,7 +262,6 @@ void CEDPView::DrawData()
 			}
 		}
 		avg = sum/pRec->iNumOfForce[i];
-#endif
 		pen.DeleteObject();
 		pen.CreatePen(PS_SOLID, 2, color[i]);
 		pDC->SelectObject(&pen);
@@ -283,6 +282,8 @@ void CEDPView::DrawData()
 			pDC->SetPixel(x, y, color[i]);
 #endif
 		}
+	}
+
 	}
 
 	pDC->SelectObject(oldFont);
