@@ -8,7 +8,6 @@
 #include "LeftView.h"
 #include "FormViewEx.h"
 #include "EDPView.h"
-#include "TreePropSheet\\TreePropSheet.h"
 #include "DlgSettingDir.h"
 
 #ifdef _DEBUG
@@ -32,6 +31,12 @@ static UINT indicators[] =
 	ID_INDICATOR_NUM,
 	ID_INDICATOR_SCRL,
 };
+
+
+int MyMessageBox(LPCTSTR lpszText, LPCTSTR lpszCaption, UINT nType)
+{
+	return AfxGetApp()->GetMainWnd()->GetActiveWindow()->MessageBox(lpszText, lpszCaption, nType);
+}
 
 
 // CMainFrame ¹¹Ôì/Îö¹¹
@@ -116,7 +121,7 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	if(!m_wndSplitter.CreateStatic(this,2,1)){
 		return FALSE;
 	}
-	m_wndSplitter.CreateView(0,0,RUNTIME_CLASS(CFormViewEx),CSize(500,50),pContext);
+	m_wndSplitter.CreateView(0,0,RUNTIME_CLASS(CFormViewEx),CSize(500,60),pContext);
 	m_wndSplitter2.CreateStatic(&m_wndSplitter,1,2,WS_CHILD|WS_VISIBLE,m_wndSplitter.IdFromRowCol(1, 0));
 	m_wndSplitter2.CreateView(0,0,RUNTIME_CLASS(CLeftView),CSize(200,100),pContext);
 	m_wndSplitter2.CreateView(0,1,RUNTIME_CLASS(CEDPView),CSize(100,100),pContext);
@@ -145,32 +150,20 @@ void CMainFrame::OnSettings()
 	CDlgSettingDir dlg;
 	dlg.DoModal();
 	return;
+}
 
-	CPropertyPage page1(IDD_SETTING_DIR);
-	//CDlgSettingDir page1;
-	page1.m_psp.dwFlags&= ~PSP_HASHELP;
-	// set images
-	CImageList	DefaultImages, Images;
-	DefaultImages.Create(IDB_BITMAP_SETTINGS, 16, 0, RGB(0x00, 0x80, 0x80));
-	Images.Create(IDB_BITMAP_SETTINGS, 16, 0, RGB(0x00, 0x80, 0x80));
-	
-	CTreePropSheet::SetPageIcon(&page1, Images, 0);
-	//CTreePropSheet::SetPageIcon(&wndPageIncoming, Images, 1);
+BOOL PeekAndPump()
+{
+  static MSG msg;
 
-	CTreePropSheet sht(_T("Preferences"));
-	sht.m_psh.dwFlags&= ~PSH_HASHELP;
-	sht.AddPage(&page1);
+  while(::PeekMessage(&msg,NULL,0,0,PM_NOREMOVE))
+  {
+	  if(!AfxGetApp()->PumpMessage())
+    {
+		  ::PostQuitMessage(0);
+		  return FALSE;
+	  }	
+  }
 
-	sht.SetEmptyPageText(_T("Please select a child item of '%s'."));
-
-	sht.SetTreeViewMode(TRUE, TRUE, TRUE);
-	sht.SetTreeDefaultImages(&DefaultImages);
-	sht.SetActivePage(&page1);
-
-	sht.DoModal();
-
-	sht.DestroyPageIcon(&page1);
-	//sht.DestroyPageIcon(&wndPageIncoming);
-	/*
-	*/
+  return TRUE;
 }
