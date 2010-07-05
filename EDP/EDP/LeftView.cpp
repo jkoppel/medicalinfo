@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "LeftView.h"
 #include "EDP.h"
+#include "GlobalFuncs.h"
+#include "direct.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -62,6 +64,7 @@ void CLeftView::Dump(CDumpContext& dc) const
 
 /////////////////////////////////////////////////////////////////////////////
 // CLeftView message handlers
+#define CONFIG_DIR_FILE		"directories.txt"
 
 void CLeftView::OnInitialUpdate() 
 {
@@ -77,28 +80,62 @@ void CLeftView::OnInitialUpdate()
 	m_pTree->SetHtml(TRUE);
 	m_pTree->SetImages(TRUE);
 
-	int i=0;
+	g_pRec = new struct TestRecordNode[20];
+	g_iRecNum = 0;
+	char dir[1024], buf[1024];
+
+	FILE *pFile = NULL;
+	fopen_s(&pFile, CONFIG_DIR_FILE, "rb");
+	if(!pFile){
+		return;
+	}
+	do{
+		memset(dir, 0, sizeof(dir));
+		fscanf(pFile, "%s\r\n", dir);
+		if(strlen(dir)>0){
+			CFileFind f; 
+			_chdir(dir);
+			BOOL bFind = f.FindFile("*.*"); 
+			while(bFind) 
+			{ 
+				bFind = f.FindNextFile(); 
+				if(f.IsDots()){
+					continue; 
+				}
+				CString tmp;
+				tmp = CString(dir) + "\\" + f.GetFileName();
+				sprintf(buf, "%s", tmp.GetBuffer(0));
+				if(LoadFile(buf, g_pRec[g_iRecNum].test_rec)){
+					sprintf(g_pRec[g_iRecNum].dir, "%s", dir);
+					sprintf(g_pRec[g_iRecNum].file, "%s", f.GetFileName().GetBuffer(0));
+					g_iRecNum++;
+				}
+			}
+		}
+		else{
+			break;
+		}
+	} while(!feof(pFile));
+	fclose(pFile);
 
 	TV_INSERTSTRUCT tvRoot;//Ê÷¸ù
     TV_INSERTSTRUCT tvSecond;//Ê÷Ö¦
 	TV_INSERTSTRUCT tvThree;//Ê÷Ò¶
 	tvRoot.hParent=NULL;
-	tvRoot.item.pszText="¸ùÄ¿Â¼/";
+	tvRoot.item.pszText=g_pRec[0].dir;
 	tvRoot.item.mask=TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-    tvRoot.item.iImage=8;
-	tvRoot.item.iSelectedImage=8;
+    tvRoot.item.iImage=11;
+	tvRoot.item.iSelectedImage=11;
 	HTREEITEM item_root=m_pTree->InsertItem(&tvRoot);
-	m_pTree->SetTextColor(RGB(255, 0, 0));
+	m_pTree->SetTextColor(RGB(0, 0, 0));
 
-	tvRoot.hParent = item_root;
-	item_root = m_pTree->InsertItem(&tvRoot);
-	m_pTree->SetTextColor(RGB(0, 255, 0));
-
-	for(int i=0;i<9;i++){
+	for(int i=0;i<g_iRecNum;i++){
+		tvRoot.item.pszText = g_pRec[i].file;
 		tvRoot.item.iImage=i;
 		tvRoot.item.iSelectedImage=i;
-		item_root = m_pTree->InsertItem(&tvRoot);
-		m_pTree->SetItemTextColor(item_root, RGB(((i/6)%2)*255, ((i/3)%2)*255, ((i/5)%2)*255));
+		tvRoot.hParent = item_root;
+		HTREEITEM item_curr = m_pTree->InsertItem(&tvRoot);
+		m_pTree->SetItemTextColor(item_curr, RGB(((i/6)%2)*255, ((i/3)%2)*255, ((i/5)%2)*255));
 	}
 }
 
