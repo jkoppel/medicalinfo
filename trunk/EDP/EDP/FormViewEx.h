@@ -1,4 +1,5 @@
 #pragma once
+#include "afxwin.h"
 
 
 
@@ -28,6 +29,13 @@ protected:
 public:
 	virtual void OnInitialUpdate();
 	afx_msg void OnPaint();
+	afx_msg void OnBnClickedBtnApply();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	CString m_strStartTime;
+	CStatic m_ctrlGroupFilter;
+	CString m_strEndTime;
+	CString m_strProductNo;
+	CString m_strOperatorNo;
 };
 
 
