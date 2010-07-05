@@ -34,7 +34,21 @@ struct TestRecord
 	double  fDataFreq[MAX_SPEED_NUM];		// 检测结果采样频率，单位: Hz
 	double  fForce[MAX_SPEED_NUM][MAX_FORCE_NUM]; // 与速度数组对应的每个速度下测量到的力数组，单位: N
 	double  fDisplacement[MAX_SPEED_NUM][MAX_FORCE_NUM];// 与速度数组对应的每个速度下测量到的位移数组，单位: m
-}; 
+};
+
+struct TestRecordNode{
+	char dir[256];
+	char file[128];
+	struct TestRecord test_rec;
+};
+
+extern int g_iRecNum;
+extern struct TestRecordNode *g_pRec;
 
 extern BOOL LoadFile(const char *file, struct TestRecord &rec);
 extern BOOL SaveFile(const char *file, struct TestRecord rec);
+//显示消息
+extern void ShowMsg(const char *msg);
+BOOL CheckStrDateFormat(const char *StrDateTime, int &year, int &month, int &day);
+BOOL CheckStrTimeFormat(const char *StrTime, int &hour, int &minute);
+
