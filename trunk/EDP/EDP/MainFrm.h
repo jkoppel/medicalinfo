@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "SplitterWndEx.h"
+#include "SplitterWndEx\\SplitterWndEx.h"
 
 
 class CMainFrame : public CFrameWnd
@@ -47,4 +47,5 @@ public:
 	afx_msg void OnSettings();
 };
 
-
+extern BOOL PeekAndPump();
+extern int MyMessageBox(LPCTSTR lpszText, LPCTSTR lpszCaption, UINT nType = MB_OK);
