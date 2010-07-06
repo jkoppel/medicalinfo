@@ -131,6 +131,7 @@ void CPatientDlg::SetData(struct UserData data)
 	m_dlgTab3.m_strClinicalDiagnosis = CString(data.ClinicalDiagnosis);
 	m_dlgTab3.m_strPharmacy = CString(data.Pharmacy);
 	m_dlgTab3.m_strPastHistory = CString(data.PastHistory);
+	m_dlgTab3.m_iStatus = data.Status;
 
 	m_dlgTab1.UpdateData(FALSE);
 	m_dlgTab2.UpdateData(FALSE);
@@ -180,6 +181,8 @@ void CPatientDlg::GetData(struct UserData &data)
 	_snprintf_s(data.Pharmacy, sizeof(data.Pharmacy), "%s", buf);
 	CString2Char(m_dlgTab3.m_strPastHistory, buf);
 	_snprintf_s(data.PastHistory, sizeof(data.PastHistory), "%s", buf);
+
+	data.Status = m_dlgTab3.m_iStatus;
 }
 
 void CPatientDlg::OnBnClickedOk()
