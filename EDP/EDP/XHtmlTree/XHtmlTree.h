@@ -240,9 +240,6 @@ public:
 	HTREEITEM	GetPrevCheckedItem(HTREEITEM hItem);
 	HTREEITEM	GetPrevItem(HTREEITEM hItem);
 	BOOL		GetReadOnly() { return m_bReadOnly; }
-	//begin:added by hwy
-	BOOL		GetEditEnabled(){ return m_bEditEnabled; }
-	//end:added by hwy
 	BOOL		GetSelectFollowsCheck() { return m_bSelectFollowsCheck; }
 	COLORREF	GetSeparatorColor() { return m_crSeparator; }		//+++1.6
 	int			GetSeparatorCount(HTREEITEM hItem);
@@ -305,10 +302,6 @@ public:
 	CXHtmlTree&	SetLogfont(LOGFONT * pLogFont);
 	CXHtmlTree&	SetReadOnly(BOOL bReadOnly)
 				{ m_bReadOnly = bReadOnly; return *this; }
-	//begin:added by hwy
-	CXHtmlTree&	SetEditEnabled(BOOL bEditEnabled)
-				{ m_bEditEnabled = bEditEnabled; return *this; }
-	//end:added by hwy
 	CXHtmlTree&	SetSelectFollowsCheck(BOOL bFlag) 
 				{ m_bSelectFollowsCheck = bFlag; return *this; }
 	CXHtmlTree&	SetSeparatorColor(COLORREF rgb);		//+++1.6
@@ -420,10 +413,6 @@ protected:
 											// maps HTREEITEM ==> XHTMLTREEDATA
 	BOOL			m_bReadOnly;			// TRUE = tree is read-only 
 											// (checkboxes disabled)
-	//begin:added by hwy
-	BOOL			m_bEditEnabled;			// TRUE = tree is edit enabled 
-											// (editbox enabled)
-	//end:added by hwy
 	BOOL			m_bSmartCheck;			// TRUE = Smart Checkboxes enabled
 	BOOL			m_bCheckBoxes;			// TRUE = checkboxes enabled
 	BOOL			m_bSelectFollowsCheck;	// TRUE = item will be selected, 
