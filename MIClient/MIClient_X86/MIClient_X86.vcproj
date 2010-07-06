@@ -299,6 +299,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Common\DialogEx.h"
+					>
+				</File>
+				<File
 					RelativePath="..\common\GlobalFuncs.h"
 					>
 				</File>
@@ -344,6 +348,10 @@
 				</File>
 				<File
 					RelativePath="..\common\DataFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\DialogEx.cpp"
 					>
 				</File>
 				<File
