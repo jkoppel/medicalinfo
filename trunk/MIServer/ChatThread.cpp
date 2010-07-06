@@ -263,6 +263,23 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s", "OK||\r\n");
 			m_peer.Send(CString(buf));
 			break;
+		case CMD_SEARCHBYSCANCODEID:
+			if(!p){
+				m_peer.Send(CString("ER||\r\n"));
+				return -1;
+			}
+			strTmp = g_strList.GetNext(p);
+			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%s", buf);
+			strTmp.ReleaseBuffer();
+			pID = new int[1024];
+			if(!Cmd_SearchByScancodeID(buf, pID, num)){
+				m_peer.Send(CString("ER||\r\n"));
+				break;
+			}
+			MakeIDToSeparatorString(pID, num, strTmp);
+			m_peer.Send(strTmp);
+			delete []pID;
+			break;
 		default:
 			m_peer.Send(CString("ER||\r\n"));
 			break;
