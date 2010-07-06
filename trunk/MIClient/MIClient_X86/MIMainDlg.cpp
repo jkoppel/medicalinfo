@@ -13,10 +13,11 @@
 
 // CMIMainDlg dialog
 
-IMPLEMENT_DYNAMIC(CMIMainDlg, CDialog)
+IMPLEMENT_DYNAMIC(CMIMainDlg, CDialogEx)
 
 CMIMainDlg::CMIMainDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CMIMainDlg::IDD, pParent)
+	: CDialogEx(pParent, CMIMainDlg::IDD)
+	, m_strScancodeID(_T(""))
 {
 	char buf[100];
 	int len = 100;
@@ -30,6 +31,8 @@ CMIMainDlg::CMIMainDlg(CWnd* pParent /*=NULL*/)
 	m_nRecNum = 0;
 	m_bPageMode = TRUE;
 	m_nCurrPageIndex = 0;
+	m_nStatusMode = MODE_UNPROCESSED;
+	m_bShowSearchResult = FALSE;
 
 	m_bDragging = FALSE;
 	m_nDragIndex = -1;
@@ -46,12 +49,14 @@ CMIMainDlg::~CMIMainDlg()
 
 void CMIMainDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST_PATIENT, m_lstPatient);
+	DDX_Control(pDX, IDC_STATUS, m_ctrlStatus);
+	DDX_Text(pDX, IDC_SCANCODEID, m_strScancodeID);
 }
 
 
-BEGIN_MESSAGE_MAP(CMIMainDlg, CDialog)
+BEGIN_MESSAGE_MAP(CMIMainDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CONNECT, &CMIMainDlg::OnBnClickedConnect)
 	ON_MESSAGE(SOCK_ONCLOSE, OnDisconnect)
 	ON_BN_CLICKED(IDC_ADD, &CMIMainDlg::OnBnClickedAdd)
@@ -67,7 +72,10 @@ BEGIN_MESSAGE_MAP(CMIMainDlg, CDialog)
 	ON_NOTIFY(LVN_BEGINDRAG, IDC_LIST_PATIENT, &CMIMainDlg::OnLvnBegindragListPatient)
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONUP()
-	END_MESSAGE_MAP()
+	ON_CBN_SELCHANGE(IDC_STATUS, &CMIMainDlg::OnCbnSelchangeStatus)
+	ON_BN_CLICKED(IDC_SEARCH, &CMIMainDlg::OnBnClickedSearch)
+	ON_WM_TIMER()
+END_MESSAGE_MAP()
 
 ///接收到断开连接消息
 LRESULT CMIMainDlg::OnDisconnect(WPARAM wParam, LPARAM lParam)
@@ -301,12 +309,20 @@ void CMIMainDlg::UpdateCurrPage()
 
 BOOL CMIMainDlg::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	CDialogEx::OnInitDialog();
 
 	g_pClientSocket = new CClientSocket(this);
 	SetWindowPos(NULL, 0, 0, 240, 300, SWP_SHOWWINDOW);
 
 	InitListBox();
+
+	m_ctrlStatus.InsertString(0, CString("全部"));
+	m_ctrlStatus.InsertString(1, CString("未处理"));
+	m_ctrlStatus.InsertString(2, CString("已处理"));
+	m_ctrlStatus.SetCurSel(0);
+
+	ShowTime();
+	SetTimer(100, 1000, NULL);
 	return TRUE;  
 }
 
@@ -327,7 +343,7 @@ int ReceiveData()
 }
 
 ///连接命令
-int CMIMainDlg::CmdConnect()
+BOOL CMIMainDlg::CmdConnect()
 {
 	char buf[256];
 
@@ -340,7 +356,7 @@ int CMIMainDlg::CmdConnect()
 	return TRUE;
 }
 
-int CMIMainDlg::CmdGetRecordNum(int &num)
+BOOL CMIMainDlg::CmdGetRecordNum(int &num)
 {
 	char buf[256];
 	CString strTmp;
@@ -372,7 +388,7 @@ int CMIMainDlg::CmdGetRecordNum(int &num)
 	return TRUE;
 }
 
-int CMIMainDlg::CmdGetAllIDs(int *pID, int &num)
+BOOL CMIMainDlg::CmdGetAllIDs(int *pID, int &num)
 {
 	char buf[256];
 	CString strTmp;
@@ -433,7 +449,7 @@ int CMIMainDlg::CmdGetAllIDs(int *pID, int &num)
 	return TRUE;
 }
 
-int CMIMainDlg::CmdGetRecordByID(int ID, struct UserData &data)
+BOOL CMIMainDlg::CmdGetRecordByID(int ID, struct UserData &data)
 {
 	char buf[256];
 
@@ -447,7 +463,7 @@ int CMIMainDlg::CmdGetRecordByID(int ID, struct UserData &data)
 	return ParseRecvDataToRec(CString(g_RecvData), data);
 }
 
-int CMIMainDlg::CmdAppendRecord(struct UserData &data)
+BOOL CMIMainDlg::CmdAppendRecord(struct UserData &data)
 {
 	g_bIsDataComing = FALSE;
 	CString cmdStr;
@@ -484,7 +500,7 @@ int CMIMainDlg::CmdAppendRecord(struct UserData &data)
 	return TRUE;
 }
 
-int CMIMainDlg::CmdDeleteRecordByID(int ID)
+BOOL CMIMainDlg::CmdDeleteRecordByID(int ID)
 {
 	char buf[256];
 
@@ -497,7 +513,7 @@ int CMIMainDlg::CmdDeleteRecordByID(int ID)
 	return TRUE;
 }
 
-int CMIMainDlg::CmdModifyRecordByID(int ID, struct UserData data)
+BOOL CMIMainDlg::CmdModifyRecordByID(int ID, struct UserData data)
 {
 	CString cmdStr;
 
@@ -516,7 +532,7 @@ int CMIMainDlg::CmdModifyRecordByID(int ID, struct UserData data)
 	return TRUE;
 }
 
-int CMIMainDlg::CmdGetNextFreeOrder(int &order)
+BOOL CMIMainDlg::CmdGetNextFreeOrder(int &order)
 {
 	g_bIsDataComing = FALSE;
 	CString cmdStr;
@@ -552,7 +568,7 @@ int CMIMainDlg::CmdGetNextFreeOrder(int &order)
 	return TRUE;
 }
 
-int CMIMainDlg::CmdGetOrderByID(int ID, int &order)
+BOOL CMIMainDlg::CmdGetOrderByID(int ID, int &order)
 {
 	char buf[256];
 
@@ -585,7 +601,7 @@ int CMIMainDlg::CmdGetOrderByID(int ID, int &order)
 	return TRUE;
 }
 
-int CMIMainDlg::CmdSetOrderByID(int ID, int order)
+BOOL CMIMainDlg::CmdSetOrderByID(int ID, int order)
 {
 	char buf[256];
 
@@ -614,7 +630,7 @@ int CMIMainDlg::CmdSetOrderByID(int ID, int order)
 	return TRUE;
 }
 
-int CMIMainDlg::CmdMoveOrder(int org_order, int dst_order)
+BOOL CMIMainDlg::CmdMoveOrder(int org_order, int dst_order)
 {
 	char buf[256];
 
@@ -643,7 +659,7 @@ int CMIMainDlg::CmdMoveOrder(int org_order, int dst_order)
 	return TRUE;
 }
 
-int CMIMainDlg::CmdMoveOrderPrev(int order)
+BOOL CMIMainDlg::CmdMoveOrderPrev(int order)
 {
 	char buf[256];
 
@@ -672,7 +688,7 @@ int CMIMainDlg::CmdMoveOrderPrev(int order)
 	return TRUE;
 }
 
-int CMIMainDlg::CmdMoveOrderNext(int order)
+BOOL CMIMainDlg::CmdMoveOrderNext(int order)
 {
 	char buf[256];
 
@@ -700,6 +716,68 @@ int CMIMainDlg::CmdMoveOrderNext(int order)
 
 	return TRUE;
 }
+
+BOOL CMIMainDlg::CmdSearchByScancodeID(const char *scan_code_id, int *pID, int &num)
+{
+	char buf[256];
+	CString strTmp;
+	POSITION p;
+	num = 0;
+
+	g_bIsDataComing = FALSE;
+	sprintf_s(buf, "%s%d%s%s%s", "CMD", CMD_SEARCHBYSCANCODEID, "||", scan_code_id, "||\r\n");
+	g_pClientSocket->Send(buf);
+	if(!ReceiveData()){
+		return FALSE;
+	}
+
+	ParseSeparatorString(CString(g_RecvData));
+	p = g_strList.GetHeadPosition();
+
+	if(!p){
+		return FALSE;
+	}
+
+	g_strList.GetNext(p);//cmd
+	if(!p){
+		return FALSE;
+	}
+
+	strTmp = g_strList.GetNext(p);//Num
+	if(!p){
+		return FALSE;
+	}
+	if(!strTmp.IsEmpty()){
+		CString2Char(strTmp, buf);
+		sscanf_s(buf, "%d", &num);
+		if(num==0){
+			return TRUE;
+		}
+	}
+
+	int num1 = 0;
+	do{
+		strTmp = g_strList.GetNext(p);//ID
+		if(!strTmp.IsEmpty()){
+			CString2Char(strTmp, buf);
+			if(strncmp(buf, "\r\n", 2)!=0){
+				sscanf_s(buf, "%d", &pID[num1++]);
+			}
+			else{
+				break;
+			}
+		}
+		else{
+			break;
+		}
+	}while(p);
+	if(num!=num1){
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
 
 void CMIMainDlg::OnBnClickedAdd()
 {
@@ -1105,7 +1183,7 @@ void CMIMainDlg::OnMouseMove(UINT nFlags, CPoint point)
 		m_pDragImage->DragShowNolock(true);
 	}
 
-	CDialog::OnMouseMove(nFlags, point);
+	CDialogEx::OnMouseMove(nFlags, point);
 }
 
 void CMIMainDlg::OnLButtonUp(UINT nFlags, CPoint point)
@@ -1136,7 +1214,7 @@ void CMIMainDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		}
 	}
 
-	CDialog::OnLButtonUp(nFlags, point);
+	CDialogEx::OnLButtonUp(nFlags, point);
 }
 
 void CMIMainDlg::DropItemOnList(CListCtrl* pDragList, CListCtrl* pDropList)
@@ -1224,4 +1302,67 @@ void CMIMainDlg::DropItemOnList(CListCtrl* pDragList, CListCtrl* pDropList)
 
 	// Select the new item we just inserted
 	pDropList->SetItemState (lvi.plvi->iItem, LVIS_SELECTED, LVIS_SELECTED);
+}
+
+void CMIMainDlg::OnCbnSelchangeStatus()
+{
+	m_nStatusMode = m_ctrlStatus.GetCurSel();
+	m_bShowSearchResult = FALSE;
+}
+
+void CMIMainDlg::OnBnClickedSearch()
+{
+	UpdateData(TRUE);
+	int num;
+	int *pID = new int[m_nRecNum + 10];
+	char buf[256];
+	struct UserData data;
+
+	g_ProgressInfo.Show("正在查询...");
+	CString2Char(m_strScancodeID, buf);
+	if(!CmdSearchByScancodeID(buf, pID, num)){
+		delete []pID;
+		g_ProgressInfo.Hide();
+		ShowMsg("未找到数据");
+		return;
+	}
+	m_bShowSearchResult = TRUE;
+	m_lstPatient.DeleteAllItems();
+	for(int i=0;i<num;i++){
+		if(!CmdGetRecordByID(pID[i], data)){
+			delete []pID;
+			pID = NULL;
+			g_ProgressInfo.Hide();
+			ShowMsg("查询失败");
+			return;
+		}
+		m_lstPatient.InsertItem(i, CString("病人资料"));
+		UpdateRowData(i, data);
+	}
+
+	g_ProgressInfo.Hide();
+	delete []pID;
+	pID = NULL;
+}
+
+void CMIMainDlg::ShowTime()
+{
+	SYSTEMTIME t;
+	GetLocalTime(&t);
+	char buf[256];
+	
+	sprintf(buf, "%s%02d:%02d:%02d", 
+					"医疗信息远程录入系统     ",
+					t.wHour, t.wMinute, t.wSecond);
+
+	SetWindowText(CString(buf));
+}
+
+void CMIMainDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	if(nIDEvent==100){
+		ShowTime();
+	}
+
+	CDialogEx::OnTimer(nIDEvent);
 }

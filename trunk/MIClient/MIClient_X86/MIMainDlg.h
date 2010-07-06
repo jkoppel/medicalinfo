@@ -3,6 +3,8 @@
 #include "afxcmn.h"
 #include "..\\Common\\GlobalFuncs.h"
 #include "..\\Common\\GlobalVars.h"
+#include "c:\program files\microsoft visual studio 8\vc\ce\atlmfc\include\afxwin.h"
+#include "..\\Common\\DialogEx.h"
 
 
 // CMIMainDlg dialog
@@ -13,7 +15,7 @@ typedef struct {
 } lvItem, *plvItem;
 
 
-class CMIMainDlg : public CDialog
+class CMIMainDlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(CMIMainDlg)
 
@@ -24,6 +26,7 @@ public:
 // Dialog Data
 	enum { IDD = IDD_MICLIENT_MAIN };
 	enum { PAGE_SIZE = 10 };
+	enum { MODE_ALL=0, MODE_UNPROCESSED, MODE_PROCESSED };
 
 protected:
 	void SetConnectStatus(BOOL);
@@ -35,6 +38,10 @@ protected:
 	BOOL m_bPageMode;
 	int m_nCurrPageIndex;
 	int m_nPageNum;
+	int m_nStatusMode;
+	BOOL m_bShowSearchResult;
+
+	COLORREF m_crBackground;
 protected:
 	CListCtrl* m_pDragList;		//Which ListCtrl we are dragging FROM
 	CListCtrl* m_pDropList;		//Which ListCtrl we are dropping ON
@@ -59,20 +66,22 @@ public:
 	void InitListBox();
 	void UpdateRowData(int index, struct UserData data);
 	void UpdateCurrPage();
+	void ShowTime();
 
-	int CmdConnect();
-	int CmdGetRecordNum(int &num);
-	int CmdGetAllIDs(int *pID, int &num);
-	int CmdGetRecordByID(int ID, struct UserData &data);
-	int CmdAppendRecord(struct UserData &data);
-	int CmdDeleteRecordByID(int ID);
-	int CmdModifyRecordByID(int ID, struct UserData data);
-	int CmdGetNextFreeOrder(int &order);
-	int CmdGetOrderByID(int ID, int &order);
-	int CmdSetOrderByID(int ID, int order);
-	int CmdMoveOrder(int org_order, int dst_order);
-	int CmdMoveOrderPrev(int order);
-	int CmdMoveOrderNext(int order);
+	BOOL CmdConnect();
+	BOOL CmdGetRecordNum(int &num);
+	BOOL CmdGetAllIDs(int *pID, int &num);
+	BOOL CmdGetRecordByID(int ID, struct UserData &data);
+	BOOL CmdAppendRecord(struct UserData &data);
+	BOOL CmdDeleteRecordByID(int ID);
+	BOOL CmdModifyRecordByID(int ID, struct UserData data);
+	BOOL CmdGetNextFreeOrder(int &order);
+	BOOL CmdGetOrderByID(int ID, int &order);
+	BOOL CmdSetOrderByID(int ID, int order);
+	BOOL CmdMoveOrder(int org_order, int dst_order);
+	BOOL CmdMoveOrderPrev(int order);
+	BOOL CmdMoveOrderNext(int order);
+	BOOL CmdSearchByScancodeID(const char *scan_code_id, int *pID, int &num);
 public:
 	afx_msg void OnBnClickedMoveprev();
 public:
@@ -94,4 +103,9 @@ public:
 public:
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	void DropItemOnList(CListCtrl* pDragList, CListCtrl* pDropList);
+	CComboBox m_ctrlStatus;
+	CString m_strScancodeID;
+	afx_msg void OnCbnSelchangeStatus();
+	afx_msg void OnBnClickedSearch();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
