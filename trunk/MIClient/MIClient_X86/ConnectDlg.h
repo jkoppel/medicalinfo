@@ -1,9 +1,11 @@
 #pragma once
 
+#include "..\\Common\\DialogEx.h"
+
 
 // CConnectDlg dialog
 
-class CConnectDlg : public CDialog
+class CConnectDlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(CConnectDlg)
 
