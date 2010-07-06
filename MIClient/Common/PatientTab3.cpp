@@ -19,6 +19,7 @@ CPatientTab3::CPatientTab3(CWnd* pParent /*=NULL*/)
 	, m_strClinicalDiagnosis(_T(""))
 	, m_strPharmacy(_T(""))
 	, m_strPastHistory(_T(""))
+	, m_iStatus(0)
 {
 
 }
@@ -36,6 +37,8 @@ void CPatientTab3::DoDataExchange(CDataExchange* pDX)
 	DDV_MaxChars(pDX, m_strClinicalDiagnosis, 50);
 	DDV_MaxChars(pDX, m_strPharmacy, 50);
 	DDV_MaxChars(pDX, m_strPastHistory, 50);
+	DDX_Control(pDX, IDC_STATUS, m_ctrlStatus);
+	DDX_CBIndex(pDX, IDC_STATUS, m_iStatus);
 }
 
 
@@ -44,3 +47,14 @@ END_MESSAGE_MAP()
 
 
 // CPatientTab3 message handlers
+
+BOOL CPatientTab3::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+
+	m_ctrlStatus.InsertString(0, CString("未处理"));
+	m_ctrlStatus.InsertString(1, CString("已处理"));
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
+}

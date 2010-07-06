@@ -1,4 +1,5 @@
 #pragma once
+#include "c:\program files\microsoft visual studio 8\vc\ce\atlmfc\include\afxwin.h"
 
 
 // CPatientTab3 dialog
@@ -24,4 +25,7 @@ public:
 	CString m_strPharmacy;
 public:
 	CString m_strPastHistory;
+	CComboBox m_ctrlStatus;
+	virtual BOOL OnInitDialog();
+	int m_iStatus;
 };
