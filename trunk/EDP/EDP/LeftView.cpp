@@ -79,6 +79,7 @@ void CLeftView::OnInitialUpdate()
 	m_pTree->SetSmartCheckBox(TRUE);
 	m_pTree->SetHtml(TRUE);
 	m_pTree->SetImages(TRUE);
+	m_pTree->SetTextColor(RGB(0, 0, 0));
 
 	g_pRec = new struct TestRecordNode[20];
 	g_iRecNum = 0;
@@ -127,7 +128,6 @@ void CLeftView::OnInitialUpdate()
     tvRoot.item.iImage=11;
 	tvRoot.item.iSelectedImage=11;
 	HTREEITEM item_root=m_pTree->InsertItem(&tvRoot);
-	m_pTree->SetTextColor(RGB(0, 0, 0));
 
 	for(int i=0;i<g_iRecNum;i++){
 		tvRoot.item.pszText = g_pRec[i].file;
