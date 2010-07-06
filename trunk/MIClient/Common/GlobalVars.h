@@ -26,6 +26,7 @@ extern CStringList g_strList;
 struct UserData{
 	int ID;									//ID
 	int Order;								//Ë³Ðò
+	int Status;								//×´Ì¬
 	char ScancodeID[MAX_UDATA_STR_LENGTH+1];//É¨ÃèÂë
 	int Number;								//²¡°¸ºÅ
 	char Name[MAX_UDATA_STR_LENGTH+1];		//ÐÕÃû
@@ -62,6 +63,7 @@ struct UserData{
 #define CMD_MOVEORDER				11
 #define CMD_MOVEORDERPREV			12
 #define CMD_MOVEORDERNEXT			13
+#define CMD_SEARCHBYSCANCODEID		14
 
 #endif
 
