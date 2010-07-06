@@ -21,6 +21,7 @@ extern void ParseSeparatorString(CString str);
 struct UserData{
 	int ID;
 	int Order;
+	int Status;
 	char ScancodeID[MAX_UDATA_STR_LENGTH+1];
 	int Number;
 	char Name[MAX_UDATA_STR_LENGTH+1];
@@ -83,6 +84,9 @@ extern BOOL Cmd_MoveOrder(int org_order, int dst_order);
 extern BOOL Cmd_MoveOrderPrev(int order);
 
 extern BOOL Cmd_MoveOrderNext(int order);
+
+extern BOOL Cmd_SearchByScancodeID(const char *scan_code_id, int *pID, int &num);
+
 
 extern _ConnectionPtr	g_pDBConnection;
 extern BOOL g_bIsDBConnected;

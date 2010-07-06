@@ -192,6 +192,9 @@ void MakeSendCmdFromRec(struct UserData data, CString &str)
 	sprintf(buf, "%d", data.Order);
 	g_strList.AddTail(buf);
 
+	sprintf(buf, "%d", data.Status);
+	g_strList.AddTail(buf);
+
 	g_strList.AddTail(data.ScancodeID);
 
 	sprintf(buf, "%d", data.Number);
@@ -246,6 +249,13 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 
 	str = g_strList.GetNext(p);
 	sscanf(str.GetBuffer(str.GetLength()), "%d", &data.ID);
+	str.ReleaseBuffer();
+	if(!p){
+		return FALSE;
+	}
+
+	str = g_strList.GetNext(p);
+	sscanf(str.GetBuffer(str.GetLength()), "%d", &data.Status);
 	str.ReleaseBuffer();
 	if(!p){
 		return FALSE;
@@ -526,6 +536,14 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 			rec.Order = (UINT)(long)(var);
 		}
 
+		var = pHandlerRecordset->GetCollect("Status");
+		if(var.vt != VT_NULL){
+			rec.Status = (UINT)(long)(var);
+		}
+		else{
+			rec.Status = 0;
+		}
+
 		var = pHandlerRecordset->GetCollect("Address");
 		if(var.vt != VT_NULL){
 			str = (LPCSTR)_bstr_t(var);
@@ -710,6 +728,14 @@ BOOL Cmd_GetRecordByOrder(int order, struct UserData &rec)
 		var = pHandlerRecordset->GetCollect("ID");
 		if(var.vt != VT_NULL){
 			rec.ID = (UINT)(long)(var);
+		}
+
+		var = pHandlerRecordset->GetCollect("Status");
+		if(var.vt != VT_NULL){
+			rec.Status = (UINT)(long)(var);
+		}
+		else{
+			rec.Status = 0;
 		}
 
 		var = pHandlerRecordset->GetCollect("Address");
@@ -941,8 +967,9 @@ BOOL Cmd_AppendRecord(struct UserData &rec)
 	rec.Order = order;
 
 	CString strSql;
-	strSql.Format("INSERT INTO Case_Data([Order],ScancodeID,[Number],Name,Sex,Age,Birth_date,People,Department,Type_Of_Work,Province,City,Address,ZipCode,Tel,Clinical_Diagnosis,Height,Weight,Check_Date,Hazards,Pharmacy,Past_History) VALUES(%d,'%s',%d,'%s','%s',%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',%d,'%s','%s','%s','%s','%s')",
+	strSql.Format("INSERT INTO Case_Data([Order],[Status],ScancodeID,[Number],Name,Sex,Age,Birth_date,People,Department,Type_Of_Work,Province,City,Address,ZipCode,Tel,Clinical_Diagnosis,Height,Weight,Check_Date,Hazards,Pharmacy,Past_History) VALUES(%d,%d,'%s',%d,'%s','%s',%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',%d,'%s','%s','%s','%s','%s')",
 					rec.Order,
+					rec.Status,
 					rec.ScancodeID,
 					rec.Number,
 					rec.Name,
@@ -994,7 +1021,8 @@ BOOL Cmd_DeleteRecordByID(int ID)
 BOOL Cmd_ModifyRecordByID(int ID, struct UserData rec)
 {
 	CString strSql;
-	strSql.Format("UPDATE Case_Data SET ScancodeID='%s',[Number]=%d,Name='%s',Sex='%s',Age=%d,Birth_date='%s',People='%s',Department='%s',Type_Of_Work='%s',Province='%s',City='%s',Address='%s',ZipCode='%s',Tel='%s',Clinical_Diagnosis='%s',Height=%d,Weight='%s',Check_Date='%s',Hazards='%s',Pharmacy='%s',Past_History='%s' WHERE ID=%d",
+	strSql.Format("UPDATE Case_Data SET Status=%d,ScancodeID='%s',[Number]=%d,Name='%s',Sex='%s',Age=%d,Birth_date='%s',People='%s',Department='%s',Type_Of_Work='%s',Province='%s',City='%s',Address='%s',ZipCode='%s',Tel='%s',Clinical_Diagnosis='%s',Height=%d,Weight='%s',Check_Date='%s',Hazards='%s',Pharmacy='%s',Past_History='%s' WHERE ID=%d",
+					rec.Status,
 					rec.ScancodeID,
 					rec.Number,
 					rec.Name,
@@ -1315,6 +1343,49 @@ BOOL Cmd_MoveOrderNext(int order)
 	if(!Cmd_SetOrderByID(iao[1].ID, iao[0].Order)){
 		return FALSE;
 	}
+
+	return TRUE;
+}
+
+BOOL Cmd_SearchByScancodeID(const char *scan_code_id, int *pID, int &num)
+{
+	_RecordsetPtr	pHandlerRecordset;
+	CString str;
+	char buf[256];
+
+	sprintf(buf, "%s%s%s", "SELECT ID,[Order],ScancodeID FROM Case_Data WHERE ScancodeID='", scan_code_id, "' ORDER BY [Order] ASC");
+	pHandlerRecordset.CreateInstance(__uuidof(Recordset));
+	try{
+		pHandlerRecordset->Open(buf,// 查询表中所有字段
+		g_pDBConnection.GetInterfacePtr(),	 // 获取库接库的IDispatch指针
+		adOpenDynamic,
+		adLockOptimistic,
+		adCmdText);
+	}
+	catch(_com_error *e){
+		Printf(e->ErrorMessage());
+		return FALSE;
+	}  
+
+	BOOL ret = FALSE;
+	_variant_t var;
+
+	num = 0;
+	while(!pHandlerRecordset->adoEOF){
+		var = pHandlerRecordset->GetCollect("ID");
+		if(var.vt != VT_NULL){
+			pID[num++] = (UINT)(long)(var);
+		}
+		else{
+			break;
+		}
+
+		pHandlerRecordset->MoveNext();
+	}
+
+	pHandlerRecordset->Close();
+	pHandlerRecordset.Release();
+	pHandlerRecordset = NULL;
 
 	return TRUE;
 }
