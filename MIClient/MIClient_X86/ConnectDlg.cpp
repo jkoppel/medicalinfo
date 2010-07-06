@@ -11,10 +11,10 @@
 
 // CConnectDlg dialog
 
-IMPLEMENT_DYNAMIC(CConnectDlg, CDialog)
+IMPLEMENT_DYNAMIC(CConnectDlg, CDialogEx)
 
 CConnectDlg::CConnectDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CConnectDlg::IDD, pParent)
+	: CDialogEx(pParent, CConnectDlg::IDD)
 	, m_strAddress(_T(""))
 	, m_nPort(5000)
 {
@@ -27,13 +27,13 @@ CConnectDlg::~CConnectDlg()
 
 void CConnectDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_ADDRESS, m_strAddress);
 	DDX_Text(pDX, IDC_PORT, m_nPort);
 }
 
 
-BEGIN_MESSAGE_MAP(CConnectDlg, CDialog)
+BEGIN_MESSAGE_MAP(CConnectDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CONNECT, &CConnectDlg::OnBnClickedConnect)
 END_MESSAGE_MAP()
 
@@ -49,5 +49,5 @@ void CConnectDlg::OnBnClickedConnect()
 		ShowMsg("服务器端口范围在1~9999之间");
 		return;
 	}
-	CDialog::OnOK();
+	CDialogEx::OnOK();
 }
