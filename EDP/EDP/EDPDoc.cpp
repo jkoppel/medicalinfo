@@ -24,7 +24,6 @@ END_MESSAGE_MAP()
 CEDPDoc::CEDPDoc()
 {
 	//初始化
-	m_bDataExists = FALSE;
 }
 
 CEDPDoc::~CEDPDoc()
@@ -35,9 +34,6 @@ BOOL CEDPDoc::OnNewDocument()
 {
 	if (!CDocument::OnNewDocument())
 		return FALSE;
-
-	//初始化
-	m_bDataExists = FALSE;
 
 	return TRUE;
 }
@@ -82,21 +78,10 @@ BOOL CEDPDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	if (!CDocument::OnOpenDocument(lpszPathName))
 		return FALSE;
 
-	//读数据并将它复制过来
-	struct TestRecord rec;
-	if(!LoadFile(lpszPathName, rec)){
-		return FALSE;
-	}
-	m_bDataExists = TRUE;
-	memcpy(&m_rec, &rec, sizeof(struct TestRecord));
-
 	return TRUE;
 }
 
 void CEDPDoc::OnCloseDocument()
 {
-	//重置标志
-	m_bDataExists = FALSE;
-
 	CDocument::OnCloseDocument();
 }

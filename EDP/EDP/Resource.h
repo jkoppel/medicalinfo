@@ -32,6 +32,7 @@
 #define IDC_PRODUCTNO                   1025
 #define IDC_OPERATORNO                  1026
 #define IDC_FILTER_GROUP                1027
+#define IDC_TREE1                       1028
 #define ID_SETTINGS                     32772
 
 // Next default values for new objects
@@ -40,7 +41,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        140
 #define _APS_NEXT_COMMAND_VALUE         32774
-#define _APS_NEXT_CONTROL_VALUE         1028
+#define _APS_NEXT_CONTROL_VALUE         1029
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

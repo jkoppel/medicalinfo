@@ -6,6 +6,8 @@
 #include "EDP.h"
 #include "GlobalFuncs.h"
 #include "direct.h"
+#include "SplitterWndEx\\SplitterWndEx.h"
+#include "EDPView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -21,7 +23,6 @@ IMPLEMENT_DYNCREATE(CLeftView, CView)
 CLeftView::CLeftView()
 {
 	m_ilDataFile.DeleteImageList();
-	m_pTree = NULL;
 }
 
 CLeftView::~CLeftView()
@@ -33,9 +34,11 @@ BEGIN_MESSAGE_MAP(CLeftView, CView)
 	//{{AFX_MSG_MAP(CLeftView)
 	ON_NOTIFY_REFLECT(NM_DBLCLK, OnDblclk)
 	ON_NOTIFY_REFLECT(TVN_SELCHANGED, OnSelchanged)
+	ON_NOTIFY(TVN_SELCHANGED, IDC_TREE, OnSelchanged)
 	//}}AFX_MSG_MAP
 	ON_WM_CREATE()
 	ON_WM_SIZE()
+	ON_REGISTERED_MESSAGE(WM_XHTMLTREE_CHECKBOX_CLICKED, OnCheckbox)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -73,73 +76,59 @@ void CLeftView::OnInitialUpdate()
 	// create image list for level 0 items
 	m_ilDataFile.DeleteImageList();
 	m_ilDataFile.Create(IDB_BITMAP_DATAFILE, 16, 1, RGB(255,255,255));
-	m_pTree->SetImageList(&m_ilDataFile, TVSIL_NORMAL);
 
-	m_pTree->Initialize(TRUE, TRUE);
-	m_pTree->SetSmartCheckBox(TRUE);
-	m_pTree->SetHtml(TRUE);
-	m_pTree->SetImages(TRUE);
-	m_pTree->SetTextColor(RGB(0, 0, 0));
-
-	g_pRec = new struct TestRecordNode[20];
-	g_iRecNum = 0;
-	char dir[1024], buf[1024];
-
-	FILE *pFile = NULL;
-	fopen_s(&pFile, CONFIG_DIR_FILE, "rb");
-	if(!pFile){
-		return;
-	}
-	do{
-		memset(dir, 0, sizeof(dir));
-		fscanf(pFile, "%s\r\n", dir);
-		if(strlen(dir)>0){
-			CFileFind f; 
-			_chdir(dir);
-			BOOL bFind = f.FindFile("*.*"); 
-			while(bFind) 
-			{ 
-				bFind = f.FindNextFile(); 
-				if(f.IsDots()){
-					continue; 
-				}
-				CString tmp;
-				tmp = CString(dir) + "\\" + f.GetFileName();
-				sprintf(buf, "%s", tmp.GetBuffer(0));
-				if(LoadFile(buf, g_pRec[g_iRecNum].test_rec)){
-					sprintf(g_pRec[g_iRecNum].dir, "%s", dir);
-					sprintf(g_pRec[g_iRecNum].file, "%s", f.GetFileName().GetBuffer(0));
-					g_iRecNum++;
-				}
-			}
-		}
-		else{
-			break;
-		}
-	} while(!feof(pFile));
-	fclose(pFile);
-
-	TV_INSERTSTRUCT tvRoot;//Ê÷¸ù
-    TV_INSERTSTRUCT tvSecond;//Ê÷Ö¦
-	TV_INSERTSTRUCT tvThree;//Ê÷Ò¶
-	tvRoot.hParent=NULL;
-	tvRoot.item.pszText=g_pRec[0].dir;
-	tvRoot.item.mask=TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-    tvRoot.item.iImage=11;
-	tvRoot.item.iSelectedImage=11;
-	HTREEITEM item_root=m_pTree->InsertItem(&tvRoot);
-
-	for(int i=0;i<g_iRecNum;i++){
-		tvRoot.item.pszText = g_pRec[i].file;
-		tvRoot.item.iImage=i;
-		tvRoot.item.iSelectedImage=i;
-		tvRoot.hParent = item_root;
-		HTREEITEM item_curr = m_pTree->InsertItem(&tvRoot);
-		m_pTree->SetItemTextColor(item_curr, RGB(((i/6)%2)*255, ((i/3)%2)*255, ((i/5)%2)*255));
-	}
+	InitTree();
 }
 
+void CLeftView::InitTree()
+{
+	g_pTree->DeleteAllItems();
 
+	g_pTree->SetImageList(&m_ilDataFile, TVSIL_NORMAL);
+
+	g_pTree->Initialize(TRUE, TRUE);
+	g_pTree->SetSmartCheckBox(TRUE);
+	g_pTree->SetHtml(TRUE);
+	g_pTree->SetImages(TRUE);
+	g_pTree->SetTextColor(RGB(0, 0, 0));
+
+	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	LoadNode();
+
+	TV_INSERTSTRUCT tvRoot;//Ê÷¸ù
+	tvRoot.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+
+	for(int i=0;i<g_iDirNodeNum;i++){
+		tvRoot.hParent = NULL;
+		tvRoot.item.pszText = g_pDirNode[i].sDir;
+		tvRoot.item.iImage = 8;
+		tvRoot.item.iSelectedImage = 8;
+	
+		HTREEITEM item_root=g_pTree->InsertItem(&tvRoot);
+		for(int j=0;j<g_pDirNode[i].iNum;j++){
+			TV_INSERTSTRUCT tvChild;//Ê÷Ò¶
+			tvChild.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+			tvChild.item.pszText = g_pDirNode[i].pFileNode[j].sFile;
+			tvChild.item.iImage= 10;
+			tvChild.item.iSelectedImage = 10;
+			tvChild.hParent = item_root;
+			HTREEITEM item_child = g_pTree->InsertItem(&tvChild);
+			for(int k=0;k<g_pDirNode[i].pFileNode[j].rec.iNumOfSpeed;k++){
+				TV_INSERTSTRUCT tvChild;//Ê÷Ò¶
+				tvChild.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+				char tmp[128];
+				sprintf(tmp, "%s%d", "Speed ", k + 1);
+				tvChild.item.pszText = tmp;
+				tvChild.item.iImage=(k % 12) + 2;
+				tvChild.item.iSelectedImage = (k % 12) + 2;
+				tvChild.hParent = item_child;
+				HTREEITEM item_curr = g_pTree->InsertItem(&tvChild);
+				g_pTree->SetItemTextColor(item_curr, color[k]);
+				g_pTree->SetItemData(item_curr, (DWORD_PTR)(&g_pDirNode[i].pFileNode[j].item_data[k]));
+			}
+		}
+	}
+}
 
 void CLeftView::OnDblclk(NMHDR* pNMHDR, LRESULT* pResult) 
 {
@@ -149,6 +138,11 @@ void CLeftView::OnDblclk(NMHDR* pNMHDR, LRESULT* pResult)
 void CLeftView::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	NM_TREEVIEW* pNMView = (NM_TREEVIEW*)pNMHDR;
+
+	CSplitterWndEx* pSplitter=(CSplitterWndEx*)GetParent();
+	CEDPView *pView = (CEDPView*)pSplitter->GetPane(0,1);
+	pView->RedrawWindow();
+
 	*pResult = 0;
 }
 
@@ -159,18 +153,19 @@ int CLeftView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	
-	m_pTree = new CXHtmlTree();
-	ASSERT(m_pTree);
+	g_pTree = new CXHtmlTree();
+	ASSERT(g_pTree);
 
 	// note:  TVS_NOTOOLTIPS is set in CXHtmlTree::PreCreateWindow()
 
 	DWORD dwStyle = TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | 
-					TVS_EDITLABELS | TVS_SHOWSELALWAYS | /*TVS_NOTOOLTIPS |*/
+					TVS_SHOWSELALWAYS | /*TVS_NOTOOLTIPS |*/
 					WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | WS_BORDER;
+					//TVS_EDITLABELS : ¿ÉÒÔ±à¼­
 
 	CRect rect(0,0,100,100);
 
-	VERIFY(m_pTree->Create(dwStyle, rect, this, IDC_TREE));
+	VERIFY(g_pTree->Create(dwStyle, rect, this, IDC_TREE));
 
 	return 0;
 }
@@ -179,9 +174,52 @@ void CLeftView::OnSize(UINT nType, int cx, int cy)
 {
 	CView::OnSize(nType, cx, cy);
 
-	if (m_pTree && ::IsWindow(m_pTree->m_hWnd))
+	if (g_pTree && ::IsWindow(g_pTree->m_hWnd))
 	{
 		// stretch tree to fill window
-		m_pTree->MoveWindow(0, 0, cx, cy);
+		g_pTree->MoveWindow(0, 0, cx, cy);
 	}
+}
+
+LRESULT CLeftView::OnCheckbox(WPARAM wParam, LPARAM lParam)
+//=============================================================================
+{
+	/*
+	TRACE(_T("in CXHtmlTreeTestDlg::OnCheckbox\n"));
+
+	XHTMLTREEMSGDATA *pData = (XHTMLTREEMSGDATA *)wParam;
+	ASSERT(pData);
+
+	BOOL bChecked = lParam;
+
+	if (pData)
+	{
+		HTREEITEM hItem = pData->hItem;
+
+		if (hItem)
+		{
+			if (m_bLog)
+				m_List.Printf(CXListBox::Blue, CXListBox::White, 0, 
+					_T("%04d  checkbox %schecked at '%s'"), m_nLineNo++,
+					bChecked ? _T("") : _T("un"),
+					m_Tree.GetItemText(hItem));
+
+			DumpInfo(hItem);
+
+			UINT uState = m_Tree.GetItemState(hItem, TVIS_STATEIMAGEMASK);
+			uState = uState >> 12;
+			int nStateImage = m_Tree.GetStateImage(hItem);
+			TRACE(_T("bChecked=%d  uState=%X  nStateImage=%d\n"), bChecked, uState, nStateImage);
+
+			if (m_pCheckedItemsDlg)
+				OnShowChecked();
+		}
+	}
+	*/
+	CSplitterWndEx* pSplitter=(CSplitterWndEx*)GetParent();
+	CEDPView *pView = (CEDPView*)pSplitter->GetPane(0,1);
+	pView->RedrawWindow();
+
+
+	return 0;
 }

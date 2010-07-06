@@ -12,7 +12,6 @@
 
 #include   <afxcview.h>
 #include "EDPView.h"
-#include "XHtmlTree\\XHtmlTree.h"
 
 class CLeftView : public CView
 {
@@ -25,6 +24,7 @@ public:
 
 // Operations
 public:
+	void InitTree();
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -47,7 +47,6 @@ protected:
 protected:
 	CEDPView* m_pDrawView;
 	CImageList m_ilDataFile;
-	CXHtmlTree *m_pTree;
 
 	//{{AFX_MSG(CLeftView)
 	afx_msg void OnDblclk(NMHDR* pNMHDR, LRESULT* pResult);
@@ -57,6 +56,7 @@ protected:
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg LRESULT OnCheckbox(WPARAM, LPARAM);
 };
 
 /////////////////////////////////////////////////////////////////////////////

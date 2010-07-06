@@ -43,8 +43,8 @@ protected:
 	POINT m_pntClientAreaOrig;	//真正坐标原点位置
 	int m_nClientAreaWidth;		//作图区域宽度
 	int m_nClientAreaHeight;	//作图区域高度
-	int m_nXSpan;				//横轴一格对应的像素大小
-	int m_nYSpan;				//纵轴一格对应的像素大小
+	//int m_nXSpan;				//横轴一格对应的像素大小
+	//int m_nYSpan;				//纵轴一格对应的像素大小
 
 	CLBTabCtrl *m_pTab;
 

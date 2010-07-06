@@ -45,6 +45,8 @@ protected:
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
 public:
 	afx_msg void OnSettings();
+public:
+	afx_msg void OnDestroy();
 };
 
 extern BOOL PeekAndPump();
