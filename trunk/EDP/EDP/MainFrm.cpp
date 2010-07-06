@@ -9,6 +9,7 @@
 #include "FormViewEx.h"
 #include "EDPView.h"
 #include "DlgSettingDir.h"
+#include "GlobalFuncs.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -22,6 +23,7 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
 	ON_COMMAND(ID_SETTINGS, &CMainFrame::OnSettings)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -56,7 +58,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	/*
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP
 		| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
 		!m_wndToolBar.LoadToolBar(IDR_MAINFRAME))
@@ -64,7 +65,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		TRACE0("未能创建工具栏\n");
 		return -1;      // 未能创建
 	}
-	*/
 
 	if (!m_wndStatusBar.Create(this) ||
 		!m_wndStatusBar.SetIndicators(indicators,
@@ -74,12 +74,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      // 未能创建
 	}
 
-	// TODO: 如果不需要工具栏可停靠，则删除这三行
-	/*
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	EnableDocking(CBRS_ALIGN_ANY);
 	DockControlBar(&m_wndToolBar);
-	*/
 
 	return 0;
 }
@@ -129,27 +126,17 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 
 	m_wndSplitter.LockBar();
 	return TRUE;
-
-	/*
-	if(!m_wndSplitter.CreateStatic (this,1,2)){
-		return FALSE;
-	}
-	if(!m_wndSplitter.CreateView(0,0,RUNTIME_CLASS(CLeftView),CSize(200,100),pContext)||
-		!m_wndSplitter.CreateView (0,1,RUNTIME_CLASS(CEDPView),CSize(100,100),pContext)){
-		m_wndSplitter.DestroyWindow();
-		return FALSE;
-	}
-	return TRUE;
-	*/
-
-	//return CFrameWnd::OnCreateClient(lpcs, pContext);//the org oncreateclient content
 }
 
 void CMainFrame::OnSettings()
 {
 	CDlgSettingDir dlg;
-	dlg.DoModal();
-	return;
+	if(dlg.DoModal()==IDOK){
+		CLeftView *pView = (CLeftView*)m_wndSplitter2.GetPane(0, 0);
+		pView->InitTree();
+		CEDPView *pView1 = (CEDPView*)m_wndSplitter2.GetPane(0, 1);
+		pView1->RedrawWindow();
+	}
 }
 
 BOOL PeekAndPump()
@@ -166,4 +153,11 @@ BOOL PeekAndPump()
   }
 
   return TRUE;
+}
+
+void CMainFrame::OnDestroy()
+{
+	CFrameWnd::OnDestroy();
+
+	ReleaseDirNode();
 }

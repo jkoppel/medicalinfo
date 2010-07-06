@@ -1,9 +1,6 @@
 #include "StdAfx.h"
 #include "GlobalFuncs.h"
-
-
-int g_iRecNum = 0;
-struct TestRecordNode *g_pRec = NULL;
+#include "GlobalVars.h"
 
 BOOL LoadFile(const char *file, struct TestRecord &rec)
 {
@@ -56,6 +53,71 @@ BOOL LoadFile(const char *file, struct TestRecord &rec)
 BOOL SaveFile(const char *file, struct TestRecord rec)
 {
 	return TRUE;
+}
+
+BOOL LoadNode()
+{
+	LoadDirFromConfigFile();
+
+	int i;
+	CFileFind ff;
+	BOOL bDecide = FALSE;
+	CString str, name;
+	char buf[1024];
+
+	g_iDirNodeNum = g_saDirectories.GetCount();
+	g_pDirNode = new struct TestRecordDirNode[g_iDirNodeNum];
+	memset(g_pDirNode, 0, sizeof(struct TestRecordDirNode) * g_iDirNodeNum);
+
+	for(i=0;i<g_saDirectories.GetCount();i++){
+		str = g_saDirectories.GetAt(i);
+		if(str.Right(1)!='\\'){
+			str += "\\";
+		}
+		sprintf(g_pDirNode[i].sDir, "%s", str);
+		g_pDirNode[i].pFileNode = new struct TestRecordFileNode[20];
+
+		bDecide = ff.FindFile(str+"*.DFT");
+		g_pDirNode[i].iNum = 0;
+		while(bDecide){
+			bDecide = ff.FindNextFile();  
+			if(ff.IsDirectory() || ff.IsDots()){//目录或.,..
+				continue;
+			}
+			name = str + ff.GetFileName();
+			sprintf(buf, "%s", name.GetBuffer(0));
+			name.ReleaseBuffer();
+			if(LoadFile(buf, g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].rec)){
+				name = ff.GetFileName();
+				sprintf(g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].sFile, "%s", name.GetBuffer(0));
+				name.ReleaseBuffer();
+				for(int s=0;s<g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].rec.iNumOfSpeed;s++){
+					g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].item_data[s].iIndex = s;
+					g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].item_data[s].pRec = &g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].rec;
+				}
+				g_pDirNode[i].iNum ++;
+			}
+			if(g_pDirNode[i].iNum>=20){
+				break;
+			}
+		}
+		ff.Close();
+	}
+	return TRUE;
+}
+
+void ReleaseDirNode()
+{
+	if(g_pDirNode!=NULL){
+		for(int i=0;i<g_iDirNodeNum;i++){
+			if(g_pDirNode[i].pFileNode!=NULL){
+				delete []g_pDirNode[i].pFileNode;
+				g_pDirNode[i].pFileNode = NULL;
+			}
+		}
+		delete []g_pDirNode;
+		g_pDirNode = NULL;
+	}
 }
 
 extern int MyMessageBox(LPCTSTR lpszText, LPCTSTR lpszCaption, UINT nType = MB_OK);
@@ -187,5 +249,49 @@ BOOL CheckStrTimeFormat(const char *StrTime, int &hour, int &minute)
 		return FALSE;
 	}
 
+	return TRUE;
+}
+
+BOOL LoadDirFromConfigFile()
+{
+	CStdioFile file;
+	if(!file.Open(CONFIG_DIR_FILE, CFile::modeNoTruncate | CFile::modeCreate)){
+		return FALSE;
+	}
+	g_saDirectories.RemoveAll();
+	char dir[1024];
+	CString str;
+	while(file.ReadString(dir, sizeof(dir))){
+		if(strlen(dir)>0){
+			if(dir[strlen(dir)-1]=='\n'){//去掉换行符
+				dir[strlen(dir)-1]='\0';
+			}
+			str.Format("%s", dir);
+			str.Trim();
+			if(str.GetLength()>0){
+				g_saDirectories.Add(str);
+			}
+		}
+	}
+	file.Close();
+	return TRUE;
+}
+
+BOOL SaveDirToConfigFile()
+{
+	CStdioFile file;
+	if(!file.Open(CONFIG_DIR_FILE, CFile::modeCreate | CFile::modeWrite)){
+		return FALSE;
+	}
+	CString str;
+	for(int i=0;i<g_saDirectories.GetCount();i++){
+		str = g_saDirectories.GetAt(i);;
+		str = str.Trim();
+		if(str.GetLength()){
+			str += CString("\n");
+			file.WriteString(str);
+		}
+	}
+	file.Close();
 	return TRUE;
 }

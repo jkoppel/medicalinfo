@@ -5,6 +5,7 @@
 #pragma once
 
 #include "GlobalFuncs.h"
+#include "GlobalVars.h"
 
 
 class CEDPDoc : public CDocument
@@ -15,8 +16,6 @@ protected: // 仅从序列化创建
 
 // 属性
 public:
-	int m_bDataExists;//读了文件
-	struct TestRecord m_rec;//读出来的记录
 
 // 操作
 public:

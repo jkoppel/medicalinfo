@@ -146,33 +146,33 @@ void CEDPView::DrawData()
 	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
 
 	//画轴坐标及文字标识
-	m_nXSpan = m_nClientAreaWidth / 11;
-	m_nYSpan = (int)(m_nClientAreaHeight / 5.5);
+	double xspan = m_nClientAreaWidth / 11.0;
+	double yspan= m_nClientAreaHeight / 5.5;
 	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + m_nXSpan/2 + m_nXSpan * i, m_pntClientAreaRef.y);
-		pDC->LineTo(m_pntClientAreaRef.x + m_nXSpan/2 + m_nXSpan * i, m_pntClientAreaRef.y + 5);
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
 
 		sprintf_s(buf, "%d", (i-5)*10);
-		rect.left = m_pntClientAreaRef.x + m_nXSpan/2 + m_nXSpan * i - 25;
-		rect.right = m_pntClientAreaRef.x + m_nXSpan/2 + m_nXSpan * i + 25;
+		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
+		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
 		rect.top = m_pntClientAreaRef.y;
 		rect.bottom = m_pntClientAreaRef.y + 25;
 		pDC->DrawText(buf, &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
 	}
 	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + m_nYSpan * i);
-		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + m_nYSpan * i);
+		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
 
 		sprintf_s(buf, "%d", (4-i)*250);
 		rect.left = m_pntClientAreaRef.x - 5 - 40;
 		rect.right = m_pntClientAreaRef.x - 5;
-		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + m_nYSpan * i - 10;
-		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + m_nYSpan * i + 10;
+		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
+		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
 		pDC->DrawText(buf, &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
 	}
 	//原点位置
-	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + m_nXSpan/2 + m_nXSpan * 5;
-	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + m_nYSpan * 4;
+	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
+	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
 
 	pen.DeleteObject();
 
@@ -183,12 +183,12 @@ void CEDPView::DrawData()
 	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
 	pDC->SelectObject(&pen);
 	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + m_nXSpan/2 + m_nXSpan * i, m_pntClientAreaRef.y -2);
-		pDC->LineTo(m_pntClientAreaRef.x + m_nXSpan/2 + m_nXSpan * i, m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
 	}
 	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + m_nYSpan * i);
-		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + m_nYSpan * i);
+		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
 	}
 	pen.DeleteObject();
 
@@ -233,57 +233,54 @@ void CEDPView::DrawData()
 	oldFont=pDC->SelectObject(&fontLogo);
 	pDC->DrawText("Force [N]", &rect, DT_SINGLELINE | DT_LEFT );
 
-	//画曲线
-	/*
-	CEDPDoc *pDoc = GetDocument();
-	if(!pDoc->m_bDataExists){
+	if(g_pTree==NULL){
 		return;
 	}
-	pRec = &pDoc->m_rec;
-	*/
 
-	for(int k=0;k<g_iRecNum;k++){
-		pRec = &g_pRec[i].test_rec;
-
-
-	//pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
-	//pDC->SelectObject(&pen);
 	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
-	for(i=0;i<pRec->iNumOfSpeed;i++){
-		double min = pRec->fDisplacement[i][0], max = pRec->fDisplacement[i][0], sum = 0.0, avg = 0.0;
+	HTREEITEM hItem = g_pTree->GetFirstCheckedItem();
+	while (hItem)
+	{
+		DWORD_PTR p = g_pTree->GetItemData(hItem);
+
+		hItem = g_pTree->GetNextCheckedItem(hItem);
+
+		if(p==NULL){
+			continue;
+		}
+		struct TreeItemData *tp = (struct TreeItemData *)p;
+
+		double min = tp->pRec->fDisplacement[tp->iIndex][0], max = tp->pRec->fDisplacement[tp->iIndex][0], sum = 0.0, avg = 0.0;
 		//计算均值及幅度
-		for(j=0;j<pRec->iNumOfForce[i];j++){
-			sum += pRec->fDisplacement[i][j];
-			if(pRec->fDisplacement[i][j]<min){
-				min = pRec->fDisplacement[i][j];
+		for(j=0;j<tp->pRec->iNumOfForce[tp->iIndex];j++){
+			sum += tp->pRec->fDisplacement[tp->iIndex][j];
+			if(tp->pRec->fDisplacement[tp->iIndex][j]<min){
+				min = tp->pRec->fDisplacement[tp->iIndex][j];
 			}
-			if(pRec->fDisplacement[i][j]>max){
-				max = pRec->fDisplacement[i][j];
+			if(tp->pRec->fDisplacement[tp->iIndex][j]>max){
+				max = tp->pRec->fDisplacement[tp->iIndex][j];
 			}
 		}
-		avg = sum/pRec->iNumOfForce[i];
+		avg = sum/tp->pRec->iNumOfForce[tp->iIndex];
 		pen.DeleteObject();
-		pen.CreatePen(PS_SOLID, 2, color[i]);
+		pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
 		pDC->SelectObject(&pen);
 		for(j=0;j<800;j++){
 			//X按均值和幅度缩放到对应值
-			x = (int)((pRec->fDisplacement[i][300+j] - avg) / (max-min) * (m_nXSpan*10) + m_pntClientAreaOrig.x);
+			x = (int)((tp->pRec->fDisplacement[tp->iIndex][300+j] - avg) * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
 			//Y直接使用原大小
-			y = (int)(m_pntClientAreaOrig.y - pRec->fForce[i][300+j]);
-#if 1	//是否要画线，是1，否0
+			y = (int)(m_pntClientAreaOrig.y - tp->pRec->fForce[tp->iIndex][300+j] * (yspan / 250));
 			if(j==0){
 				pDC->MoveTo(x, y);
-				pDC->SetPixel(x, y, color[i]);
+				pDC->SetPixel(x, y, color[tp->iIndex]);
 			}
 			else{
 				pDC->LineTo(x, y);
 			}
-#else
-			pDC->SetPixel(x, y, color[i]);
-#endif
+			if(tp->pRec->fForce[tp->iIndex][300+j]>1000){
+				AfxMessageBox("Hello World!");
+			}
 		}
-	}
-
 	}
 
 	pDC->SelectObject(oldFont);
