@@ -136,7 +136,6 @@ CXHtmlTree::CXHtmlTree()
 	m_bCheckBoxes(FALSE),
 	m_bSelectFollowsCheck(TRUE),
 	m_bReadOnly(FALSE),
-	m_bEditEnabled(FALSE),//added by hwy
 	m_bHtml(TRUE),
 	m_bStripHtml(FALSE),
 	m_bLogFont(FALSE),
@@ -4502,8 +4501,6 @@ BOOL CXHtmlTree::GetItemRect(HTREEITEM hItem, LPRECT lpRect, BOOL bTextOnly)
 BOOL CXHtmlTree::OnBeginlabeledit(NMHDR* /*pNMHDR*/, LRESULT* pResult) 
 //=============================================================================
 {
-	//begin:deleted by hwy
-	/*
 	*pResult = 0;
 
 	HTREEITEM hItem = IsOverItem();
@@ -4523,9 +4520,8 @@ BOOL CXHtmlTree::OnBeginlabeledit(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 		m_nHorzPos = GetScrollPos(SB_HORZ);	// save initial scroll position
 	}
 	return (BOOL)*pResult;	// 0 = allow parent to handle
-	*/
-	//end:deleted by hwy
 	//begin:added by hwy
+	/*
 	*pResult = 0;
 
 	HTREEITEM hItem = IsOverItem();
@@ -4545,6 +4541,7 @@ BOOL CXHtmlTree::OnBeginlabeledit(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 		m_nHorzPos = GetScrollPos(SB_HORZ);	// save initial scroll position
 	}
 	return (BOOL)*pResult;	// 0 = allow parent to handle
+	*/
 	//end:added by hwy
 }
 
