@@ -108,12 +108,12 @@ void CLeftView::InitTree()
 		for(int j=0;j<g_pDirNode[i].iNum;j++){
 			TV_INSERTSTRUCT tvChild;//Ê÷Ò¶
 			tvChild.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-			tvChild.item.pszText = g_pDirNode[i].pFileNode[j].sFile;
+			tvChild.item.pszText = g_pDirNode[i].pFileNode[j].addition_info.sFile;
 			tvChild.item.iImage= 10;
 			tvChild.item.iSelectedImage = 10;
 			tvChild.hParent = item_root;
 			HTREEITEM item_child = g_pTree->InsertItem(&tvChild);
-			for(int k=0;k<g_pDirNode[i].pFileNode[j].rec.iNumOfSpeed;k++){
+			for(int k=0;k<g_pDirNode[i].pFileNode[j].test_record.iNumOfSpeed;k++){
 				TV_INSERTSTRUCT tvChild;//Ê÷Ò¶
 				tvChild.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
 				char tmp[128];
@@ -124,7 +124,7 @@ void CLeftView::InitTree()
 				tvChild.hParent = item_child;
 				HTREEITEM item_curr = g_pTree->InsertItem(&tvChild);
 				g_pTree->SetItemTextColor(item_curr, color[k]);
-				g_pTree->SetItemData(item_curr, (DWORD_PTR)(&g_pDirNode[i].pFileNode[j].item_data[k]));
+				g_pTree->SetItemData(item_curr, (DWORD_PTR)(&g_pDirNode[i].pFileNode[j].tree_item_data[k]));
 			}
 		}
 	}
