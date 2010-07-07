@@ -628,7 +628,7 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="SkipProgress"
+				Name="SkinProgress"
 				>
 				<File
 					RelativePath=".\SkinProgress\SkinProgress.cpp"
@@ -636,6 +636,94 @@
 				</File>
 				<File
 					RelativePath=".\SkinProgress\SkinProgress.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Mime"
+				>
+				<File
+					RelativePath=".\Mime\Markup.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Mime\Markup.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Mime\Mime.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Mime\Mime.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Mime\MimeChar.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Mime\MimeChar.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Mime\MimeCode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Mime\MimeCode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Mime\MimeType.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="EasyXml"
+				>
+				<File
+					RelativePath=".\EasyXml\mime.h"
+					>
+				</File>
+				<File
+					RelativePath=".\EasyXml\xml.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\EasyXml\xml.h"
 					>
 				</File>
 			</Filter>
