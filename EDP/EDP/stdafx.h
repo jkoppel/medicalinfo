@@ -55,6 +55,8 @@
 
 #include <afxmt.h>
 
+#include <atlimage.h>
+
 #define XHTMLHTML
 #define XHTMLTOOLTIPS
 #define XHTMLXML
