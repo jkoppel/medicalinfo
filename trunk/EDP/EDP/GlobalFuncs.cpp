@@ -3,12 +3,16 @@
 #include "GlobalVars.h"
 #include "Mime\\Mime.h"
 #include "Mime\\MimeCode.h"
+#include <math.h>
 
-BOOL LoadFile(const char *file, struct TestRecord &rec)
+#define M_PI	3.1415926
+
+BOOL LoadFile(const char *file, struct TestRecordFileNode &node)
 {
-	int ret;
+	int ret, i, j;
 	FILE *fp = NULL;
 	char buf[256], buf1[256];
+	double min, max, avg;
 
 	if(file==NULL || strlen(file)==0){
 		return FALSE;
@@ -40,19 +44,212 @@ BOOL LoadFile(const char *file, struct TestRecord &rec)
 	}
 
 	//略过6718字节
-	if(fseek(fp, 6718, SEEK_SET)!=0){
+	if(fseek(fp, 30, SEEK_SET)!=0){
+		fclose(fp);
+		return FALSE;
+	}
+
+	ret = (int)fread(&node.machine_info, sizeof(struct CCMachineInfo), 1, fp);
+	if(ret!=1){
+		fclose(fp);
+		return FALSE;
+	}
+
+	ret = (int)fread(&node.product_info, sizeof(struct CCProductInfo), 1, fp);
+	if(ret!=1){
 		fclose(fp);
 		return FALSE;
 	}
 
 	//直接读取数据
-	ret = (int)fread(&rec, sizeof(rec), 1, fp);
+	ret = (int)fread(&node.test_record, sizeof(struct CCTestRecord), 1, fp);
 	fclose(fp);
+	if(ret!=1){
+		return FALSE;
+	}
 
-	return (ret==1);
+	sprintf(node.addition_info.sFile, "%s", file);
+
+	memset(node.tree_item_data, 0, sizeof(node.tree_item_data));
+	for(i=0;i<node.test_record.iNumOfSpeed;i++){
+		node.tree_item_data[i].iIndex = i;
+		node.tree_item_data[i].bSelected = FALSE;
+		node.tree_item_data[i].pNode = &node;
+	}
+
+	//对文件做处理
+	memset(&node.addition_info, 0, sizeof(node.addition_info));
+	if(node.test_record.bDataValid==FALSE){
+		return TRUE;
+	}
+	if(node.test_record.bNormalSpeed){
+		for(i=0;i<node.test_record.iNumOfSpeed;i++){
+			j = node.test_record.iSpdIndex[i];
+			node.test_record.fSetSpeed[i] = node.product_info.fSpeed0[j];
+			if(node.product_info.bDifferentOffset){
+				node.test_record.fSetOffset[i] = node.product_info.fSpeedOffset[j];
+			}
+			else{
+				node.test_record.fSetOffset[i] = node.product_info.fOffset;
+			}
+
+			min = node.test_record.fDisplacement[i][0];
+			max = min;
+			for(j=0;j<node.test_record.iNumOfSpeed;j++){
+				if(node.test_record.fDisplacement[i][j] < min){
+					min = node.test_record.fDisplacement[i][j];
+				}
+				if(node.test_record.fDisplacement[i][j] > max){
+					max = node.test_record.fDisplacement[i][j];
+				}
+			}
+			avg = (max+min)/2;
+			for(j=0;j<node.test_record.iNumOfForce[i];j++){
+				node.test_record.fDisplacement[i][j] -= avg;
+			}
+			node.addition_info.fDisplacementLength[i] = (max-min)/2;
+
+			int P[7];
+			int flag[7];
+			int num = 0;
+			for(j=100;j<node.test_record.iNumOfForce[i]-1;j++){
+				if(node.test_record.fDisplacement[i][j]<0 && node.test_record.fDisplacement[i][j+1]>=0){
+					P[num] = j+1;
+					flag[num] = 0;
+					num++;
+				}
+				else if(node.test_record.fDisplacement[i][j]>0 && node.test_record.fDisplacement[i][j+1]<=0){
+					P[num] = j+1;
+					flag[num] = 1;
+					num++;
+				}
+				if(num>=7){
+					break;
+				}
+			}
+			int PP[2];
+			int T = (P[2] - P[1])/2;
+			for(j=0;j<num;j++){
+				if(flag[j]==1 &&
+					P[j]+T>=node.product_info.iDataBandStart &&
+					P[j]+T<=node.product_info.iDataBandStart+node.product_info.iDataBandLen){
+						node.addition_info.iDataBandStart[i] = P[j] + T;
+						node.addition_info.iDataBandLen[i] = (P[2] - P[1])*2;
+						break;
+				}
+			}
+			node.test_record.fRealSpeed[i] = 2 * M_PI * node.test_record.fDataFreq[i] / node.addition_info.iDataBandLen[i] * node.test_record.fRealSpeed[i];
+
+			memcpy(node.addition_info.fForceOfFilter[i]+node.addition_info.iDataBandStart[i],
+					node.test_record.fForce[i]+node.addition_info.iDataBandStart[i],
+					node.addition_info.iDataBandLen[i] * sizeof(double));
+			filter_new(node.addition_info.fForceOfFilter[i] + node.addition_info.iDataBandStart[i],
+						node.test_record.fDataFreq[i],
+						10*node.test_record.fSetSpeed[i]/node.test_record.fSetOffset[i]/(2*M_PI), 
+						node.addition_info.iDataBandLen[i]);
+
+			min = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]];
+			max = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]];
+			for(j=0;j<node.addition_info.iDataBandLen[i];j++){
+				if(node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j]<min){
+					min = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j];
+				}
+				if(node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j]>max){
+					max = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j];
+				}
+			}
+			node.test_record.fPfm[i] = max;
+			node.test_record.fPym[i] = min;
+		}
+	}
+
+	/*
+	if(node.test_record.bFrictionSpeed){
+		for(i=0;i<node.test_record.iFrictionNumOfSpeed;i++){
+			j = node.test_record.iFrictionSpdIndex[i];
+			node.test_record.fFrictionSetSpeed[i] = node.product_info.fSpeed0[j];
+			if(node.product_info.bDifferentOffset){
+				node.test_record.fFrictionSetOffset[i] = node.product_info.fSpeedOffset[j];
+			}
+			else{
+				node.test_record.fFrictionSetOffset[i] = node.product_info.fOffset;
+			}
+
+			min = node.test_record.fFrictionDisplacement[i][0];
+			max = min;
+			for(j=0;j<node.test_record.iFrictionNumOfSpeed;j++){
+				if(node.test_record.fFrictionDisplacement[i][j] < min){
+					min = node.test_record.fFrictionDisplacement[i][j];
+				}
+				if(node.test_record.fFrictionDisplacement[i][j] > max){
+					max = node.test_record.fFrictionDisplacement[i][j];
+				}
+			}
+			avg = (max+min)/2;
+			for(j=0;j<node.test_record.iFrictionNumOfForce[i];j++){
+				node.test_record.fFrictionDisplacement[i][j] -= avg;
+			}
+			node.addition_info.fFrictionDisplacementLength[i] = (max-min)/2;
+
+			int P[7];
+			int flag[7];
+			int num = 0;
+			for(j=100;j<node.test_record.iFrictionNumOfForce[i]-1;j++){
+				if(node.test_record.fFrictionDisplacement[i][j]<0 && node.test_record.fFrictionDisplacement[i][j+1]>=0){
+					P[num] = j+1;
+					flag[num] = 0;
+					num++;
+				}
+				else if(node.test_record.fFrictionDisplacement[i][j]>0 && node.test_record.fFrictionDisplacement[i][j+1]<=0){
+					P[num] = j+1;
+					flag[num] = 1;
+					num++;
+				}
+				if(num>=7){
+					break;
+				}
+			}
+			int PP[2];
+			int T = (P[2] - P[1])/2;
+			for(j=0;j<num;j++){
+				if(flag[j]==1 &&
+					P[j]+T>=node.product_info.iDataBandStart &&
+					P[j]+T<=node.product_info.iDataBandStart+node.product_info.iDataBandLen){
+						node.addition_info.iDataBandStart[i] = P[j] + T;
+						node.addition_info.iDataBandLen[i] = (P[2] - P[1])*2;
+						break;
+				}
+			}
+			node.test_record.fFrictionRealSpeed[i] = 2 * M_PI * node.test_record.fFrictionDataFreq[i] / node.addition_info.iFrictionDataBandLen[i] * node.test_record.fFrictionRealSpeed[i];
+
+			memcpy(node.addition_info.fForceOfFilter[i]+node.addition_info.iDataBandStart[i],
+					node.test_record.fForce[i]+node.addition_info.iDataBandStart[i],
+					node.addition_info.iDataBandLen[i] * sizeof(double));
+			filter_new(node.addition_info.fForceOfFilter[i] + node.addition_info.iDataBandStart[i],
+						node.test_record.fDataFreq[i],
+						10*node.test_record.fSetSpeed[i]/node.test_record.fSetOffset[i]/(2*M_PI), 
+						node.addition_info.iDataBandLen[i]);
+
+			min = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]];
+			max = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]];
+			for(j=0;j<node.addition_info.iDataBandLen[i];j++){
+				if(node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j]<min){
+					min = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j];
+				}
+				if(node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j]>max){
+					max = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j];
+				}
+			}
+			node.test_record.fPfm[i] = max;
+			node.test_record.fPym[i] = min;
+		}
+	}
+	*/
+
+	return TRUE;
 }
 
-BOOL SaveFile(const char *file, struct TestRecord rec)
+BOOL SaveFile(const char *file, struct CCTestRecord rec)
 {
 	return TRUE;
 }
@@ -89,14 +286,10 @@ BOOL LoadNode()
 			name = str + ff.GetFileName();
 			sprintf(buf, "%s", name.GetBuffer(0));
 			name.ReleaseBuffer();
-			if(LoadFile(buf, g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].rec)){
+			if(LoadFile(buf, g_pDirNode[i].pFileNode[g_pDirNode[i].iNum])){
 				name = ff.GetFileName();
-				sprintf(g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].sFile, "%s", name.GetBuffer(0));
+				sprintf(g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].addition_info.sFile, "%s", name.GetBuffer(0));
 				name.ReleaseBuffer();
-				for(int s=0;s<g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].rec.iNumOfSpeed;s++){
-					g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].item_data[s].iIndex = s;
-					g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].item_data[s].pRec = &g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].rec;
-				}
 				g_pDirNode[i].iNum ++;
 			}
 			if(g_pDirNode[i].iNum>=20){
@@ -395,3 +588,262 @@ void TestMime()
 
 	delete pBuff;
 }
+
+// 返回值： 0: 正常， －1: 内存不足 
+int filter_new( 
+			   double dat[],     // 数据数组 
+			   double fs,      // 采样频率 Hz 
+			   double fc,       // 滤波频率 Hz 
+			   int num        // 数据个数 
+			   ) 
+{ 
+	register int i,j; 
+
+	int Len=31; 
+	double *Coef; 
+	double *X; 
+	X= (double *)calloc(num+Len+50, sizeof(double)); 
+	if(X==NULL) 
+		return -1; 
+	Len=fir_dsgn(Len, fs, fc, &Coef); 
+	if(Len<0) 
+	{ 
+		free(X); 
+
+		return -1; 
+	} 
+
+	for(i=0;i<num+Len;i++) 
+	{ 
+		X[i]=0; 
+		if(i<num) 
+			X[i]=dat[i]*Coef[0]; 
+		for(j=1;j<=Len;j++) 
+		{ 
+			if(i>=j && i-j<num) 
+				X[i]+=dat[i-j]*Coef[j]; 
+			else if(i<j) 
+				X[i]+=dat[0]*Coef[j]; 
+			else if(i-j>=num) 
+				X[i]+=dat[num-1]*Coef[j]; 
+
+		} 
+	} 
+
+	memcpy(dat,&X[Len/2],sizeof(double)*num); 
+	free(X); 
+	free(Coef); 
+	return 0; 
+} 
+
+
+/*---------------------------------------------------------------*/ 
+/* Design FIR filter using window method. Hamming window is used */ 
+/* If sucess, return a point to the filter coefficient array,    */ 
+/* otherwise, return NULL. Calling program should release the    */ 
+/* allocated memory in this subroutine                           */ 
+/*                                                               */ 
+/*                                                               */ 
+/*  Suppose sampling rate is 2 Hz                                */ 
+/*                                                               */ 
+/*  Len : filter length, should be ODD and Len>=3                */ 
+/*  CutLow : low cutoff, when lowpass, CutLow = 0.0              */ 
+/*  CutHigh: high cutoff, when highpass, CutHigh = 1.0           */ 
+/*  when bandpass,    0.0 < CutLow < CutHigh < 1.0               */ 
+/*                                                               */ 
+/*  example:                                                     */ 
+/*      Coef = fir_dsgn(127, 0.3, 0.8);                          */ 
+/*   return a bandpass filter                                    */ 
+/*---------------------------------------------------------------*/ 
+int fir_dsgn(int Len, double FreqS, double FreqB , double **Coef1)  
+{ 
+
+	double Sum, TmpFloat; 
+	int CoefNum, HalfLen, Cnt; 
+	double CutLow, CutHigh; 
+
+	CutLow  = 0; 
+
+	CutHigh = FreqB/FreqS*2.0; 
+
+	/*---------------------------------------------*/ 
+	/* adjust the number of coefficients to be ODD */ 
+	/*---------------------------------------------*/ 
+	CoefNum = Len; 
+	if (Len % 2 == 0)  
+	{ 
+		CoefNum++; 
+	} 
+	HalfLen = (CoefNum - 1) / 2; 
+
+	//-------------------------------------------------------- 
+	// Allocate memory for coefficients if length changed 
+	//-------------------------------------------------------- 
+
+	double *Coef; 
+	*Coef1 = (double *)calloc(CoefNum+50, sizeof(double)); 
+	if (*Coef1 == NULL)  
+	{ 
+		return (-1); 
+	} 
+	int Order = CoefNum; 
+	Coef = *Coef1; 
+
+	double Pi=3.14159265; 
+
+
+	/*------------------*/ 
+	/*  Lowpass filter  */ 
+	/*------------------*/ 
+	if ((CutLow == 0.0) && (CutHigh < 1.0))  
+	{ 
+
+		Coef[HalfLen] = CutHigh; 
+		for (Cnt=1; Cnt<=HalfLen; Cnt++)  
+		{ 
+			TmpFloat = Pi * Cnt; 
+			Coef[HalfLen + Cnt] = sin(CutHigh * TmpFloat) / TmpFloat; 
+			Coef[HalfLen - Cnt] = Coef[HalfLen + Cnt]; 
+		} 
+
+		/*------------------------------*/ 
+		/* multiplying with a window    */ 
+		/*------------------------------*/ 
+		TmpFloat = 2.0 * Pi / (CoefNum - 1.0); 
+		Sum = 0.0; 
+		for (Cnt=0; Cnt<CoefNum; Cnt++)  
+		{ 
+			Coef[Cnt] *= (0.54 - 0.46 * cos(TmpFloat * Cnt)); 
+			Sum += Coef[Cnt]; 
+		} 
+
+
+		/*------------------------------*/ 
+		/* Normalize GAIN to 1          */ 
+		/*------------------------------*/ 
+		for (Cnt=0; Cnt<CoefNum; Cnt++)  
+		{ 
+			Coef[Cnt] /= fabs (Sum); 
+		} 
+		return (Order); 
+
+	}  /* if Lowpass */ 
+
+
+	/*------------------*/ 
+	/* Highpass filter  */ 
+	/*------------------*/ 
+	if ((CutLow > 0.0) && (CutHigh == 1.0))  
+	{ 
+
+		Coef[HalfLen] = CutLow; 
+		for (Cnt=1; Cnt<=HalfLen; Cnt++)  
+		{ 
+			TmpFloat = Pi * Cnt; 
+			Coef[HalfLen + Cnt] = sin(CutLow * TmpFloat) / TmpFloat; 
+			Coef[HalfLen - Cnt] = Coef[HalfLen + Cnt]; 
+		} 
+
+
+		/*------------------------------*/ 
+		/* multiplying with a window    */ 
+		/*------------------------------*/ 
+		TmpFloat = 2.0 * Pi / (CoefNum - 1.0); 
+		Sum = 0.0; 
+		for (Cnt=0; Cnt<CoefNum; Cnt++)  
+		{ 
+			Coef[Cnt] *= -(0.54 - 0.46 * cos(TmpFloat * Cnt)); 
+			if (Cnt % 2 == 0) Sum += Coef[Cnt];  /* poly(-1), even +, odd -*/ 
+			else Sum -= Coef[Cnt] ; 
+		} 
+
+		Coef[HalfLen] += 1; 
+		Sum += 1; 
+
+		/*------------------------------*/ 
+		/* Normalize GAIN to 1          */ 
+		/*------------------------------*/ 
+		for (Cnt=0; Cnt<CoefNum; Cnt++)  
+		{ 
+			Coef[Cnt] /= fabs (Sum); 
+		}   
+		return (Order); 
+
+	} /* if HighPass */ 
+
+
+
+	/*------------------*/ 
+	/* Bandpass filter  */ 
+	/*------------------*/ 
+	if ((CutLow > 0.0) && (CutHigh < 1.0) && (CutLow < CutHigh))  
+	{ 
+
+		Coef[HalfLen] = CutHigh - CutLow; 
+		for (Cnt=1; Cnt<=HalfLen; Cnt++)  
+		{ 
+			TmpFloat = Pi * Cnt; 
+			Coef[HalfLen + Cnt] = 2.0 * sin( (CutHigh - CutLow) / 2.0 * TmpFloat) * 
+				cos( (CutHigh + CutLow) / 2.0 * TmpFloat) / TmpFloat; 
+			Coef[HalfLen - Cnt] = Coef[HalfLen + Cnt]; 
+		} 
+
+		/*------------------------------*/ 
+		/* multiplying with a window    */ 
+		/*------------------------------*/ 
+		TmpFloat = 2.0 * Pi / (CoefNum - 1.0); 
+		Sum = 0.0; 
+		for (Cnt=0; Cnt<CoefNum; Cnt++)  
+		{ 
+			Coef[Cnt] *= (0.54 - 0.46 * cos(TmpFloat * Cnt)); 
+			Sum += Coef[Cnt]; 
+		} 
+
+
+		return (Order); 
+
+	} /* if */ 
+
+	/*------------------*/ 
+	/* Bandstop filter  */ 
+	/*------------------*/ 
+	if ((CutLow > 0.0) && (CutHigh < 1.0) && (CutLow>CutHigh))  
+	{ 
+
+		Coef[HalfLen] = CutLow - CutHigh; 
+		for (Cnt=1; Cnt<=HalfLen; Cnt++)  
+		{ 
+			TmpFloat = Pi * Cnt; 
+			Coef[HalfLen + Cnt] = 2.0 * sin( (CutLow - CutHigh) / 2.0 * TmpFloat) * 
+				cos( (CutHigh + CutLow) / 2.0 * TmpFloat) / TmpFloat; 
+			Coef[HalfLen - Cnt] = Coef[HalfLen + Cnt]; 
+		} 
+
+		/*------------------------------*/ 
+		/* multiplying with a window    */ 
+		/*------------------------------*/ 
+		TmpFloat = 2.0 * Pi / (CoefNum - 1.0); 
+		Sum = 0.0; 
+		for (Cnt=0; Cnt<CoefNum; Cnt++)  
+
+		{ 
+			Coef[Cnt] *= -(0.54 - 0.46 * cos(TmpFloat * Cnt)); 
+			Sum += Coef[Cnt]; 
+		} 
+
+		Coef[HalfLen] += 1; 
+		Sum += 1; 
+
+		/*------------------------------*/ 
+		/* Normalize GAIN to 1          */ 
+		/*------------------------------*/ 
+		for (Cnt=0; Cnt<CoefNum; Cnt++)  
+		{ 
+			Coef[Cnt] /= fabs (Sum); 
+		} 
+		return (Order); 
+
+	}  /* if */ 
+
+	return (Order);    /* never reach here */ 
+} 
