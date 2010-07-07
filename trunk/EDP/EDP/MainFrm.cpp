@@ -45,7 +45,7 @@ int MyMessageBox(LPCTSTR lpszText, LPCTSTR lpszCaption, UINT nType)
 
 CMainFrame::CMainFrame()
 {
-	// TODO: 在此添加成员初始化代码
+	//TestMime();
 }
 
 CMainFrame::~CMainFrame()
@@ -130,6 +130,46 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 
 void CMainFrame::OnSettings()
 {
+	/*
+	CEDPView *pView1 = (CEDPView*)m_wndSplitter2.GetPane(0, 1);
+	CDC *pDC = pView1->GetDC();
+	CBitmap bm;
+	RECT rect;
+
+	pView1->GetClientRect(&rect);
+	bm.CreateCompatibleBitmap(pDC, rect.right-rect.left, rect.bottom-rect.top);
+	CDC tdc; 
+	tdc.CreateCompatibleDC(pDC); 
+	CBitmap*pOld=tdc.SelectObject(&bm); 
+	tdc.BitBlt(rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top,pDC,0,0,SRCCOPY);//截取屏幕数据bmp到bm里 
+	CImage *image=new CImage; 
+	image->Attach(bm); 
+	image->Save("a.jpg");//bmp数据转换成jpeg保存到文件
+	*/
+	/*
+	CWindowDC dc(NULL);  
+	CBitmap bm;  
+	CRect rect(0,0,::GetSystemMetrics(SM_CXSCREEN),::GetSystemMetrics(SM_CYSCREEN));    
+
+	int Width=rect.Width(); 
+	int Height=rect.Height(); 
+	bm.CreateCompatibleBitmap(&dc,Width,Height); 
+	CDC tdc; 
+	tdc.CreateCompatibleDC(&dc); 
+	CBitmap*pOld=tdc.SelectObject(&bm); 
+	tdc.BitBlt(0,0,Width,Height,&dc,0,0,SRCCOPY);//截取屏幕数据bmp到bm里 
+	CImage *image=new CImage; 
+	image->Attach(bm); 
+	image->Save("a.jpg");//bmp数据转换成jpeg保存到文件
+	*///屏幕截图源码
+
+	/*
+	CBitmap *pBmp = pDC->GetCurrentBitmap();
+	CImage imgTemp;
+	imgTemp.Attach(pDC);
+	imgTemp.Save(CString("a.jpg"));
+	*/
+
 	CDlgSettingDir dlg;
 	if(dlg.DoModal()==IDOK){
 		CLeftView *pView = (CLeftView*)m_wndSplitter2.GetPane(0, 0);
