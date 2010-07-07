@@ -121,7 +121,7 @@ void CEDPView::DrawData()
 	CBrush brush;
 	int i, j, x, y;
 	char buf[100];
-	struct TestRecord *pRec = NULL;
+	struct CCTestRecord *pRec = NULL;
 	CFont fontLogo,*oldFont;
 
 	GetClientRect(&rect);
@@ -250,37 +250,74 @@ void CEDPView::DrawData()
 		}
 		struct TreeItemData *tp = (struct TreeItemData *)p;
 
-		double min = tp->pRec->fDisplacement[tp->iIndex][0], max = tp->pRec->fDisplacement[tp->iIndex][0], sum = 0.0, avg = 0.0;
-		//计算均值及幅度
-		for(j=0;j<tp->pRec->iNumOfForce[tp->iIndex];j++){
-			sum += tp->pRec->fDisplacement[tp->iIndex][j];
-			if(tp->pRec->fDisplacement[tp->iIndex][j]<min){
-				min = tp->pRec->fDisplacement[tp->iIndex][j];
-			}
-			if(tp->pRec->fDisplacement[tp->iIndex][j]>max){
-				max = tp->pRec->fDisplacement[tp->iIndex][j];
-			}
-		}
-		avg = sum/tp->pRec->iNumOfForce[tp->iIndex];
 		pen.DeleteObject();
 		pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
 		pDC->SelectObject(&pen);
-		for(j=0;j<800;j++){
+		for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
+			j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
+			j++){
 			//X按均值和幅度缩放到对应值
-			x = (int)((tp->pRec->fDisplacement[tp->iIndex][300+j] - avg) * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+			x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
 			//Y直接使用原大小
-			y = (int)(m_pntClientAreaOrig.y - tp->pRec->fForce[tp->iIndex][300+j] * (yspan / 250));
-			if(j==0){
+			y = (int)(m_pntClientAreaOrig.y - tp->pNode->test_record.fForce[tp->iIndex][j] * (yspan/250));
+			if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
 				pDC->MoveTo(x, y);
 				pDC->SetPixel(x, y, color[tp->iIndex]);
 			}
 			else{
 				pDC->LineTo(x, y);
 			}
-			if(tp->pRec->fForce[tp->iIndex][300+j]>1000){
+			if(tp->pNode->test_record.fForce[tp->iIndex][300+j]>1000){
 				AfxMessageBox("Hello World!");
 			}
 		}
+
+		for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
+			j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
+			j++){
+			//X按均值和幅度缩放到对应值
+			x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+			//Y直接使用原大小
+			y = (int)(m_pntClientAreaOrig.y - tp->pNode->addition_info.fForceOfFilter[tp->iIndex][j] * (yspan/250));
+			if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
+				pDC->MoveTo(x, y);
+				pDC->SetPixel(x, y, color[tp->iIndex]);
+			}
+			else{
+				pDC->LineTo(x, y);
+			}
+			if(tp->pNode->test_record.fForce[tp->iIndex][300+j]>1000){
+				AfxMessageBox("Hello World!");
+			}
+
+		}
+
+		/*
+		for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
+			j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
+			j++){
+			//X按均值和幅度缩放到对应值
+			double tmp;
+			tmp = (j-tp->pNode->addition_info.iDataBandStart[tp->iIndex]-tp->pNode->addition_info.iDataBandLen[tp->iIndex]/2);
+			//tmp /= tp->pNode->test_record.fDataFreq[tp->iIndex];
+			tmp *= xspan / 100;
+			tmp += m_pntClientAreaOrig.x;
+			x = (int)tmp;
+			//x = (int)((j-tp->pNode->addition_info.iDataBandStart[tp->iIndex])  * (xspan/100) / tp->pNode->test_record.fDataFreq[tp->iIndex] + m_pntClientAreaOrig.x);
+			//Y直接使用原大小
+			y = (int)(m_pntClientAreaOrig.y - tp->pNode->addition_info.fForceOfFilter[tp->iIndex][j] * (yspan/250));
+			if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
+				pDC->MoveTo(x, y);
+				pDC->SetPixel(x, y, color[tp->iIndex]);
+			}
+			else{
+				pDC->LineTo(x, y);
+			}
+			if(tp->pNode->test_record.fForce[tp->iIndex][300+j]>1000){
+				AfxMessageBox("Hello World!");
+			}
+		}
+		*/
 	}
 
 	pDC->SelectObject(oldFont);
