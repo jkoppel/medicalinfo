@@ -15,4 +15,6 @@ BOOL CheckStrTimeFormat(const char *StrTime, int &hour, int &minute);
 extern BOOL LoadDirFromConfigFile();
 extern BOOL SaveDirToConfigFile();
 
+extern void TestMime();
+
 #endif

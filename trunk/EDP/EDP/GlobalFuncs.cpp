@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "GlobalFuncs.h"
 #include "GlobalVars.h"
+#include "Mime\\Mime.h"
+#include "Mime\\MimeCode.h"
 
 BOOL LoadFile(const char *file, struct TestRecord &rec)
 {
@@ -294,4 +296,102 @@ BOOL SaveDirToConfigFile()
 	}
 	file.Close();
 	return TRUE;
+}
+
+void TestMime()
+{
+    CMimeMessage mail;
+
+    // Initialize message header
+
+    mail.SetDate(); // set 'Date' field to the current time
+
+    mail.SetVersion();
+    mail.SetFrom("sender@local.com");
+    mail.SetTo("recipient1@server1.com, Nick Name <recipient2@server1.com>, \"Nick Name\" <recipient3@server3.com>");
+    mail.SetCc("recipient4@server4.com");
+    mail.SetSubject("Test message");
+    mail.SetFieldValue("X-Priority", "3 (Normal)"); // extended field
+
+    mail.SetFieldValue("X-My-Field", "My value");   // user-defined field
+
+
+    // Initialize body part header
+
+    mail.SetContentType("multipart/mixed");
+    // generate a boundary delimeter automatically
+
+    // if the parameter is NULL
+
+    mail.SetBoundary(NULL);
+
+    // Add a text body part
+
+    // Content-Type is not specified, so the default
+
+    // value "text/plain" is implicitly used
+
+    // Content-Transfer-Encoding is not specified
+
+    // so the default value "7bit" is implicitly used
+
+    CMimeBody* pBp = mail.CreatePart();
+    pBp->SetText("Hi, there");  // set the content of the body part
+
+
+    // Add a file attachment body part
+
+    pBp = mail.CreatePart();
+    pBp->SetDescription("enclosed photo");
+    pBp->SetTransferEncoding("base64");
+    // if Content-Type is not specified, it'll be
+
+    // set to "image/jpeg" by ReadFromFile()
+
+    pBp->ReadFromFile("test.jpg"); 
+
+    // Generate a simple message
+
+    CMimeMessage mail2;
+    mail2.SetFrom("abc@abc.com");
+    mail2.SetTo("abc@abc.com");
+    mail2.SetSubject("This is an attached message");
+    mail2.SetText("Content of attached message.\r\n");
+
+    // Attach the message
+
+    pBp = mail.CreatePart();
+    pBp->SetDescription("enclosed message");
+    pBp->SetTransferEncoding("7bit");
+    // if Content-Type is not specified, it'll be
+
+    // set to "message/rfc822" by SetMessage()
+
+    pBp->SetMessage(&mail2); 
+
+    // Add an embeded multipart
+
+    pBp = mail.CreatePart();
+    pBp->SetContentType("multipart/alternative");
+    pBp->SetBoundary("embeded_multipart_boundary");
+    CMimeBody *pBpChild = pBp->CreatePart();
+    pBpChild->SetText("Content of Part 1\r\n");
+    pBpChild = pBp->CreatePart();
+    pBpChild->SetText("Content of Part 2\r\n");
+
+    // Store the message to buffer    
+
+    // fold the long lines in the headers
+
+    CMimeEnvironment::SetAutoFolding(true); 
+    int nSize = mail.GetLength();
+    char* pBuff = new char[nSize];
+    nSize = mail.Store(pBuff, nSize);
+
+	CFile file;
+	file.Open("Debug.mht", CFile::modeCreate | CFile::modeWrite);
+	file.Write(pBuff, nSize);
+	file.Close();
+
+	delete pBuff;
 }
