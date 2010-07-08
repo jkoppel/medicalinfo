@@ -50,6 +50,8 @@ struct IDAndOrder{
 	int Order;
 };
 
+enum {MODE_ALL=0, MODE_UNPROCESSED, MODE_PROCESSED};
+
 extern void MakeSendCmdFromRec(struct UserData data, CString &str);
 extern int ParseRecvDataToRec(CString str, struct UserData &data);
 
@@ -57,7 +59,7 @@ extern void CreateDataFile();
 
 extern BOOL Cmd_GetRecordNum(int &num);
 
-extern BOOL Cmd_GetAllIDs(int *pID, int &num);
+extern BOOL Cmd_GetAllIDs(int *pID, int &num, int mode=MODE_ALL);
 
 extern void MakeIDToSeparatorString(int *pID, int num, CString &str);
 
