@@ -256,11 +256,107 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath="..\Common\res\b1down.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\b1gray.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\b1mask.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\b1norm.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\b1norm1.bmp"
+				>
+			</File>
+			<File
 				RelativePath=".\res\bitmap1.bmp"
 				>
 			</File>
 			<File
 				RelativePath=".\res\drag.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\eyeblue.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\eyecl2.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\eyeclosed.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\eyegray.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\eyegreen.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\eyemask.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\eyered.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image1.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image10.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image11.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image12.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image2.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image3.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image4.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image5.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image6.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image7.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image8.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\res\Image9.bmp"
 				>
 			</File>
 			<File
@@ -283,11 +379,23 @@
 				Name="Header Files"
 				>
 				<File
+					RelativePath="..\Common\ButtonEx.h"
+					>
+				</File>
+				<File
 					RelativePath="..\common\CESocket.h"
 					>
 				</File>
 				<File
+					RelativePath="..\Common\CheckBoxEx.h"
+					>
+				</File>
+				<File
 					RelativePath="..\common\ClientSocket.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\ComboBoxEx.h"
 					>
 				</File>
 				<File
@@ -300,6 +408,10 @@
 				</File>
 				<File
 					RelativePath="..\Common\DialogEx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\EditEx.h"
 					>
 				</File>
 				<File
@@ -334,16 +446,32 @@
 					RelativePath="..\common\ProgressInfo.h"
 					>
 				</File>
+				<File
+					RelativePath="..\Common\StaticEx.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
 				>
 				<File
+					RelativePath="..\Common\ButtonEx.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\common\CESocket.cpp"
 					>
 				</File>
 				<File
+					RelativePath="..\Common\CheckBoxEx.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\common\ClientSocket.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\ComboBoxEx.cpp"
 					>
 				</File>
 				<File
@@ -352,6 +480,10 @@
 				</File>
 				<File
 					RelativePath="..\Common\DialogEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\EditEx.cpp"
 					>
 				</File>
 				<File
@@ -380,6 +512,10 @@
 				</File>
 				<File
 					RelativePath="..\common\ProgressInfo.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\StaticEx.cpp"
 					>
 				</File>
 			</Filter>
