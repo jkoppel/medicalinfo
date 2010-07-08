@@ -444,14 +444,27 @@ BOOL Cmd_GetRecordNum(int &num)
 	return ret;
 }
 
-BOOL Cmd_GetAllIDs(int *pID, int &num)
+BOOL Cmd_GetAllIDs(int *pID, int &num, int mode)
 {
 	_RecordsetPtr	pHandlerRecordset;
 	CString str;
+	char buf[256];
+
+	if(mode==MODE_ALL){
+		sprintf(buf, "%s", "SELECT ID,[Order] FROM Case_Data ORDER BY [Order] ASC");
+	}
+	else if(mode==MODE_UNPROCESSED){
+		sprintf(buf, "%s",
+				"SELECT ID,[Order],[Status] FROM Case_Data WHERE [Status]<>1 OR [Status] IS NULL ORDER BY [Order] ASC");
+	}
+	else{
+		sprintf(buf, "%s",
+				"SELECT ID,[Order],[Status] FROM Case_Data WHERE [Status]>0 ORDER BY [Order] ASC");
+	}
 
 	pHandlerRecordset.CreateInstance(__uuidof(Recordset));
 	try{
-		pHandlerRecordset->Open("SELECT ID,Order FROM Case_Data ORDER BY [Order] ASC",// 查询表中所有字段
+		pHandlerRecordset->Open(buf,// 查询表中所有字段
 		g_pDBConnection.GetInterfacePtr(),	 // 获取库接库的IDispatch指针
 		adOpenDynamic,
 		adLockOptimistic,
