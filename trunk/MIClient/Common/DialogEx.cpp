@@ -42,12 +42,12 @@ BOOL CDialogEx::OnEraseBkgnd(CDC* pDC)
 {
 	CBrush brush;
 	CRect rect;
-	COLORREF rgbBackGnd = RGB(255,100,100);
+	COLORREF rgbBackGnd = RGB(0,0,255);
 
 	GetClientRect(&rect);
 	brush.CreateSolidBrush(rgbBackGnd);
 	pDC-> FillRect(rect,&brush);
 	return   TRUE; 
 
-	//return CDialog::OnEraseBkgnd(pDC);
+	return CDialog::OnEraseBkgnd(pDC);
 }
