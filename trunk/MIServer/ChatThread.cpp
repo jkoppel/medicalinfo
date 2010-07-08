@@ -61,6 +61,7 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 	char buf[2048];
 	int ID, num, cmdID, *pID;
 	int order, org_order, dst_order;
+	int mode;
 	CString strTmp;
 	struct UserData data;
 	POSITION p;
@@ -146,12 +147,20 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			m_peer.Send(CString("OK||\r\n"));
 			break;
 		case CMD_GETALLID:
+			if(!p){
+				m_peer.Send(CString("ER||\r\n"));
+				return -1;
+			}
+			strTmp = g_strList.GetNext(p);
+			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &mode);
+			strTmp.ReleaseBuffer();
+
 			if(!Cmd_GetRecordNum(num)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
 			pID = new int[num+10];
-			if(!Cmd_GetAllIDs(pID, num)){
+			if(!Cmd_GetAllIDs(pID, num, mode)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
