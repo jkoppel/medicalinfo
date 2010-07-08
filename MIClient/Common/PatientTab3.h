@@ -1,5 +1,4 @@
 #pragma once
-#include "c:\program files\microsoft visual studio 8\vc\ce\atlmfc\include\afxwin.h"
 
 
 // CPatientTab3 dialog
