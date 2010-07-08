@@ -18,6 +18,7 @@ IMPLEMENT_DYNAMIC(CMIMainDlg, CDialogEx)
 CMIMainDlg::CMIMainDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(pParent, CMIMainDlg::IDD)
 	, m_strScancodeID(_T(""))
+	, m_strPageInfo(_T("0/0"))
 {
 	char buf[100];
 	int len = 100;
@@ -53,6 +54,11 @@ void CMIMainDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST_PATIENT, m_lstPatient);
 	DDX_Control(pDX, IDC_STATUS, m_ctrlStatus);
 	DDX_Text(pDX, IDC_SCANCODEID, m_strScancodeID);
+	DDX_Text(pDX, IDC_PAGEINFO, m_strPageInfo);
+	DDX_Control(pDX, IDC_PAGEMODE, m_ctrlPageMode);
+	DDX_Control(pDX, IDC_CONNECT, m_ctrlConnect);
+	DDX_Control(pDX, IDC_SCANCODEID, m_ctrlScancodeID);
+	DDX_Control(pDX, IDC_STATIC_SCANCODE, m_ctrlScancodeID_Static);
 }
 
 
@@ -75,6 +81,8 @@ BEGIN_MESSAGE_MAP(CMIMainDlg, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_STATUS, &CMIMainDlg::OnCbnSelchangeStatus)
 	ON_BN_CLICKED(IDC_SEARCH, &CMIMainDlg::OnBnClickedSearch)
 	ON_WM_TIMER()
+	ON_CBN_SELCHANGE(IDC_PAGEMODE, &CMIMainDlg::OnCbnSelchangePagemode)
+	ON_BN_CLICKED(IDC_SETTING, &CMIMainDlg::OnBnClickedSetting)
 END_MESSAGE_MAP()
 
 ///接收到断开连接消息
@@ -161,6 +169,9 @@ void CMIMainDlg::OnBnClickedConnect()
 				if(CmdConnect()){
 					if(CmdGetRecordNum(num)){
 						m_nRecNum = num;
+						m_bPageMode = TRUE;
+						m_nStatusMode = MODE_ALL;
+						m_nCurrPageIndex = 0;
 						if(num==0){
 							m_lstPatient.DeleteAllItems();
 							ShowMsg("连接成功");
@@ -279,7 +290,7 @@ void CMIMainDlg::UpdateCurrPage()
 	g_ProgressInfo.Show("正在更新数据");
 
 	pID = new int[num+10];
-	if(!CmdGetAllIDs(pID, num)){
+	if(!CmdGetAllIDs(pID, num, m_nStatusMode)){
 		delete []pID;
 		g_ProgressInfo.Hide();
 		return;
@@ -289,10 +300,12 @@ void CMIMainDlg::UpdateCurrPage()
 		offset = m_nCurrPageIndex * PAGE_SIZE;
 		m_nPageNum = (num+PAGE_SIZE-1)/PAGE_SIZE;
 		curr_page_size = (m_nCurrPageIndex < m_nPageNum - 1) ? PAGE_SIZE : num - (m_nPageNum-1) * PAGE_SIZE;
+		m_strPageInfo.Format(CString("%d/%d"), m_nCurrPageIndex+1, m_nPageNum);
 	}
 	else{
 		offset = 0;
 		curr_page_size = num;
+		m_strPageInfo.Format(CString("%d/%d"), 1, 1);
 	}
 
 	for(index=0;index<curr_page_size;index++){
@@ -321,9 +334,17 @@ BOOL CMIMainDlg::OnInitDialog()
 	m_ctrlStatus.InsertString(2, CString("已处理"));
 	m_ctrlStatus.SetCurSel(0);
 
+	m_ctrlPageMode.InsertString(0, CString("单页"));
+	m_ctrlPageMode.InsertString(1, CString("多页"));
+	m_ctrlPageMode.SetCurSel(1);
+
 	ShowTime();
 	SetTimer(100, 1000, NULL);
-	return TRUE;  
+
+	m_ctrlConnect.SetBkColor(RGB(0,255,0));
+	m_ctrlScancodeID.SetBkColor(RGB(0,255,255));
+	m_ctrlScancodeID_Static.SetBkColor(RGB(0,255,255));
+	return TRUE;
 }
 
 ///获取数据
@@ -388,7 +409,7 @@ BOOL CMIMainDlg::CmdGetRecordNum(int &num)
 	return TRUE;
 }
 
-BOOL CMIMainDlg::CmdGetAllIDs(int *pID, int &num)
+BOOL CMIMainDlg::CmdGetAllIDs(int *pID, int &num, int mode)
 {
 	char buf[256];
 	CString strTmp;
@@ -396,7 +417,7 @@ BOOL CMIMainDlg::CmdGetAllIDs(int *pID, int &num)
 	num = 0;
 
 	g_bIsDataComing = FALSE;
-	sprintf_s(buf, "%s%d%s", "CMD", CMD_GETALLID, "||\r\n");
+	sprintf_s(buf, "%s%d%s%d%s", "CMD", CMD_GETALLID, "||", mode, "||\r\n");
 	g_pClientSocket->Send(buf);
 	if(!ReceiveData()){
 		return FALSE;
@@ -798,12 +819,14 @@ void CMIMainDlg::OnBnClickedAdd()
 		}
 		ret = CmdAppendRecord(data);
 		if(ret){
+			m_bShowSearchResult = FALSE;
+			m_nStatusMode = MODE_ALL;
+			m_ctrlStatus.SetCurSel(0);
+			CmdGetRecordNum(m_nRecNum);
 			if(!m_bPageMode){
-				m_lstPatient.InsertItem(m_nRecNum, CString("病人记录"));
-				UpdateRowData(m_nRecNum++, data);
+				UpdateCurrPage();
 			}
 			else{
-				m_nRecNum ++;
 				m_nPageNum = (m_nRecNum+PAGE_SIZE-1)/PAGE_SIZE;
 				m_nCurrPageIndex = m_nPageNum - 1;
 				UpdateCurrPage();
@@ -885,17 +908,23 @@ void CMIMainDlg::OnBnClickedDelete()
 
 	ret = CmdDeleteRecordByID(ID);
 	if(ret){
-		if(!m_bPageMode){
+		if(m_bShowSearchResult){
 			m_lstPatient.DeleteItem(index);
 			m_nRecNum--;
 		}
 		else{
-			m_nRecNum --;
-			m_nPageNum = (m_nRecNum + PAGE_SIZE -1)/PAGE_SIZE;
-			if(m_nCurrPageIndex==m_nPageNum){
-				m_nCurrPageIndex --;
+			if(!m_bPageMode){
+				m_lstPatient.DeleteItem(index);
+				m_nRecNum--;
 			}
-			UpdateCurrPage();
+			else{
+				m_nRecNum --;
+				m_nPageNum = (m_nRecNum + PAGE_SIZE -1)/PAGE_SIZE;
+				if(m_nCurrPageIndex==m_nPageNum){
+					m_nCurrPageIndex --;
+				}
+				UpdateCurrPage();
+			}
 		}
 
 		ShowMsg("删除成功");
@@ -1011,6 +1040,13 @@ void CMIMainDlg::OnBnClickedMovenext()
 
 void CMIMainDlg::OnBnClickedPageFirst()
 {
+	if(!g_bIsConnected){
+		return;
+	}
+	if(m_bShowSearchResult){
+		return;
+	}
+
 	if(!m_bPageMode){
 		return;
 	}
@@ -1023,6 +1059,13 @@ void CMIMainDlg::OnBnClickedPageFirst()
 
 void CMIMainDlg::OnBnClickedPagePrev()
 {
+	if(!g_bIsConnected){
+		return;
+	}
+	if(m_bShowSearchResult){
+		return;
+	}
+
 	if(!m_bPageMode){
 		return;
 	}
@@ -1035,6 +1078,13 @@ void CMIMainDlg::OnBnClickedPagePrev()
 
 void CMIMainDlg::OnBnClickedPageNext()
 {
+	if(!g_bIsConnected){
+		return;
+	}
+	if(m_bShowSearchResult){
+		return;
+	}
+
 	if(!m_bPageMode){
 		return;
 	}
@@ -1047,6 +1097,13 @@ void CMIMainDlg::OnBnClickedPageNext()
 
 void CMIMainDlg::OnBnClickedPageLast()
 {
+	if(!g_bIsConnected){
+		return;
+	}
+	if(m_bShowSearchResult){
+		return;
+	}
+
 	if(!m_bPageMode){
 		return;
 	}
@@ -1059,6 +1116,10 @@ void CMIMainDlg::OnBnClickedPageLast()
 
 void CMIMainDlg::OnBnClickedSwitchPagemode()
 {
+	if(m_bShowSearchResult){
+		return;
+	}
+
 	m_bPageMode = !m_bPageMode;
 	if(m_bPageMode){
 		m_nCurrPageIndex = 0;
@@ -1306,12 +1367,23 @@ void CMIMainDlg::DropItemOnList(CListCtrl* pDragList, CListCtrl* pDropList)
 
 void CMIMainDlg::OnCbnSelchangeStatus()
 {
+	if(!g_bIsConnected){
+		return;
+	}
+
 	m_nStatusMode = m_ctrlStatus.GetCurSel();
 	m_bShowSearchResult = FALSE;
+
+	m_nCurrPageIndex = 0;
+	UpdateCurrPage();
 }
 
 void CMIMainDlg::OnBnClickedSearch()
 {
+	if(!g_bIsConnected){
+		return;
+	}
+
 	UpdateData(TRUE);
 	int num;
 	int *pID = new int[m_nRecNum + 10];
@@ -1351,8 +1423,8 @@ void CMIMainDlg::ShowTime()
 	GetLocalTime(&t);
 	char buf[256];
 	
-	sprintf(buf, "%s%02d:%02d:%02d", 
-					"医疗信息远程录入系统     ",
+	sprintf_s(buf, "%s%02d:%02d:%02d", 
+					"医疗信息远程录入系统 ",
 					t.wHour, t.wMinute, t.wSecond);
 
 	SetWindowText(CString(buf));
@@ -1365,4 +1437,27 @@ void CMIMainDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+void CMIMainDlg::OnCbnSelchangePagemode()
+{
+	if(m_bShowSearchResult){
+		return;
+	}
+
+	if(m_ctrlPageMode.GetCurSel()==0){;
+		m_bPageMode = FALSE;
+	}
+	else{
+		m_bPageMode = TRUE;
+	}
+	if(m_bPageMode){
+		m_nCurrPageIndex = 0;
+	}
+	UpdateCurrPage();
+}
+
+void CMIMainDlg::OnBnClickedSetting()
+{
+	ShowMsg("设置");
 }
