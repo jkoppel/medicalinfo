@@ -3,9 +3,11 @@
 #include "afxcmn.h"
 #include "..\\Common\\GlobalFuncs.h"
 #include "..\\Common\\GlobalVars.h"
-#include "c:\program files\microsoft visual studio 8\vc\ce\atlmfc\include\afxwin.h"
 #include "..\\Common\\DialogEx.h"
-
+#include "..\\Common\\ButtonEx.h"
+#include "..\\Common\\EditEx.h"
+#include "..\\Common\\StaticEx.h"
+#include "..\\Common\\ComboBoxEx.h"
 
 // CMIMainDlg dialog
 
@@ -70,7 +72,7 @@ public:
 
 	BOOL CmdConnect();
 	BOOL CmdGetRecordNum(int &num);
-	BOOL CmdGetAllIDs(int *pID, int &num);
+	BOOL CmdGetAllIDs(int *pID, int &num, int mode=MODE_ALL);
 	BOOL CmdGetRecordByID(int ID, struct UserData &data);
 	BOOL CmdAppendRecord(struct UserData &data);
 	BOOL CmdDeleteRecordByID(int ID);
@@ -103,9 +105,17 @@ public:
 public:
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	void DropItemOnList(CListCtrl* pDragList, CListCtrl* pDropList);
-	CComboBox m_ctrlStatus;
 	CString m_strScancodeID;
 	afx_msg void OnCbnSelchangeStatus();
 	afx_msg void OnBnClickedSearch();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnCbnSelchangePagemode();
+	afx_msg void OnBnClickedSetting();
+public:
+	CString m_strPageInfo;
+	CComboBox m_ctrlStatus;
+	CComboBox m_ctrlPageMode;
+	CButtonEx m_ctrlConnect;
+	CEditEx m_ctrlScancodeID;
+	CStaticEx m_ctrlScancodeID_Static;
 };
