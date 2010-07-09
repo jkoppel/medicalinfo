@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "DataFile.h"
-
 #include "MIBase.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 ///创建数据文件:建立该文件,并且往数据文件中写入:记录个数0(4字节),记录长度(4字节)
 /**
@@ -62,6 +65,7 @@ int DataFile_Delete(const char *path)
 	//删除文件
 
 #ifdef _WIN32_WCE
+	ret = 0;
 #else
 	ret = _unlink(path);//deleted by hwy, TODO
 #endif
