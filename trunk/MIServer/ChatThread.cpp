@@ -70,6 +70,10 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 		m_peer.Send(CString("ER||\r\n"));
 		return -1;
 	}
+	if(g_bIsDBConnected==FALSE){//没有连接数据库
+		m_peer.Send(CString("ER||1||\r\n"));
+		return -1;
+	}
 	ParseSeparatorString(m_sRecv);
 	p = g_strList.GetHeadPosition();
 	strTmp = g_strList.GetNext(p);
