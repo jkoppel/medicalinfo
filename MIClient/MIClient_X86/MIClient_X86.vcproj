@@ -387,10 +387,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Common\CheckBoxEx.h"
-					>
-				</File>
-				<File
 					RelativePath="..\common\ClientSocket.h"
 					>
 				</File>
@@ -460,10 +456,6 @@
 				</File>
 				<File
 					RelativePath="..\common\CESocket.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Common\CheckBoxEx.cpp"
 					>
 				</File>
 				<File
