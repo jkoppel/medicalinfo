@@ -2,7 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by MIClient_X86.rc
 //
-#define IDOK2                           2
 #define IDD_DIALOGEX                    103
 #define IDR_MAINFRAME                   128
 #define IDD_PROGRESS_INFO               129
