@@ -341,9 +341,11 @@ BOOL CMIMainDlg::OnInitDialog()
 	ShowTime();
 	SetTimer(100, 1000, NULL);
 
+/*
 	m_ctrlConnect.SetBkColor(RGB(0,255,0));
 	m_ctrlScancodeID.SetBkColor(RGB(0,255,255));
 	m_ctrlScancodeID_Static.SetBkColor(RGB(0,255,255));
+*/
 	return TRUE;
 }
 
