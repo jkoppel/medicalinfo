@@ -78,6 +78,9 @@ BOOL CPatientDlg::OnInitDialog()
 
 	SetData(m_Data);
 
+	SetWindowPos(NULL, 0, 0, 240, 300, SWP_SHOWWINDOW);
+
+
 	return TRUE;
 }
 
