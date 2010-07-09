@@ -1,8 +1,8 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by MIClient_X86.rc
+// Used by MIClient.rc
 //
-#define IDOK2                           2
+#define IDD_DIALOGEX                    103
 #define IDR_MAINFRAME                   128
 #define IDD_PROGRESS_INFO               129
 #define IDD_CONNECT                     130
@@ -52,14 +52,20 @@
 #define IDC_PAGE_NEXT                   1041
 #define IDC_PAGE_LAST                   1042
 #define IDC_SWITCH_PAGEMODE             1043
+#define IDC_SCANCODEID                  1044
+#define IDC_STATUS                      1045
+#define IDC_PAGEMODE                    1046
+#define IDC_PAGEINFO                    1048
+#define IDC_SETTING                     1049
+#define IDC_STATIC_SCANCODE             1050
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        138
+#define _APS_NEXT_RESOURCE_VALUE        170
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1040
-#define _APS_NEXT_SYMED_VALUE           101
+#define _APS_NEXT_CONTROL_VALUE         1051
+#define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif
