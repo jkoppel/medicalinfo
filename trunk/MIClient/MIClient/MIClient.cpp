@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "MIClient.h"
-#include "MIMainDlg.h"
+#include "..\\Common\\MIMainDlg.h"
 #include "..\\Common\\GlobalFuncs.h"
 #include "..\\Common\\ProgressInfo.h"
 
