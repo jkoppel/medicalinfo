@@ -40,6 +40,7 @@ END_MESSAGE_MAP()
 
 BOOL CDialogEx::OnEraseBkgnd(CDC* pDC)
 {
+/*
 	CBrush brush;
 	CRect rect;
 	COLORREF rgbBackGnd = RGB(0,0,255);
@@ -47,7 +48,7 @@ BOOL CDialogEx::OnEraseBkgnd(CDC* pDC)
 	GetClientRect(&rect);
 	brush.CreateSolidBrush(rgbBackGnd);
 	pDC-> FillRect(rect,&brush);
-	return   TRUE; 
-
+	return   TRUE;
+*/
 	return CDialog::OnEraseBkgnd(pDC);
 }
