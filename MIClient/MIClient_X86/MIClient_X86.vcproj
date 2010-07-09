@@ -190,15 +190,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\ConnectDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\MIClient.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MIMainDlg.cpp"
 				>
 			</File>
 			<File
@@ -230,15 +222,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\ConnectDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\MIClient.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MIMainDlg.h"
 				>
 			</File>
 			<File
@@ -395,6 +379,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Common\ConnectDlg.h"
+					>
+				</File>
+				<File
 					RelativePath="..\common\containers.h"
 					>
 				</File>
@@ -420,6 +408,10 @@
 				</File>
 				<File
 					RelativePath="..\common\MIBase.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\MIMainDlg.h"
 					>
 				</File>
 				<File
@@ -467,6 +459,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Common\ConnectDlg.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\common\DataFile.cpp"
 					>
 				</File>
@@ -484,6 +480,10 @@
 				</File>
 				<File
 					RelativePath="..\common\GlobalVars.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\MIMainDlg.cpp"
 					>
 				</File>
 				<File
