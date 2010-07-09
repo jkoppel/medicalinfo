@@ -189,15 +189,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\ConnectDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\MIClient.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MIMainDlg.cpp"
 				>
 			</File>
 			<File
@@ -227,15 +219,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\ConnectDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\MIClient.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MIMainDlg.h"
 				>
 			</File>
 			<File
@@ -252,6 +236,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\res\drag.bmp"
+				>
+			</File>
 			<File
 				RelativePath=".\res\MIClient.ico"
 				>
@@ -273,6 +261,10 @@
 				Filter="h;hpp;hxx;hm;inl;inc;xsd"
 				>
 				<File
+					RelativePath="..\Common\ButtonEx.h"
+					>
+				</File>
+				<File
 					RelativePath="..\common\CESocket.h"
 					>
 				</File>
@@ -281,11 +273,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Common\ComboBoxEx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\ConnectDlg.h"
+					>
+				</File>
+				<File
 					RelativePath="..\common\containers.h"
 					>
 				</File>
 				<File
 					RelativePath="..\common\DataFile.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\DialogEx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\EditEx.h"
 					>
 				</File>
 				<File
@@ -298,6 +306,10 @@
 				</File>
 				<File
 					RelativePath="..\common\MIBase.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\MIMainDlg.h"
 					>
 				</File>
 				<File
@@ -320,11 +332,19 @@
 					RelativePath="..\common\ProgressInfo.h"
 					>
 				</File>
+				<File
+					RelativePath="..\Common\StaticEx.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
 				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 				>
+				<File
+					RelativePath="..\Common\ButtonEx.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\common\CESocket.cpp"
 					>
@@ -334,7 +354,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Common\ComboBoxEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\ConnectDlg.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\common\DataFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\DialogEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\EditEx.cpp"
 					>
 				</File>
 				<File
@@ -343,6 +379,10 @@
 				</File>
 				<File
 					RelativePath="..\common\GlobalVars.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\MIMainDlg.cpp"
 					>
 				</File>
 				<File
@@ -363,6 +403,10 @@
 				</File>
 				<File
 					RelativePath="..\common\ProgressInfo.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\StaticEx.cpp"
 					>
 				</File>
 			</Filter>
