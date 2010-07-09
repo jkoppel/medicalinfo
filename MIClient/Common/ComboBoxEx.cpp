@@ -121,7 +121,9 @@ void CMyComboBoxEx::OnCBPaint(CDC* pDC)
 	//绘制客户区
 	CDC dMemDC;
 	dMemDC.CreateCompatibleDC(pDC);
-	dMemDC.SetMapMode(pDC->GetMapMode());	
+#ifndef _WIN32_WCE
+	dMemDC.SetMapMode(pDC->GetMapMode());
+#endif
 
 	//画动作
 	CBitmap mNewBmp;
