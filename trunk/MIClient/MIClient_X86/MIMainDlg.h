@@ -115,7 +115,12 @@ public:
 	CString m_strPageInfo;
 	CComboBox m_ctrlStatus;
 	CComboBox m_ctrlPageMode;
+	CButton m_ctrlConnect;
+	CEdit m_ctrlScancodeID;
+	CStatic m_ctrlScancodeID_Static;
+/*
 	CButtonEx m_ctrlConnect;
 	CEditEx m_ctrlScancodeID;
 	CStaticEx m_ctrlScancodeID_Static;
+*/
 };
