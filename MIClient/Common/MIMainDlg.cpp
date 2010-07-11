@@ -1625,6 +1625,7 @@ void CMIMainDlg::OnRecMoveToLast()
 	m_lstPatient.SetItemState(m_lstPatient.GetItemCount()-1, LVNI_SELECTED, LVNI_SELECTED);
 }
 
+#ifdef _WIN32_WCE
 ///重载窗口处理流程，处理触笔点按事件
 LRESULT CMIMainDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1660,3 +1661,4 @@ LRESULT CMIMainDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 	return CDialogEx::WindowProc(message, wParam, lParam);
 }
+#endif
