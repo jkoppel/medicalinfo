@@ -47,10 +47,18 @@ CMIMainDlg::CMIMainDlg(CWnd* pParent /*=NULL*/)
 	m_pDragList = NULL;
 	m_pDropList = NULL;
 	m_pDropWnd = NULL;
+
+	m_pMenu = new CMenu();
+	m_pMenu->CreatePopupMenu();
+	m_pMenu->AppendMenu(MF_STRING, ID_REC_MOVEPREV, _T("上移"));
+	m_pMenu->AppendMenu(MF_STRING, ID_REC_MOVENEXT, _T("下移"));
+	m_pMenu->AppendMenu(MF_STRING, ID_REC_MOVETOFIRST, _T("移到第一条"));
+	m_pMenu->AppendMenu(MF_STRING, ID_REC_MOVETOLAST, _T("移到最后一条"));
 }
 
 CMIMainDlg::~CMIMainDlg()
 {
+	delete m_pMenu;
 }
 
 void CMIMainDlg::DoDataExchange(CDataExchange* pDX)
@@ -85,9 +93,13 @@ BEGIN_MESSAGE_MAP(CMIMainDlg, CDialogEx)
 	ON_WM_LBUTTONUP()
 	ON_CBN_SELCHANGE(IDC_STATUS, &CMIMainDlg::OnCbnSelchangeStatus)
 	ON_BN_CLICKED(IDC_SEARCH, &CMIMainDlg::OnBnClickedSearch)
-	ON_WM_TIMER()
 	ON_CBN_SELCHANGE(IDC_PAGEMODE, &CMIMainDlg::OnCbnSelchangePagemode)
 	ON_BN_CLICKED(IDC_SETTING, &CMIMainDlg::OnBnClickedSetting)
+	ON_NOTIFY(NM_RCLICK, IDC_LIST_PATIENT, &CMIMainDlg::OnNMRclickListPatient)
+	ON_COMMAND(ID_REC_MOVEPREV, &CMIMainDlg::OnRecMovePrev)
+	ON_COMMAND(ID_REC_MOVENEXT, &CMIMainDlg::OnRecMoveNext)
+	ON_COMMAND(ID_REC_MOVETOFIRST, &CMIMainDlg::OnRecMoveToFirst)
+	ON_COMMAND(ID_REC_MOVETOLAST, &CMIMainDlg::OnRecMoveToLast)
 END_MESSAGE_MAP()
 
 ///接收到断开连接消息
@@ -346,9 +358,6 @@ BOOL CMIMainDlg::OnInitDialog()
 	m_ctrlPageMode.InsertString(0, CString("单页"));
 	m_ctrlPageMode.InsertString(1, CString("多页"));
 	m_ctrlPageMode.SetCurSel(1);
-
-	ShowTime();
-	SetTimer(100, 1000, NULL);
 
 /*
 	m_ctrlConnect.SetBkColor(RGB(0,255,0));
@@ -950,6 +959,10 @@ void CMIMainDlg::OnBnClickedMoveprev()
 {
 	int index;
 
+	if(m_bShowSearchResult){
+		return;
+	}
+
 	index = (int)m_lstPatient.GetFirstSelectedItemPosition()-1;
 	if(index<0){
 		ShowMsg("请选择记录");
@@ -996,6 +1009,10 @@ void CMIMainDlg::OnBnClickedMoveprev()
 void CMIMainDlg::OnBnClickedMovenext()
 {
 	int index, page_size;
+
+	if(m_bShowSearchResult){
+		return;
+	}
 
 	index = (int)m_lstPatient.GetFirstSelectedItemPosition()-1;
 	if(index<0){
@@ -1428,28 +1445,6 @@ void CMIMainDlg::OnBnClickedSearch()
 	pID = NULL;
 }
 
-void CMIMainDlg::ShowTime()
-{
-	SYSTEMTIME t;
-	GetLocalTime(&t);
-	char buf[256];
-	
-	sprintf_s(buf, "%s%02d:%02d:%02d", 
-					"医疗信息远程录入系统 ",
-					t.wHour, t.wMinute, t.wSecond);
-
-	SetWindowText(CString(buf));
-}
-
-void CMIMainDlg::OnTimer(UINT_PTR nIDEvent)
-{
-	if(nIDEvent==100){
-		ShowTime();
-	}
-
-	CDialogEx::OnTimer(nIDEvent);
-}
-
 void CMIMainDlg::OnCbnSelchangePagemode()
 {
 	if(m_bShowSearchResult){
@@ -1471,4 +1466,197 @@ void CMIMainDlg::OnCbnSelchangePagemode()
 void CMIMainDlg::OnBnClickedSetting()
 {
 	ShowMsg("设置");
+}
+
+void CMIMainDlg::OnNMRclickListPatient(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	int index;
+	POINT curPos;
+	GetCursorPos(&curPos);
+
+	if(!g_bIsConnected){
+		*pResult = 0;
+		return;
+	}
+	index = (int)(m_lstPatient.GetFirstSelectedItemPosition() - 1);
+	if(index<0){
+		*pResult = 0;
+		return;
+	}
+
+	m_pMenu->TrackPopupMenu(TPM_LEFTALIGN, curPos.x, curPos.y, this);
+
+	*pResult = 0;
+}
+
+void CMIMainDlg::OnRecMovePrev()
+{
+	OnBnClickedMoveprev();
+}
+
+void CMIMainDlg::OnRecMoveNext()
+{
+	OnBnClickedMovenext();
+}
+
+void CMIMainDlg::OnRecMoveToFirst()
+{
+	int index;
+
+	index = (int)m_lstPatient.GetFirstSelectedItemPosition()-1;
+	if(index<0){
+		ShowMsg("请选择记录");
+		return;
+	}
+
+	if(!m_bPageMode && index==0){
+		return;
+	}
+	if(m_bPageMode && m_nCurrPageIndex==0 && index==0){
+		return;
+	}
+
+	CString str;
+	char buf[100];
+	int ID_src, ID_dst, *pID;
+	int num;
+	int order_src, order_dst;
+
+	str = m_lstPatient.GetItemText(index, 0);
+	CString2Char(str, buf);
+	sscanf_s(buf, "%d", &ID_src);
+
+	g_ProgressInfo.Show("正在移动...");
+	if(!CmdGetRecordNum(num)){
+		ShowMsg("移动失败");
+		return;
+	}
+	pID = new int[num];
+	if(!CmdGetAllIDs(pID, num)){
+		delete []pID;
+		ShowMsg("移动失败");
+		return;
+	}
+	ID_dst = pID[0];
+	delete []pID;
+
+	if(!CmdGetOrderByID(ID_src, order_src)){
+		ShowMsg("移动失败");
+		return;
+	}
+	if(!CmdGetOrderByID(ID_dst, order_dst)){
+		ShowMsg("移动失败");
+		return;
+	}
+	if(!CmdMoveOrder(order_src, order_dst)){
+		ShowMsg("移动失败");
+		return;
+	}
+
+	g_ProgressInfo.Hide();
+	if(m_bShowSearchResult){
+		m_bShowSearchResult = FALSE;
+	}
+	m_nCurrPageIndex = 0;
+	UpdateCurrPage();
+	m_lstPatient.SetItemState(0, LVNI_SELECTED, LVNI_SELECTED);
+}
+
+void CMIMainDlg::OnRecMoveToLast()
+{
+	int index;
+
+	index = (int)m_lstPatient.GetFirstSelectedItemPosition()-1;
+	if(index<0){
+		ShowMsg("请选择记录");
+		return;
+	}
+
+	if(!m_bPageMode && index==0){
+		return;
+	}
+	if(m_bPageMode && m_nCurrPageIndex==m_nPageNum-1 && index==m_lstPatient.GetItemCount()-1){
+		return;
+	}
+
+	CString str;
+	char buf[100];
+	int ID_src, ID_dst, *pID;
+	int num;
+	int order_src, order_dst;
+
+	str = m_lstPatient.GetItemText(index, 0);
+	CString2Char(str, buf);
+	sscanf_s(buf, "%d", &ID_src);
+
+	g_ProgressInfo.Show("正在移动...");
+	if(!CmdGetRecordNum(num)){
+		ShowMsg("移动失败");
+		return;
+	}
+	pID = new int[num];
+	if(!CmdGetAllIDs(pID, num)){
+		delete []pID;
+		ShowMsg("移动失败");
+		return;
+	}
+	ID_dst = pID[num-1];
+	delete []pID;
+
+	if(!CmdGetOrderByID(ID_src, order_src)){
+		ShowMsg("移动失败");
+		return;
+	}
+	if(!CmdGetOrderByID(ID_dst, order_dst)){
+		ShowMsg("移动失败");
+		return;
+	}
+	if(!CmdMoveOrder(order_src, order_dst)){
+		ShowMsg("移动失败");
+		return;
+	}
+
+	g_ProgressInfo.Hide();
+	if(m_bShowSearchResult){
+		m_bShowSearchResult = FALSE;
+	}
+	m_nCurrPageIndex = m_nPageNum - 1;
+	UpdateCurrPage();
+	m_lstPatient.SetItemState(m_lstPatient.GetItemCount()-1, LVNI_SELECTED, LVNI_SELECTED);
+}
+
+///重载窗口处理流程，处理触笔点按事件
+LRESULT CMIMainDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	NMHDR *pNMHDR;
+
+	switch(message){
+		case WM_NOTIFY:
+		{
+			if((UINT)wParam==IDC_LIST_PATIENT){
+				pNMHDR = (NMHDR*)lParam;
+				if(pNMHDR->code==GN_CONTEXTMENU){
+					int index;
+					CPoint pt;
+					NMRGINFO* pInfo;
+
+					pInfo = (NMRGINFO*)pNMHDR;
+					pt = pInfo->ptAction;
+
+					if(!g_bIsConnected){
+						break;;
+					}
+					index = (int)(m_lstPatient.GetFirstSelectedItemPosition() - 1);
+					if(index<0){
+						break;
+					}
+
+					m_pMenu->TrackPopupMenu(TPM_LEFTALIGN, pt.x, pt.y, this);
+				}
+				break;
+			}
+		}
+	}
+
+	return CDialogEx::WindowProc(message, wParam, lParam);
 }
