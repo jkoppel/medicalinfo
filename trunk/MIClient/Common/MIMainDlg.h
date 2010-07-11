@@ -27,7 +27,7 @@ public:
 
 	// Dialog Data
 	enum { IDD = IDD_MICLIENT_MAIN };
-	enum { PAGE_SIZE = 10 };
+	enum { PAGE_SIZE = 12 };
 	enum { MODE_ALL=0, MODE_UNPROCESSED, MODE_PROCESSED };
 
 protected:
@@ -68,7 +68,6 @@ public:
 	void InitListBox();
 	void UpdateRowData(int index, struct UserData data);
 	void UpdateCurrPage();
-	void ShowTime();
 
 	BOOL CmdConnect();
 	BOOL CmdGetRecordNum(int &num);
@@ -86,31 +85,25 @@ public:
 	BOOL CmdSearchByScancodeID(const char *scan_code_id, int *pID, int &num);
 public:
 	afx_msg void OnBnClickedMoveprev();
-public:
 	afx_msg void OnBnClickedMovenext();
-public:
 	afx_msg void OnBnClickedPageFirst();
-public:
 	afx_msg void OnBnClickedPagePrev();
-public:
 	afx_msg void OnBnClickedPageNext();
-public:
 	afx_msg void OnBnClickedPageLast();
-public:
 	afx_msg void OnBnClickedSwitchPagemode();
-public:
 	afx_msg void OnLvnBegindragListPatient(NMHDR *pNMHDR, LRESULT *pResult);
-public:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-public:
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	void DropItemOnList(CListCtrl* pDragList, CListCtrl* pDropList);
 	CString m_strScancodeID;
 	afx_msg void OnCbnSelchangeStatus();
 	afx_msg void OnBnClickedSearch();
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnCbnSelchangePagemode();
 	afx_msg void OnBnClickedSetting();
+	afx_msg void OnRecMovePrev();
+	afx_msg void OnRecMoveNext();
+	afx_msg void OnRecMoveToFirst();
+	afx_msg void OnRecMoveToLast();
 public:
 	CString m_strPageInfo;
 	CComboBox m_ctrlStatus;
@@ -118,4 +111,8 @@ public:
 	CButton m_ctrlConnect;
 	CEdit m_ctrlScancodeID;
 	CStatic m_ctrlScancodeID_Static;
+	CMenu *m_pMenu;
+	afx_msg void OnNMRclickListPatient(NMHDR *pNMHDR, LRESULT *pResult);
+protected:
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };
