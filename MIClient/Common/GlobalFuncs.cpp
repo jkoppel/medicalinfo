@@ -16,8 +16,11 @@ extern int MyMessageBox(LPCTSTR lpszText, LPCTSTR lpszCaption, UINT nType = MB_O
 void CString2Char(CString source, char *dest)
 {
 	int length;
-	length = source.GetLength(); 
-	memset(dest, 0, length+1);
+	length = source.GetLength();
+	if(length>512){
+		length = 512;
+	}
+	memset(dest, 0, 2*length+1);
 	WideCharToMultiByte(
 		CP_ACP, WC_COMPOSITECHECK|WC_DEFAULTCHAR,
 		source.GetBuffer(length),
@@ -169,7 +172,7 @@ void MakeAddOrModRecordCmd(BOOL IsAdd, struct UserData data, CString &str)
 
 int ParseRecvDataToRec(CString str, struct UserData &data)
 {
-	char buf[1024];
+	char buf[2048];
 
 	//´æµ½String List
 	ParseSeparatorString(str);
@@ -208,7 +211,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 
 	str = g_strList.GetNext(p);
 	CString2Char(str, buf);
-	sprintf_s(data.ScancodeID, "%s", buf);
+	_snprintf(data.ScancodeID, sizeof(data.ScancodeID), "%s", buf);
 	if(!p){
 		return FALSE;
 	}
