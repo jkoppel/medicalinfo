@@ -211,7 +211,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 
 	str = g_strList.GetNext(p);
 	CString2Char(str, buf);
-	_snprintf(data.ScancodeID, sizeof(data.ScancodeID), "%s", buf);
+	_snprintf_s(data.ScancodeID, sizeof(data.ScancodeID), "%s", buf);
 	if(!p){
 		return FALSE;
 	}
