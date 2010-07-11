@@ -114,5 +114,7 @@ public:
 	CMenu *m_pMenu;
 	afx_msg void OnNMRclickListPatient(NMHDR *pNMHDR, LRESULT *pResult);
 protected:
+#ifdef _WIN32_WCE
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+#endif
 };
