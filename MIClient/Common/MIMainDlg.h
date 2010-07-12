@@ -7,7 +7,6 @@
 #include "..\\Common\\ButtonEx.h"
 #include "..\\Common\\EditEx.h"
 #include "..\\Common\\StaticEx.h"
-#include "..\\Common\\ComboBoxEx.h"
 
 
 typedef struct {
