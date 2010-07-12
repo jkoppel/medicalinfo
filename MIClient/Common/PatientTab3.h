@@ -16,15 +16,16 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()
 public:
 	CString m_strClinicalDiagnosis;
-public:
 	CString m_strPharmacy;
-public:
 	CString m_strPastHistory;
 	CComboBox m_ctrlStatus;
-	virtual BOOL OnInitDialog();
+	CComboBox m_ctrlPharmacy;
+	CComboBox m_ctrlPastHistory;
+
 	int m_iStatus;
 };
