@@ -130,7 +130,7 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 		while(pFileNode!=NULL){
 			TV_INSERTSTRUCT tvChild;//Ê÷Ò¶
 			tvChild.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-			tvChild.item.pszText = pFileNode->addition_info.sFile;//pFileNode->addition_info.sTestDate;
+			tvChild.item.pszText = pFileNode->addition_info.sTestDate;//pFileNode->addition_info.sFile;//
 			tvChild.item.iImage= 10;
 			tvChild.item.iSelectedImage = 10;
 			tvChild.hParent = item_root;
