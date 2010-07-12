@@ -21,6 +21,8 @@
 #define IDC_LISTBUDDY                   1008
 #define IDC_PROGRESS                    1009
 #define ID_DIR_SETUP                    32771
+#define INDICATOR_LOGO                  61446
+#define INDICATOR_EDIT                  61447
 
 // Next default values for new objects
 // 
