@@ -54,6 +54,7 @@ struct SUserInfo
 
 #endif
 
+#define CONFIG_FILE		"Configuration.ini"
 
 #endif//_MIBASE_H_
 
