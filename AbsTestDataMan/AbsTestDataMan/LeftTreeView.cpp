@@ -25,6 +25,7 @@ IMPLEMENT_DYNCREATE(CLeftTreeView, CView)
 CLeftTreeView::CLeftTreeView()
 {
 	m_ilDataFile.DeleteImageList();
+	m_bCheckBoxes = TRUE;
 }
 
 CLeftTreeView::~CLeftTreeView()
@@ -98,7 +99,7 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 
 	g_pTree->DeleteAllItems();
 	g_pTree->SetImageList(&m_ilDataFile, TVSIL_NORMAL);
-	g_pTree->Initialize(TRUE, TRUE);
+	g_pTree->Initialize(m_bCheckBoxes, TRUE);
 	g_pTree->SetSmartCheckBox(TRUE);
 	g_pTree->SetHtml(TRUE);
 	g_pTree->SetImages(TRUE);
@@ -153,6 +154,16 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 	}
 
 	UpdateData(FALSE);
+}
+
+void CLeftTreeView::SetCheckBoxes(BOOL bCheckBoxes)
+{
+	m_bCheckBoxes = bCheckBoxes;
+}
+
+BOOL CLeftTreeView::GetCheckBoxes()
+{
+	return m_bCheckBoxes;
 }
 
 void CLeftTreeView::OnDblclk(NMHDR* pNMHDR, LRESULT* pResult) 
