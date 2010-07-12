@@ -33,4 +33,8 @@ public:
 	CComboBox m_ctrlProvince;
 	CComboBox m_ctrlCity;
 	CComboBox m_ctrlHazards;
+	CString m_strProvinceCode[100];
+	int m_nNumOfProvinceCode;
+
+	afx_msg void OnCbnSelchangeProvince();
 };
