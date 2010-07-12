@@ -66,6 +66,7 @@
 #define IDC_COMBO_CITY                  1056
 #define IDC_COMBO_PASTHISTORY           1057
 #define IDC_COMBO_PHARMACY              1058
+#define IDC_DT_BIRTHDATE                1060
 #define ID_REC_MOVEPREV                 32771
 #define ID_REC_MOVENEXT                 32772
 #define ID_REC_MOVETOFIRST              32773
