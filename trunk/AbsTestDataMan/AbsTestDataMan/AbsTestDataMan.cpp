@@ -95,6 +95,8 @@ BOOL CAbsTestDataManApp::InitInstance()
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
 
+	m_pMainWnd->SetWindowText(_T("减振器性能使用数据管理软件"));
+
 	// 唯一的一个窗口已初始化，因此显示它并对其进行更新
 	m_pMainWnd->ShowWindow(SW_SHOW);
 	m_pMainWnd->UpdateWindow();
