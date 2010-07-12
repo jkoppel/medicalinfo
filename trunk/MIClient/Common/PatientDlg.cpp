@@ -63,7 +63,7 @@ BOOL CPatientDlg::OnInitDialog()
 	CRect rs; 
 	m_dlgTab3.GetClientRect(&rs);
 	rs.top+=25;
-	rs.bottom+=24;
+	rs.bottom+=28;
 	rs.left+=5;
 	rs.right+=5;
 
