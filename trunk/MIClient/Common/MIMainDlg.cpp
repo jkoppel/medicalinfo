@@ -1418,6 +1418,10 @@ void CMIMainDlg::OnBnClickedSearch()
 	}
 
 	UpdateData(TRUE);
+	m_strScancodeID = m_strScancodeID.Trim();
+	if(m_strScancodeID.GetLength()==0){
+		return;
+	}
 	int num;
 	int *pID = new int[m_nRecNum + 10];
 	char buf[256];
