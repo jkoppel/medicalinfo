@@ -24,6 +24,8 @@ public:
 // Operations
 public:
 	void InitTree(BOOL bReloadMode=FALSE);
+	void SetCheckBoxes(BOOL bCheckBoxes);
+	BOOL GetCheckBoxes();
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -45,6 +47,7 @@ protected:
 	// Generated message map functions
 protected:
 	CImageList m_ilDataFile;
+	BOOL m_bCheckBoxes;
 
 	//{{AFX_MSG(CLeftTreeView)
 	afx_msg void OnDblclk(NMHDR* pNMHDR, LRESULT* pResult);
