@@ -6,6 +6,9 @@
 #include "MIServerDlg.h"
 #include "GlobalFuncs.h"
 #include "PatientListDlg.h"
+#include "CfgFile.h"
+
+#define CONFIG_FILE			"Configuration.ini"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -28,6 +31,14 @@ CMIServerDlg::CMIServerDlg(CWnd* pParent /*=NULL*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	g_bIsDBConnected = FALSE;
 	g_pDBConnection = NULL;
+
+	CfgFile cf;
+	cf.OpenFile(CONFIG_FILE);
+	char sPort[256];
+	if(cf.GetVarStr("PDAPORT", "Port", sPort)){
+		m_sPort = sPort;
+	}
+	cf.CloseFile();
 }
 
 void CMIServerDlg::DoDataExchange(CDataExchange* pDX)
