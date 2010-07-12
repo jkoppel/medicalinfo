@@ -58,6 +58,14 @@
 #define IDC_PAGEINFO                    1048
 #define IDC_SETTING                     1049
 #define IDC_STATIC_SCANCODE             1050
+#define IDC_COMBO_DEPARTMENT            1051
+#define IDC_COMBO_SEX                   1052
+#define IDC_COMBO_TYPEOFWORK            1053
+#define IDC_COMBO_HAZARDS               1054
+#define IDC_COMBO_PROVINCE              1055
+#define IDC_COMBO_CITY                  1056
+#define IDC_COMBO_PASTHISTORY           1057
+#define IDC_COMBO_PHARMACY              1058
 #define ID_REC_MOVEPREV					32771
 #define ID_REC_MOVENEXT                 32772
 #define ID_REC_MOVETOFIRST              32773
@@ -69,7 +77,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        171
 #define _APS_NEXT_COMMAND_VALUE         32775
-#define _APS_NEXT_CONTROL_VALUE         1052
+#define _APS_NEXT_CONTROL_VALUE         1059
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif
