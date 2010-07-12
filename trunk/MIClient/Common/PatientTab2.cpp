@@ -10,6 +10,7 @@
 #include "PatientTab2.h"
 #include "CfgFile.h"
 #include "MIBase.h"
+#include "GlobalFuncs.h"
 
 
 // CPatientTab2 dialog
@@ -46,8 +47,18 @@ BOOL CPatientTab2::OnInitDialog()
 	cf.OpenFile(CONFIG_FILE);
 
 	if(cf.GetSectionOptions("PROVINCE", szOptions, 20, num)){
+		m_nNumOfProvinceCode = 0;
 		for(i=0;i<num;i++){
-			m_ctrlProvince.InsertString(i, CString(szOptions[i]));
+			CString str(szOptions[i]);
+			int index = str.Find(_T("="));
+			if(index>=0){
+				m_strProvinceCode[m_nNumOfProvinceCode] = str.Left(index);
+				m_strProvinceCode[m_nNumOfProvinceCode] = m_strProvinceCode[m_nNumOfProvinceCode].Trim();
+				m_nNumOfProvinceCode ++;
+				str = str.Right(str.GetLength()-index-1);
+				str = str.Trim();
+				m_ctrlProvince.InsertString(i, str);
+			}
 		}
 	}
 	if(cf.GetSectionOptions("HAZARDS", szOptions, 20, num)){
@@ -87,7 +98,45 @@ void CPatientTab2::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CPatientTab2, CDialog)
+ON_CBN_SELCHANGE(IDC_COMBO_PROVINCE, &CPatientTab2::OnCbnSelchangeProvince)
 END_MESSAGE_MAP()
 
 
 // CPatientTab2 message handlers
+void CPatientTab2::OnCbnSelchangeProvince()
+{
+	char buf[256];
+	CfgFile cf;
+	char szOptions[50][256];
+	int num;
+	int index = m_ctrlProvince.GetCurSel();
+
+	if(index>=0){
+		CString2Char(m_strProvinceCode[index], buf);
+
+		cf.OpenFile(CONFIG_FILE);
+		cf.GetSectionOptions(buf, szOptions, 50, num);
+		cf.CloseFile();
+		m_ctrlCity.ResetContent();
+		//m_ctrlZipcode.ResetContent();
+		for(int i=0;i<num;i++){
+			CString str = CString(szOptions[i]);
+			int pos = str.Find(_T("="));
+			if(pos>=1){
+				CString str_city = str.Left(pos);
+				str_city = str_city.Trim();
+				m_ctrlCity.InsertString(m_ctrlCity.GetCount(), str_city);
+/*
+				str = str.Right(str.GetLength()-pos-1);
+				str = str.Trim();
+				pos = str.Find(_T(","));
+				if(pos>=1){
+					CString str_zipcode = str.Left(pos);
+					m_ctrlZipcode.InsertString(m_ctrlZipcode.GetCount(), str_zipcode);
+				}
+*///可能的邮政编码输入
+			}
+		}
+	}
+
+}
