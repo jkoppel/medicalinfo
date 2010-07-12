@@ -359,30 +359,6 @@
 		<Filter
 			Name="Common Files"
 			>
-			<File
-				RelativePath="..\Common\CfgFile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Common\CfgFilg.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
 			<Filter
 				Name="Header Files"
 				>
@@ -392,6 +368,10 @@
 				</File>
 				<File
 					RelativePath="..\common\CESocket.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\CfgFile.h"
 					>
 				</File>
 				<File
@@ -469,6 +449,26 @@
 				<File
 					RelativePath="..\common\CESocket.cpp"
 					>
+				</File>
+				<File
+					RelativePath="..\Common\CfgFilg.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\common\ClientSocket.cpp"
