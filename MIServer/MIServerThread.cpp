@@ -2,8 +2,10 @@
 #include "MIServerThread.h"
 #include "ChatThread.h"
 #include "GlobalFuncs.h"
+#include "CfgFile.h"
 
 #define USE_UDL_FILE		1
+#define CONFIG_FILE			"Configuration.ini"
 
 ///构造函数
 CMIServerThread::CMIServerThread(CWnd* pParent)
@@ -11,7 +13,13 @@ CMIServerThread::CMIServerThread(CWnd* pParent)
 {
 	//默认设为TCP连接，端口5000
 	m_nServerType = SOCK_STREAM;
-	m_nPort = 5000;
+
+	CfgFile cf;
+	cf.OpenFile(CONFIG_FILE);
+	if(!cf.GetVarInt("PDAPORT", "Port", m_nPort)){
+		m_nPort = 5000;
+	}
+	cf.CloseFile();
 }
 
 BEGIN_MESSAGE_MAP(CMIServerThread, CDialog)
@@ -40,9 +48,11 @@ BOOL CMIServerThread::OnInitDialog()
 	ModifyStyleEx(WS_EX_APPWINDOW,WS_EX_TOOLWINDOW);  //设置在任务栏中不显示
 	this->SetWindowText(""); //这样在任务管理器的任务名称里不会显示了。
 
+	CfgFile cf;
+	cf.OpenFile(CONFIG_FILE);
+
 	//启动服务器
 	m_pSocketServer = new CMySocket(this);
-	m_sPort = _T("5000");
 	StartServer();
 
 	// 初始化COM,创建ADO连接等操作
