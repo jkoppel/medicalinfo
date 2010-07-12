@@ -103,6 +103,11 @@ SOURCE=.\CESocket.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\CfgFilg.cpp
+# SUBTRACT CPP /YX /Yc /Yu
+# End Source File
+# Begin Source File
+
 SOURCE=.\Chat.cpp
 # End Source File
 # Begin Source File
@@ -178,6 +183,10 @@ SOURCE=.\StdAfx.cpp
 # Begin Source File
 
 SOURCE=.\CESocket.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\CfgFile.h
 # End Source File
 # Begin Source File
 
