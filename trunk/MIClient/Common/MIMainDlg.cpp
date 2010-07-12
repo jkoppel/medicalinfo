@@ -58,7 +58,12 @@ CMIMainDlg::CMIMainDlg(CWnd* pParent /*=NULL*/)
 
 CMIMainDlg::~CMIMainDlg()
 {
+	m_pMenu->DestroyMenu();
 	delete m_pMenu;
+	if(g_pClientSocket){
+		delete g_pClientSocket;
+		g_pClientSocket = NULL;
+	}
 }
 
 void CMIMainDlg::DoDataExchange(CDataExchange* pDX)
