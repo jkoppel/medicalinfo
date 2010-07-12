@@ -4,6 +4,8 @@
 
 #pragma once
 #include "SplitterWndEx\\SplitterWndEx.h"
+#include "MPCLogoPane.h"
+#include "MPCStatusBar.h"
 
 class CMainFrame : public CFrameWnd
 {
@@ -31,7 +33,7 @@ public:
 #endif
 
 protected:  // 控件条嵌入成员
-	CStatusBar  m_wndStatusBar;
+	MPCStatusBar  m_wndStatusBar;
 	CToolBar    m_wndToolBar;
 	CSplitterWndEx m_wndSplitter;
 	CSplitterWndEx m_wndSplitter2; 
@@ -45,6 +47,7 @@ public:
 	afx_msg void OnDirSetup();
 public:
 	afx_msg void OnDestroy();
+	afx_msg void OnMenuSelect(UINT nItemID, UINT nFlags, HMENU hSysMenu);
 };
 
 
