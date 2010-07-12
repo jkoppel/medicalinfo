@@ -258,6 +258,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MPCLogoPane.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MPCStatusBar.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ProgressThread.cpp"
 				>
 			</File>
@@ -329,6 +337,14 @@
 			</File>
 			<File
 				RelativePath=".\MainFrm.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MPCLogoPane.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MPCStatusBar.h"
 				>
 			</File>
 			<File
