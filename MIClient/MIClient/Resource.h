@@ -66,10 +66,11 @@
 #define IDC_COMBO_CITY                  1056
 #define IDC_COMBO_PASTHISTORY           1057
 #define IDC_COMBO_PHARMACY              1058
-#define ID_REC_MOVEPREV					32771
+#define IDC_DATETIMEPICKER2             1060
+#define ID_REC_MOVEPREV                 32771
 #define ID_REC_MOVENEXT                 32772
 #define ID_REC_MOVETOFIRST              32773
-#define ID_REC_MOVETOLAST				32774
+#define ID_REC_MOVETOLAST               32774
 
 // Next default values for new objects
 // 
@@ -77,7 +78,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        171
 #define _APS_NEXT_COMMAND_VALUE         32775
-#define _APS_NEXT_CONTROL_VALUE         1059
+#define _APS_NEXT_CONTROL_VALUE         1061
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif
