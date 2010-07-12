@@ -29,6 +29,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
 	ON_COMMAND(ID_DIR_SETUP, &CMainFrame::OnDirSetup)
 	ON_WM_DESTROY()
+	ON_WM_MENUSELECT()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -72,8 +73,18 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		TRACE0("未能创建状态栏\n");
 		return -1;      // 未能创建
 	}
+	//创建一个提示
+	m_wndStatusBar.AddIndicator(0, INDICATOR_LOGO);
+	int idx = m_wndStatusBar.CommandToIndex(INDICATOR_LOGO);
+	m_wndStatusBar.SetPaneWidth(idx,120);
+	m_wndStatusBar.SetPaneStyle(idx, m_wndStatusBar.GetPaneStyle(idx) | SBPS_NOBORDERS );
 
-	// TODO: 如果不需要工具栏可停靠，则删除这三行
+	// Create a log pane window, and append it to status bar
+	MPCLogoPane * pLogo = new MPCLogoPane;
+	pLogo->Create(_T("清华汽车系"),WS_CHILD|WS_VISIBLE,&m_wndStatusBar,120);
+	pLogo->SetLogoFont(_T("Arial"), 18);
+	m_wndStatusBar.AddControl(pLogo,INDICATOR_LOGO);
+
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	EnableDocking(CBRS_ALIGN_ANY);
 	DockControlBar(&m_wndToolBar);
@@ -186,4 +197,11 @@ void CMainFrame::OnDestroy()
 	CFrameWnd::OnDestroy();
 
 	ReleaseDirNode();
+}
+
+void CMainFrame::OnMenuSelect(UINT nItemID, UINT nFlags, HMENU hSysMenu)
+{
+	CFrameWnd::OnMenuSelect(nItemID, nFlags, hSysMenu);
+
+	m_wndStatusBar.RemovePane(INDICATOR_LOGO);
 }
