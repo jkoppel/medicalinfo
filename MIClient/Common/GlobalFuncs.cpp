@@ -189,6 +189,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sscanf_s(buf, "%d", &data.ID);
 	if(!p){
@@ -196,6 +197,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sscanf_s(buf, "%d", &data.Order);
 	if(!p){
@@ -203,6 +205,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sscanf_s(buf, "%d", &data.Status);
 	if(!p){
@@ -210,6 +213,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	_snprintf_s(data.ScancodeID, sizeof(data.ScancodeID), "%s", buf);
 	if(!p){
@@ -217,6 +221,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sscanf_s(buf, "%d", &data.Number);
 	if(!p){
@@ -224,6 +229,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.Name, "%s", buf);
 	if(!p){
@@ -231,6 +237,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.Sex, "%s", buf);
 	if(!p){
@@ -238,6 +245,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sscanf_s(buf, "%d", &data.Age);
 	if(!p){
@@ -245,6 +253,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.BirthDate, "%s", buf);
 	if(!p){
@@ -252,6 +261,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.People, "%s", buf);
 	if(!p){
@@ -259,6 +269,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.Department, "%s", buf);
 	if(!p){
@@ -266,6 +277,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.TypeOfWork, "%s", buf);
 	if(!p){
@@ -273,6 +285,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.Province, "%s", buf);
 	if(!p){
@@ -280,6 +293,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.City, "%s", buf);
 	if(!p){
@@ -287,6 +301,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.Address, "%s", buf);
 	if(!p){
@@ -294,6 +309,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.ZipCode, "%s", buf);
 	if(!p){
@@ -301,6 +317,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.Tel, "%s", buf);
 	if(!p){
@@ -308,6 +325,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.ClinicalDiagnosis, "%s", buf);
 	if(!p){
@@ -315,6 +333,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sscanf_s(buf, "%d", &data.Height);
 	if(!p){
@@ -322,6 +341,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.Weight, "%s", buf);
 	if(!p){
@@ -329,6 +349,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.CheckDate, "%s", buf);
 	if(!p){
@@ -336,6 +357,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.Hazards, "%s", buf);
 	if(!p){
@@ -343,6 +365,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.Pharmacy, "%s", buf);
 	if(!p){
@@ -350,6 +373,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	}
 
 	str = g_strList.GetNext(p);
+	str = str.Trim();
 	CString2Char(str, buf);
 	sprintf_s(data.PastHistory, "%s", buf);
 
