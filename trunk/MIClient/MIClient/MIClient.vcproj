@@ -256,6 +256,30 @@
 		<Filter
 			Name="Common Files"
 			>
+			<File
+				RelativePath="..\Common\CfgFile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Common\CfgFilg.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|MKL (ARMV4I)"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|MKL (ARMV4I)"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
 			<Filter
 				Name="Header Files"
 				Filter="h;hpp;hxx;hm;inl;inc;xsd"
@@ -270,10 +294,6 @@
 				</File>
 				<File
 					RelativePath="..\common\ClientSocket.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Common\ComboBoxEx.h"
 					>
 				</File>
 				<File
@@ -351,10 +371,6 @@
 				</File>
 				<File
 					RelativePath="..\common\ClientSocket.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Common\ComboBoxEx.cpp"
 					>
 				</File>
 				<File
