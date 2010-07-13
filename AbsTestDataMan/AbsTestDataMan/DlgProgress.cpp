@@ -104,8 +104,21 @@ UINT CDlgProgress::ThreadProc(LPVOID lpParm)
 		}
 	}
 	*/
-	LoadNode();
 
+	//Do Things ...
+		/*
+		//use the following function to update step
+		if(CDlgProgress::m_pDlg){
+			::SendMessage(CDlgProgress::m_pDlg->m_hWnd, WM_UPDATEDATA, 0, 0);
+		}
+
+		//use the following to break the loop
+		if(!PeekAndPump()){
+			break;
+		}
+		*/
+
+	//After thread, we need to release resources
 	m_pThread->ExitInstance();
 	m_pThread = NULL;
 
@@ -113,7 +126,6 @@ UINT CDlgProgress::ThreadProc(LPVOID lpParm)
 		::SendMessage(m_pDlg->m_hWnd, WM_CLOSE, 0, 0);
 	}
 
-	g_pLeftTreeView->InitTree();
 	return 0;
 }
 
