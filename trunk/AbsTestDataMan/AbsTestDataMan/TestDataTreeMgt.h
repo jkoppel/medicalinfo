@@ -422,6 +422,7 @@ struct TestRecordFileNode;
 struct TreeItemData
 {
 	int iIndex;
+	BOOL bSelected;
 	struct TestRecordFileNode *pNode;
 };
 
@@ -491,6 +492,8 @@ public:
 	BOOL DeleteProductNode(ProductNodePtr pProductNodeToDelete);
 	void DeleteProductNode(const char *sProductNo);
 	BOOL SearchProductNode(const char *sProductNo, ProductNodePtr &pProductNodeFound);
+
+	void ResetNodeStatus();
 
 	ProductTreeRootPtr m_pProductTreeRoot;
 protected:
