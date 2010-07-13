@@ -34,9 +34,9 @@ void char2TCHAR(TCHAR *tcDst, const char *szSrc, int iLength)
 #ifndef _UNICODE
 	memcpy(szDst, tcSource, iLength);
 #else
-	size_t convertedChars;
-
-	mbstowcs_s(&convertedChars, tcDst, iLength+1, szSrc, _TRUNCATE);
+	CString strDst = CString(szSrc);
+	_swprintf(tcDst, _T("%s"), strDst.GetBuffer(strDst.GetAllocLength()));
+	strDst.ReleaseBuffer();
 #endif
 }
 
@@ -292,81 +292,6 @@ BOOL LoadFile(const char *file, struct TestRecordFileNode &node)
 BOOL SaveFile(const char *file, struct CCTestRecord rec)
 {
 	return TRUE;
-}
-
-BOOL LoadNode()
-{
-	LoadDirFromConfigFile();
-
-	int i;
-	CFileFind ff;
-	BOOL bDecide = FALSE;
-	CString str, name;
-	char buf[1024];
-
-	g_iDirNodeNum = (int)g_saDirectories.GetCount();
-	g_pDirNode = new struct TestRecordDirNode[g_iDirNodeNum];
-	memset(g_pDirNode, 0, sizeof(struct TestRecordDirNode) * g_iDirNodeNum);
-
-	for(int k=0;k<50;k++)
-	for(i=0;i<g_saDirectories.GetCount();i++){
-		if(CDlgProgress::m_pDlg){
-			::SendMessage(CDlgProgress::m_pDlg->m_hWnd, WM_UPDATEDATA, 0, 0);
-		}
-
-		if(!PeekAndPump()){
-			break;
-		}
-
-		str = g_saDirectories.GetAt(i);
-		if(str.Right(1)!=_T('\\')){
-			str += _T("\\");
-		}
-		swprintf(g_pDirNode[i].sDir, _T("%s"), str.GetBuffer(str.GetLength()));;
-		g_pDirNode[i].pFileNode = new struct TestRecordFileNode[20];
-
-		bDecide = ff.FindFile(str+_T("*.DFT"));
-		g_pDirNode[i].iNum = 0;
-		while(bDecide){
-			bDecide = ff.FindNextFile();  
-			if(ff.IsDirectory() || ff.IsDots()){//Ä¿Â¼»ò.,..
-				continue;
-			}
-			name = str + ff.GetFileName();
-			CString2char(buf, name);
-			if(LoadFile(buf, g_pDirNode[i].pFileNode[g_pDirNode[i].iNum])){
-				name = ff.GetFileName();
-				swprintf(g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].addition_info.sFile, _T("%s"), name);
-				//CString2char(g_pDirNode[i].pFileNode[g_pDirNode[i].iNum].addition_info.sFile, name);;
-				g_pDirNode[i].iNum ++;
-			}
-			if(g_pDirNode[i].iNum>=20){
-				break;
-			}
-
-			if(CDlgProgress::m_pDlg){
-				::SendMessage(CDlgProgress::m_pDlg->m_hWnd, WM_UPDATEDATA, 0, 0);
-			}
-
-		}
-		ff.Close();
-	}
-
-	return TRUE;
-}
-
-void ReleaseDirNode()
-{
-	if(g_pDirNode!=NULL){
-		for(int i=0;i<g_iDirNodeNum;i++){
-			if(g_pDirNode[i].pFileNode!=NULL){
-				delete []g_pDirNode[i].pFileNode;
-				g_pDirNode[i].pFileNode = NULL;
-			}
-		}
-		delete []g_pDirNode;
-		g_pDirNode = NULL;
-	}
 }
 
 BOOL IsFileInConfigDirList(CString strFile)
