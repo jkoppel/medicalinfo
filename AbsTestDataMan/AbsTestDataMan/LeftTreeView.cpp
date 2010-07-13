@@ -36,8 +36,7 @@ CLeftTreeView::~CLeftTreeView()
 BEGIN_MESSAGE_MAP(CLeftTreeView, CView)
 	//{{AFX_MSG_MAP(CLeftTreeView)
 	ON_NOTIFY_REFLECT(NM_DBLCLK, OnDblclk)
-	ON_NOTIFY_REFLECT(TVN_SELCHANGED, OnSelchanged)
-	ON_NOTIFY(TVN_SELCHANGED, IDC_TREE, OnSelchanged)
+	ON_NOTIFY(TVN_SELCHANGED, IDC_TREE, OnSelchangedTree)
 	//}}AFX_MSG_MAP
 	ON_WM_CREATE()
 	ON_WM_SIZE()
@@ -153,6 +152,7 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 		pProductNode = pProductNode->pNext;
 	}
 
+	g_pTree->Expand(g_pTree->GetRootItem(), TVE_EXPAND);
 	UpdateData(FALSE);
 }
 
@@ -171,9 +171,21 @@ void CLeftTreeView::OnDblclk(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-void CLeftTreeView::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult) 
+void CLeftTreeView::OnSelchangedTree(NMHDR* pNMHDR, LRESULT* pResult) 
 {
-	NM_TREEVIEW* pNMView = (NM_TREEVIEW*)pNMHDR;
+	if(!m_bCheckBoxes){
+		NMTREEVIEW* pNMTreeView = (NMTREEVIEW*)pNMHDR;
+
+		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
+		DWORD_PTR p = g_pTree->GetItemData(hItem);
+		if(p!=NULL){
+			g_TestDataTreeMgt.ResetNodeStatus();
+			struct TreeItemData *tp = (struct TreeItemData *)p;
+			tp->bSelected = TRUE;
+		}
+
+		g_pRightDrawAreaView->RedrawWindow();
+	}
 
 	*pResult = 0;
 }
@@ -216,9 +228,22 @@ void CLeftTreeView::OnSize(UINT nType, int cx, int cy)
 LRESULT CLeftTreeView::OnCheckbox(WPARAM wParam, LPARAM lParam)
 //=============================================================================
 {
-	CSplitterWndEx* pSplitter=(CSplitterWndEx*)GetParent();
-	CRightDrawAreaView *pView = (CRightDrawAreaView*)pSplitter->GetPane(0,1);
-	pView->RedrawWindow();
+	if(m_bCheckBoxes){
+		g_TestDataTreeMgt.ResetNodeStatus();
+		HTREEITEM hItem = g_pTree->GetFirstCheckedItem();
+		while (hItem){
+			DWORD_PTR p = g_pTree->GetItemData(hItem);
+			hItem = g_pTree->GetNextCheckedItem(hItem);
+
+			if(p==NULL){
+				continue;
+			}
+			struct TreeItemData *tp = (struct TreeItemData *)p;
+			tp->bSelected = TRUE;
+		}
+
+		g_pRightDrawAreaView->RedrawWindow();
+	}
 
 	return 0;
 }
