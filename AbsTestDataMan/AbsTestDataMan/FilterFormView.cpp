@@ -129,8 +129,10 @@ void CFilterFormView::OnBnClickedBtnApply()
 		pThread = AfxBeginThread(&MyThread, (LPVOID)0);
 	}
 	*/
-	CDlgProgress dlg;
-	dlg.DoModal();
+	//CDlgProgress dlg;
+	//dlg.DoModal();
+	g_pLeftTreeView->SetCheckBoxes(!g_pLeftTreeView->GetCheckBoxes());
+	g_pLeftTreeView->InitTree();
 }
 
 void CFilterFormView::OnSize(UINT nType, int cx, int cy)
