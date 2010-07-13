@@ -684,7 +684,7 @@ BOOL CTestDataTreeMgt::SearchProductNode(const char *sProductNo, ProductNodePtr 
 		return FALSE;
 	}
 
-	ProductNodePtr pProductNode = m_pProductTreeRoot->pProductNodeListHead;
+	ProductNodePtr pProductNode = m_pProductTreeRoot->pProductNodeListHead->pNext;
 	while(pProductNode!=NULL){
 		TCHAR tcProductNo[256];
 		char2TCHAR(tcProductNo, sProductNo, (int)strlen(sProductNo));
@@ -698,3 +698,18 @@ BOOL CTestDataTreeMgt::SearchProductNode(const char *sProductNo, ProductNodePtr 
 	return FALSE;
 }
 
+void CTestDataTreeMgt::ResetNodeStatus()
+{
+	int i;
+	ProductNodePtr pProductNode = m_pProductTreeRoot->pProductNodeListHead->pNext;
+	while(pProductNode!=NULL){
+		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
+		while(pFileNode!=NULL){
+			for(i=0;i<pFileNode->test_record.iNumOfSpeed;i++){
+				pFileNode->tree_item_data[i].bSelected = FALSE;
+			}
+			pFileNode = pFileNode->pNext;
+		}
+		pProductNode = pProductNode->pNext;
+	}
+}
