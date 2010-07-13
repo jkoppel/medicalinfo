@@ -13,9 +13,6 @@ extern BOOL SaveFile(const char *file, struct CCTestRecord rec);
 extern BOOL IsFileInConfigDirList(const char *sFile);
 extern BOOL IsFileInConfigDirList(CString strFile);
 
-extern BOOL LoadNode();
-extern void ReleaseDirNode();
-
 //œ‘ æœ˚œ¢
 extern void ShowMsg(const char *msg);
 BOOL CheckStrDateFormat(const char *StrDateTime, int &year, int &month, int &day);
