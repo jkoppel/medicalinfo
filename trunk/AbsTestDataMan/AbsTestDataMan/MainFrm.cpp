@@ -195,8 +195,6 @@ void CMainFrame::OnDirSetup()
 void CMainFrame::OnDestroy()
 {
 	CFrameWnd::OnDestroy();
-
-	ReleaseDirNode();
 }
 
 void CMainFrame::OnMenuSelect(UINT nItemID, UINT nFlags, HMENU hSysMenu)
