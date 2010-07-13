@@ -9,16 +9,6 @@
 
 #define CONFIG_DIR_FILE		"directories.txt"
 
-
-struct TestRecordDirNode{
-	TCHAR sDir[256];
-	int iNum;
-	struct TestRecordFileNode *pFileNode;
-};
-
-extern int g_iDirNodeNum;
-extern struct TestRecordDirNode *g_pDirNode;
-
 extern CStringArray g_saDirectories;
 
 extern CXHtmlTree *g_pTree;
