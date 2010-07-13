@@ -228,55 +228,52 @@ void CRightDrawAreaView::DrawData()
 
 	int iNumDrawed = 0;
 	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
-	HTREEITEM hItem = g_pTree->GetFirstCheckedItem();
-	while (hItem)
-	{
-		DWORD_PTR p = g_pTree->GetItemData(hItem);
+	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.m_pProductTreeRoot;
+	ProductNodePtr pProductNode = g_TestDataTreeMgt.m_pProductTreeRoot->pProductNodeListHead->pNext;
+	while(pProductNode!=NULL){
+		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
+		while(pFileNode!=NULL){
+			for(int iIndex=0;iIndex<pFileNode->test_record.iNumOfSpeed;iIndex++){
+				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
+				if(tp->bSelected){
+					if(tp->pNode->bDataProcessed==FALSE){
+						g_TestDataTreeMgt.ProcessData(tp->pNode);
+					}
 
-		hItem = g_pTree->GetNextCheckedItem(hItem);
+					pen.DeleteObject();
+					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
+					pDC->SelectObject(&pen);
+					for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
+						j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
+						j++){
+						//X按均值和幅度缩放到对应值
+						x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+						//Y直接使用原大小
+						y = (int)(m_pntClientAreaOrig.y - tp->pNode->test_record.fForce[tp->iIndex][j] * (yspan/250));
+						if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
+							pDC->MoveTo(x, y);
+							pDC->SetPixel(x, y, color[tp->iIndex]);
+						}
+						else{
+							pDC->LineTo(x, y);
+						}
+					}
 
-		if(p==NULL){
-			continue;
-		}
-		struct TreeItemData *tp = (struct TreeItemData *)p;
-		if(tp->pNode->bDataProcessed==FALSE){
-			g_TestDataTreeMgt.ProcessData(tp->pNode);
-		}
-
-		pen.DeleteObject();
-		pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
-		pDC->SelectObject(&pen);
-		for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
-			j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
-			j++){
-			//X按均值和幅度缩放到对应值
-			x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-			//Y直接使用原大小
-			y = (int)(m_pntClientAreaOrig.y - tp->pNode->test_record.fForce[tp->iIndex][j] * (yspan/250));
-			if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
-				pDC->MoveTo(x, y);
-				pDC->SetPixel(x, y, color[tp->iIndex]);
-			}
-			else{
-				pDC->LineTo(x, y);
-			}
-		}
-
-		for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
-			j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
-			j++){
-			//X按均值和幅度缩放到对应值
-			x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-			//Y直接使用原大小
-			y = (int)(m_pntClientAreaOrig.y - tp->pNode->addition_info.fForceOfFilter[tp->iIndex][j] * (yspan/250));
-			if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
-				pDC->MoveTo(x, y);
-				pDC->SetPixel(x, y, color[tp->iIndex]);
-			}
-			else{
-				pDC->LineTo(x, y);
-			}
-		}
+					for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
+						j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
+						j++){
+						//X按均值和幅度缩放到对应值
+						x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+						//Y直接使用原大小
+						y = (int)(m_pntClientAreaOrig.y - tp->pNode->addition_info.fForceOfFilter[tp->iIndex][j] * (yspan/250));
+						if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
+							pDC->MoveTo(x, y);
+							pDC->SetPixel(x, y, color[tp->iIndex]);
+						}
+						else{
+							pDC->LineTo(x, y);
+						}
+					}
 
 		/*
 		for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
@@ -305,10 +302,15 @@ void CRightDrawAreaView::DrawData()
 		}
 		*/
 
-		iNumDrawed ++;
-		if(iNumDrawed>=20){
-			break;
+					iNumDrawed ++;
+					if(iNumDrawed>=20){
+						break;
+					}
+				}
+			}
+			pFileNode = pFileNode->pNext;
 		}
+		pProductNode = pProductNode->pNext;
 	}
 
 	pDC->SelectObject(oldFont);
