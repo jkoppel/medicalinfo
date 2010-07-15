@@ -3,10 +3,10 @@
 #include "afxcmn.h"
 #include "..\\Common\\GlobalFuncs.h"
 #include "..\\Common\\GlobalVars.h"
-#include "..\\Common\\DialogEx.h"
-#include "..\\Common\\ButtonEx.h"
-#include "..\\Common\\EditEx.h"
-#include "..\\Common\\StaticEx.h"
+#include "..\\Common\\Controls\\DialogEx.h"
+#include "..\\Common\\Controls\\ButtonEx.h"
+#include "..\\Common\\Controls\\EditEx.h"
+#include "..\\Common\\Controls\\StaticEx.h"
 
 
 typedef struct {
