@@ -56,6 +56,7 @@ void CChatThread::ConnectTo(SOCKET s)
 ///接收到客户端数据的处理函数，核心函数
 LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 {
+	//读取数据
 	while(m_peer.GetDataSize() > 0 && m_peer.ReadString(m_sRecv));
 
 	char buf[2048];
@@ -66,18 +67,23 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 	struct UserData data;
 	POSITION p;
 
+	//检查是否已过来的命令是否是"CMD...\r\n"
 	if((m_sRecv.Find("CMD")!=0) || (m_sRecv.Find("\r\n")!=m_sRecv.GetLength()-2)){
 		m_peer.Send(CString("ER||\r\n"));
 		return -1;
 	}
-	if(g_bIsDBConnected==FALSE){//没有连接数据库
+	//未连接数据库，返回错误编号1
+	if(g_bIsDBConnected==FALSE){
 		m_peer.Send(CString("ER||1||\r\n"));
 		return -1;
 	}
+	//解析过来的命令串，按"||"分开成若干小串，存到g_strList中
 	ParseSeparatorString(m_sRecv);
+	//依次读取g_strList
 	p = g_strList.GetHeadPosition();
 	strTmp = g_strList.GetNext(p);
-	strTmp = strTmp.Right(strTmp.GetLength()-3);//SKIP CMD
+	//略过"CMD"，获取命令号
+	strTmp = strTmp.Right(strTmp.GetLength()-3);
 	sscanf(strTmp, "%d", &cmdID);
 	switch(cmdID){
 		case CMD_CONNECT://联机，测试双方通信是否正常
@@ -97,6 +103,7 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
 			}
+			//获取ID号
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
 			strTmp.ReleaseBuffer();
@@ -105,20 +112,22 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
+			//将记录数据组装成以"||"隔开的长字符串，并发送给客户端
 			MakeSendCmdFromRec(data, strTmp);
 			m_peer.Send(strTmp);
 			break;
 		case CMD_APPENDRECORD://添加一条记录
+			//解析记录
 			if(!ParseRecvDataToRec(m_sRecv, data)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
-
+			//添加记录
 			if(!Cmd_AppendRecord(data)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
-
+			//返回记录ID号
 			sprintf(buf, "%s||%d||%s", "OK", data.ID, "\r\n");
 			m_peer.Send(CString(buf));
 			break;
@@ -127,10 +136,11 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
 			}
+			//获取ID号
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
 			strTmp.ReleaseBuffer();
-
+			//删除记录
 			if(!Cmd_DeleteRecordByID(ID)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
@@ -138,16 +148,16 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			m_peer.Send(CString("OK||\r\n"));
 			break;
 		case CMD_EDITRECORDBYID://修改一条记录
+			//解析记录
 			if(!ParseRecvDataToRec(m_sRecv, data)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
-
+			//修改记录
 			if(!Cmd_ModifyRecordByID(data.ID, data)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
-
 			m_peer.Send(CString("OK||\r\n"));
 			break;
 		case CMD_GETALLID:
@@ -155,24 +165,27 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
 			}
+			//获取模式(all:所有记录；processed:已处理；unprocessed:未处理)
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &mode);
 			strTmp.ReleaseBuffer();
-
+			//获取记录数量
 			if(!Cmd_GetRecordNum(num)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
 			pID = new int[num+10];
 			if(!Cmd_GetAllIDs(pID, num, mode)){
+				delete []pID;
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
+			//将ID号组装成字符串发送回去，注意第一个数据为ID数量
 			MakeIDToSeparatorString(pID, num, strTmp);
 			m_peer.Send(strTmp);
 			delete []pID;
 			break;
-		case CMD_GETNEXTFREEORDER:
+		case CMD_GETNEXTFREEORDER://获取下一个可用的Order即排序值
 			if(!Cmd_GetNextFreeOrder(order)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
@@ -180,15 +193,16 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s||%d||%s", "OK", order, "\r\n");
 			m_peer.Send(CString(buf));
 			break;
-		case CMD_GETORDERBYID:
+		case CMD_GETORDERBYID://根据ID号获取记录的Order值
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
 			}
+			//获取记录ID号
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
 			strTmp.ReleaseBuffer();
-
+			//获取order
 			if(!Cmd_GetOrderByID(ID, order)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
@@ -196,11 +210,12 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s||%d||%s", "OK", order, "\r\n");
 			m_peer.Send(CString(buf));
 			break;
-		case CMD_SETORDERBYID:
+		case CMD_SETORDERBYID://根据ID号设置order值
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
 			}
+			//获取ID号
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &ID);
 			strTmp.ReleaseBuffer();
@@ -209,10 +224,11 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
 			}
+			//获取order值
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &order);
 			strTmp.ReleaseBuffer();
-
+			//设置order
 			if(!Cmd_SetOrderByID(ID, order)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
@@ -220,23 +236,24 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s", "OK||\r\n");
 			m_peer.Send(CString(buf));
 			break;
-		case CMD_MOVEORDER:
+		case CMD_MOVEORDER://移动order，即：org_order要移动dst_order的位置，而两者之间的依次前移或者后移
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
 			}
+			//获取org_order
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &org_order);
 			strTmp.ReleaseBuffer();
-
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
 			}
+			//获取dst_order
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &dst_order);
 			strTmp.ReleaseBuffer();
-
+			//移动order
 			if(!Cmd_MoveOrder(org_order, dst_order)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
@@ -244,15 +261,16 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s", "OK||\r\n");
 			m_peer.Send(CString(buf));
 			break;
-		case CMD_MOVEORDERPREV:
+		case CMD_MOVEORDERPREV://将order对应的记录前移一位
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
 			}
+			//获取order
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &order);
 			strTmp.ReleaseBuffer();
-
+			//前移一位
 			if(!Cmd_MoveOrderPrev(order)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
@@ -260,15 +278,16 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s", "OK||\r\n");
 			m_peer.Send(CString(buf));
 			break;
-		case CMD_MOVEORDERNEXT:
+		case CMD_MOVEORDERNEXT://将order对应的记录后移一位
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
 			}
+			//获取order
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%d", &order);
 			strTmp.ReleaseBuffer();
-
+			//后移一位
 			if(!Cmd_MoveOrderNext(order)){
 				m_peer.Send(CString("ER||\r\n"));
 				break;
@@ -276,19 +295,22 @@ LRESULT CChatThread::OnReceiveData(WPARAM wParam, LPARAM lParam)
 			sprintf(buf, "%s", "OK||\r\n");
 			m_peer.Send(CString(buf));
 			break;
-		case CMD_SEARCHBYSCANCODEID:
+		case CMD_SEARCHBYSCANCODEID://按扫描码查询记录
 			if(!p){
 				m_peer.Send(CString("ER||\r\n"));
 				return -1;
 			}
+			//获取扫描码并查询
 			strTmp = g_strList.GetNext(p);
 			sscanf(strTmp.GetBuffer(strTmp.GetLength()), "%s", buf);
 			strTmp.ReleaseBuffer();
 			pID = new int[1024];
 			if(!Cmd_SearchByScancodeID(buf, pID, num)){
+				delete []pID;
 				m_peer.Send(CString("ER||\r\n"));
 				break;
 			}
+			//将ID信息组装成返回的字符串
 			MakeIDToSeparatorString(pID, num, strTmp);
 			m_peer.Send(strTmp);
 			delete []pID;
@@ -313,9 +335,9 @@ BOOL CChatThread::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	SetWindowPos(&wndNoTopMost,0,0,0,0,SWP_HIDEWINDOW);  //设置显示方式为最上，且不显示。
+	SetWindowPos(&wndNoTopMost,0,0,0,0,SWP_HIDEWINDOW);  //设置显示方式为左上且没有长宽，实际是不显示。
 	ModifyStyleEx(WS_EX_APPWINDOW,WS_EX_TOOLWINDOW);  //设置在任务栏中不显示
-	SetWindowText(""); //这样在任务管理器的任务名称里不会显示了。
+	SetWindowText("");
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
