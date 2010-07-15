@@ -14,6 +14,8 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CPatientDlg dialog
 
+///病人列表对话框，也是供调试使用，实际运行时和本文件没有关系
+
 
 CPatientDlg::CPatientDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CPatientDlg::IDD, pParent)
