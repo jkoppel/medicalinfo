@@ -12,6 +12,7 @@
 #define new DEBUG_NEW
 #endif
 
+#include "vld.h"
 
 // CAbsTestDataManApp
 
