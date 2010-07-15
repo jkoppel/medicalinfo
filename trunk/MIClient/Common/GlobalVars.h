@@ -11,7 +11,7 @@ typedef unsigned short ushort;
 typedef unsigned int uint;
 
 
-#define MAX_PACKET_BUF_LENGTH	1024 * 1024
+#define MAX_BUF_LEN		1024
 
 extern CClientSocket * g_pClientSocket;
 extern BOOL g_bIsConnected;
