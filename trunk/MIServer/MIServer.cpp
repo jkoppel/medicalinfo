@@ -65,6 +65,7 @@ BOOL CMIServerApp::InitInstance()
 	CreateAppDataDir();
 	CreateDataFile();
 
+	//如果是想显示对话框进行调试，可以把_DEBUG_VER_宏打开
 #ifdef _DEBUG_VER_
 	CMIServerDlg p;
 #else
