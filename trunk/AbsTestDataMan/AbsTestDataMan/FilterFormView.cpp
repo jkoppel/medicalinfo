@@ -42,6 +42,9 @@ BEGIN_MESSAGE_MAP(CFilterFormView, CFormView)
 	ON_WM_PAINT()
 	ON_BN_CLICKED(IDC_BTN_APPLY, &CFilterFormView::OnBnClickedBtnApply)
 	ON_WM_SIZE()
+	ON_BN_CLICKED(IDC_BTN_TEST1, &CFilterFormView::OnBnClickedBtnTest1)
+	ON_BN_CLICKED(IDC_BTN_TEST2, &CFilterFormView::OnBnClickedBtnTest2)
+	ON_BN_CLICKED(IDC_BTN_TEST3, &CFilterFormView::OnBnClickedBtnTest3)
 END_MESSAGE_MAP()
 
 
@@ -129,10 +132,6 @@ void CFilterFormView::OnBnClickedBtnApply()
 		pThread = AfxBeginThread(&MyThread, (LPVOID)0);
 	}
 	*/
-	//CDlgProgress dlg;
-	//dlg.DoModal();
-	g_pLeftTreeView->SetCheckBoxes(!g_pLeftTreeView->GetCheckBoxes());
-	g_pLeftTreeView->InitTree();
 }
 
 void CFilterFormView::OnSize(UINT nType, int cx, int cy)
@@ -144,3 +143,29 @@ void CFilterFormView::OnSize(UINT nType, int cx, int cy)
 	SetScrollRange(1, 0, 0);
 }
 
+
+void CFilterFormView::OnBnClickedBtnTest1()
+{
+	CDlgProgress dlg;
+	dlg.DoModal();
+}
+
+void CFilterFormView::OnBnClickedBtnTest2()
+{
+	g_pLeftTreeView->SetMultiSelectMode(!g_pLeftTreeView->GetMultiSelectMode());
+	g_pLeftTreeView->InitTree();
+	g_pRightDrawAreaView->RedrawWindow();
+	if(g_pLeftTreeView->GetMultiSelectMode()){
+		GetDlgItem(IDC_BTN_TEST2)->SetWindowText(_T("多文件"));
+	}
+	else{
+		GetDlgItem(IDC_BTN_TEST2)->SetWindowText(_T("单文件"));
+	}
+}
+
+void CFilterFormView::OnBnClickedBtnTest3()
+{
+	CRightDrawAreaView::DRAW_MODE iMode = (CRightDrawAreaView::DRAW_MODE)((g_pRightDrawAreaView->GetDrawMode()+1) % 4);
+	g_pRightDrawAreaView->SetDrawMode(iMode);
+	g_pRightDrawAreaView->RedrawWindow();
+}
