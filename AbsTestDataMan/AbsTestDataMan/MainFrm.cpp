@@ -45,7 +45,6 @@ static UINT indicators[] =
 
 CMainFrame::CMainFrame()
 {
-	// TODO: 在此添加成员初始化代码
 }
 
 CMainFrame::~CMainFrame()
@@ -80,10 +79,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndStatusBar.SetPaneStyle(idx, m_wndStatusBar.GetPaneStyle(idx) | SBPS_NOBORDERS );
 
 	// Create a log pane window, and append it to status bar
-	MPCLogoPane * pLogo = new MPCLogoPane;
-	pLogo->Create(_T("清华汽车系"),WS_CHILD|WS_VISIBLE,&m_wndStatusBar,120);
-	pLogo->SetLogoFont(_T("Arial"), 18);
-	m_wndStatusBar.AddControl(pLogo,INDICATOR_LOGO);
+	m_wndStatusBar.ShowLogoPane();
 
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	EnableDocking(CBRS_ALIGN_ANY);
@@ -201,5 +197,5 @@ void CMainFrame::OnMenuSelect(UINT nItemID, UINT nFlags, HMENU hSysMenu)
 {
 	CFrameWnd::OnMenuSelect(nItemID, nFlags, hSysMenu);
 
-	m_wndStatusBar.RemovePane(INDICATOR_LOGO);
+	m_wndStatusBar.HideLogoPane();
 }
