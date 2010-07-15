@@ -6,9 +6,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+///数据库连接全局变量
 _ConnectionPtr	g_pDBConnection;
+///数据库连接状态全局不
 BOOL g_bIsDBConnected = FALSE;
+///全局字符串列表
+CStringList g_strList;
 
+///检查目录是否存在
 BOOL FolderExist(CString strPath)
 {
      WIN32_FIND_DATA   wfd;
@@ -22,6 +27,7 @@ BOOL FolderExist(CString strPath)
     return rValue;
 }
 
+///创建一个目录
 BOOL CreateFolder(CString strPath)
 {
      SECURITY_ATTRIBUTES attrib;
@@ -32,6 +38,7 @@ BOOL CreateFolder(CString strPath)
      return ::CreateDirectory( strPath, &attrib);
 }
 
+///获取系统Application Data目录，即%AppData%
 void GetAppDataDir(char *buf)
 {
 	::GetEnvironmentVariable("AppData", buf, 100);
@@ -113,7 +120,7 @@ void PrintBuffer(const char *hint, const unsigned char *buffer,int len)
 	return;
 }
 
-CStringList g_strList;
+///将全局字符串列表g_strList的字符串项按"||"连接起来，组装成一个长字符串
 void MakeSeparatorString(CString &str)
 {
 	int num = g_strList.GetCount();
@@ -135,6 +142,7 @@ void MakeSeparatorString(CString &str)
 	}
 }
 
+///将一个以"||"连接的长字符串分离开成一个一个子字符串，存放到字符串列表g_strList中
 void ParseSeparatorString(CString str)
 {
 	int offset;
@@ -178,10 +186,12 @@ void CreateDataFile()
 	}
 }
 
+///将病人数据组装成待发送到客户端的以"||"连接的命令字符串
 void MakeSendCmdFromRec(struct UserData data, CString &str)
 {
 	char buf[100];
 
+	//先将数据存到全局字符串列表中，注意前面加"OK"，后面加"\r\n"
 	g_strList.RemoveAll();
 
 	g_strList.AddTail("OK");
@@ -228,15 +238,18 @@ void MakeSendCmdFromRec(struct UserData data, CString &str)
 
 	g_strList.AddTail("\r\n");
 
+	//
 	MakeSeparatorString(str);
 }
 
+///将客户端过来的命令解析到成病人数据
 int ParseRecvDataToRec(CString str, struct UserData &data)
 {
-	//存到String List
+	//先存到String List
 	ParseSeparatorString(str);
 	memset(&data, 0, sizeof(data));
 
+	//依次解析
 	POSITION p = g_strList.GetHeadPosition();
 	if(!p){
 		return FALSE;
@@ -408,6 +421,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 	return TRUE;
 }
 
+///命令：获取记录数量
 BOOL Cmd_GetRecordNum(int &num)
 {
 	_RecordsetPtr	pHandlerRecordset;
@@ -444,6 +458,12 @@ BOOL Cmd_GetRecordNum(int &num)
 	return ret;
 }
 
+///获取(所有/已处理/未处理)的记录的ID号
+/**
+  * pID : 返回获取的ID数组 \n
+  * num : 返回ID数量 \n
+  * mode : 指定模式，ALL/UNPROCESSED/PROCESSED
+  */
 BOOL Cmd_GetAllIDs(int *pID, int &num, int mode)
 {
 	_RecordsetPtr	pHandlerRecordset;
@@ -498,6 +518,7 @@ BOOL Cmd_GetAllIDs(int *pID, int &num, int mode)
 	return TRUE;
 }
 
+///将ID数组转为待发送到客户端命令字符串
 void MakeIDToSeparatorString(int *pID, int num, CString &str)
 {
 	char buf[100];
@@ -513,6 +534,7 @@ void MakeIDToSeparatorString(int *pID, int num, CString &str)
 	str += "\r\n";
 }
 
+///根据记录号获取数据
 BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 {
 	_RecordsetPtr	pHandlerRecordset;
@@ -712,6 +734,7 @@ BOOL Cmd_GetRecordByID(int ID, struct UserData &rec)
 	return ret;
 }
 
+///根据序号order值获取记录数据
 BOOL Cmd_GetRecordByOrder(int order, struct UserData &rec)
 {
 	_RecordsetPtr	pHandlerRecordset;
@@ -906,6 +929,12 @@ BOOL Cmd_GetRecordByOrder(int order, struct UserData &rec)
 	return ret;
 }
 
+///获取两个order之间的所有记录的ID号
+/**
+  * order1, order2 : 两个记录号 \n
+  * IDAndOrder : 返回ID和Order的结构数组 \n
+  * num : 返回数组大小
+  */
 BOOL Cmd_GetOrders(int order1, int order2, struct IDAndOrder *pIDAndOrder, int &num)
 {
 	_RecordsetPtr	pHandlerRecordset;
@@ -966,6 +995,7 @@ BOOL Cmd_GetOrders(int order1, int order2, struct IDAndOrder *pIDAndOrder, int &
 	return TRUE;
 }
 
+///追加一条记录
 BOOL Cmd_AppendRecord(struct UserData &rec)
 {
 	int num1, num2, order;
@@ -1021,6 +1051,7 @@ BOOL Cmd_AppendRecord(struct UserData &rec)
 	return TRUE;
 }
 
+///根据ID号删除一条记录
 BOOL Cmd_DeleteRecordByID(int ID)
 {
 	CString strSql;
@@ -1064,6 +1095,7 @@ BOOL Cmd_ModifyRecordByID(int ID, struct UserData rec)
 	return TRUE;
 }
 
+///获取下一个可用的序号Order值
 BOOL Cmd_GetNextFreeOrder(int &order)
 {
 	BOOL ret;
@@ -1111,6 +1143,7 @@ BOOL Cmd_GetNextFreeOrder(int &order)
 	return ret;
 }
 
+///根据ID号获取记录的orer值
 BOOL Cmd_GetOrderByID(int ID, int &order)
 {
 	BOOL ret;
@@ -1150,6 +1183,7 @@ BOOL Cmd_GetOrderByID(int ID, int &order)
 	return ret;
 }
 
+///根据ID号设置order值
 BOOL Cmd_SetOrderByID(int ID, int order)
 {
 	CString strSql;
@@ -1159,6 +1193,7 @@ BOOL Cmd_SetOrderByID(int ID, int order)
 	return TRUE;
 }
 
+///移动序号顺序：org_order移到dst_order的地方，而两者之间的包括原dst_order的都依次前移或后移
 BOOL Cmd_MoveOrder(int org_order, int dst_order)
 {
 	_RecordsetPtr	pHandlerRecordset;
@@ -1193,6 +1228,7 @@ BOOL Cmd_MoveOrder(int org_order, int dst_order)
 		return FALSE;
 	}
 
+	//顺序移动两者之间的记录
 	if(org_order<=dst_order){
 		for(int i=num-1;i>=1;i--){
 			if(!Cmd_SetOrderByID(pOrder[i].ID, pOrder[i-1].Order)){
@@ -1200,6 +1236,7 @@ BOOL Cmd_MoveOrder(int org_order, int dst_order)
 				return FALSE;
 			}
 		}
+		//移完了再设置目标位置
 		Cmd_SetOrderByID(pOrder[0].ID, dst_order);
 	}
 	else{
@@ -1216,6 +1253,7 @@ BOOL Cmd_MoveOrder(int org_order, int dst_order)
 	return TRUE;
 }
 
+///将记录前移
 BOOL Cmd_MoveOrderPrev(int order)
 {
 	_RecordsetPtr	pHandlerRecordset;
@@ -1288,6 +1326,7 @@ BOOL Cmd_MoveOrderPrev(int order)
 	return TRUE;
 }
 
+///将记录后移
 BOOL Cmd_MoveOrderNext(int order)
 {
 	_RecordsetPtr	pHandlerRecordset;
@@ -1360,6 +1399,12 @@ BOOL Cmd_MoveOrderNext(int order)
 	return TRUE;
 }
 
+///根据扫描码查询记录
+/**
+  * scan_code_id : 记录扫描码 \n
+  * pID : 返回记录的ID号的数组 \n
+  * num : 返回记录个数
+  */
 BOOL Cmd_SearchByScancodeID(const char *scan_code_id, int *pID, int &num)
 {
 	_RecordsetPtr	pHandlerRecordset;
