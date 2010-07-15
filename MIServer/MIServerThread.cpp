@@ -14,6 +14,7 @@ CMIServerThread::CMIServerThread(CWnd* pParent)
 	//默认设为TCP连接，端口5000
 	m_nServerType = SOCK_STREAM;
 
+	//从配置文件获取端口号
 	CfgFile cf;
 	cf.OpenFile(CONFIG_FILE);
 	if(!cf.GetVarInt("PDAPORT", "Port", m_nPort)){
@@ -44,12 +45,9 @@ BOOL CMIServerThread::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	SetWindowPos(&wndNoTopMost,0,0,0,0,SWP_HIDEWINDOW);  //设置显示方式为最上，且不显示。
+	SetWindowPos(&wndNoTopMost,0,0,0,0,SWP_HIDEWINDOW);  //设置显示方式为左上角，且不显示。
 	ModifyStyleEx(WS_EX_APPWINDOW,WS_EX_TOOLWINDOW);  //设置在任务栏中不显示
-	this->SetWindowText(""); //这样在任务管理器的任务名称里不会显示了。
-
-	CfgFile cf;
-	cf.OpenFile(CONFIG_FILE);
+	this->SetWindowText("");
 
 	//启动服务器
 	m_pSocketServer = new CMySocket(this);
@@ -130,11 +128,13 @@ BOOL CMIServerThread::StartServer()
 	return TRUE;
 }
 
+///关闭服务器
 void CMIServerThread::StopServer()
 {
 	m_pSocketServer->Disconnect();
 }
 
+///关闭对话框
 void CMIServerThread::OnClose() 
 {
 	if(g_bIsDBConnected){
