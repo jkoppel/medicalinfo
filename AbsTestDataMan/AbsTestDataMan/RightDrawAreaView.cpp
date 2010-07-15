@@ -22,6 +22,8 @@ BEGIN_MESSAGE_MAP(CRightDrawAreaView, CView)
 	ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
+	ON_WM_CREATE()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -30,10 +32,13 @@ END_MESSAGE_MAP()
 CRightDrawAreaView::CRightDrawAreaView()
 {
 	//初始化值
+	m_iDrawMode = DM_FILTER_ONLY;
 	m_pntClientAreaRef.x = 0;
 	m_pntClientAreaRef.y = 0;
 	m_nClientAreaWidth = 0;
 	m_nClientAreaHeight = 0;
+
+	m_pTab = NULL;
 
 	g_pRightDrawAreaView = this;
 }
@@ -63,6 +68,15 @@ void CRightDrawAreaView::OnDraw(CDC* /*pDC*/)
 	DrawData();
 }
 
+void CRightDrawAreaView::SetDrawMode(CRightDrawAreaView::DRAW_MODE iMode)
+{
+	m_iDrawMode = iMode;
+}
+
+CRightDrawAreaView::DRAW_MODE CRightDrawAreaView::GetDrawMode()
+{
+	return m_iDrawMode;
+}
 
 // CRightDrawAreaView 打印
 
@@ -243,35 +257,40 @@ void CRightDrawAreaView::DrawData()
 					pen.DeleteObject();
 					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
 					pDC->SelectObject(&pen);
-					for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
-						j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
-						j++){
-						//X按均值和幅度缩放到对应值
-						x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-						//Y直接使用原大小
-						y = (int)(m_pntClientAreaOrig.y - tp->pNode->test_record.fForce[tp->iIndex][j] * (yspan/250));
-						if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
-							pDC->MoveTo(x, y);
-							pDC->SetPixel(x, y, color[tp->iIndex]);
-						}
-						else{
-							pDC->LineTo(x, y);
+
+					if(m_iDrawMode & DM_NORAML_ONLY){
+						for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
+							j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
+							j++){
+								//X按均值和幅度缩放到对应值
+								x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+								//Y直接使用原大小
+								y = (int)(m_pntClientAreaOrig.y - tp->pNode->test_record.fForce[tp->iIndex][j] * (yspan/250));
+								if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
+									pDC->MoveTo(x, y);
+									pDC->SetPixel(x, y, color[tp->iIndex]);
+								}
+								else{
+									pDC->LineTo(x, y);
+								}
 						}
 					}
 
-					for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
-						j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
-						j++){
-						//X按均值和幅度缩放到对应值
-						x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-						//Y直接使用原大小
-						y = (int)(m_pntClientAreaOrig.y - tp->pNode->addition_info.fForceOfFilter[tp->iIndex][j] * (yspan/250));
-						if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
-							pDC->MoveTo(x, y);
-							pDC->SetPixel(x, y, color[tp->iIndex]);
-						}
-						else{
-							pDC->LineTo(x, y);
+					if(m_iDrawMode & DM_FILTER_ONLY){
+						for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
+							j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
+							j++){
+								//X按均值和幅度缩放到对应值
+								x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+								//Y直接使用原大小
+								y = (int)(m_pntClientAreaOrig.y - tp->pNode->addition_info.fForceOfFilter[tp->iIndex][j] * (yspan/250));
+								if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
+									pDC->MoveTo(x, y);
+									pDC->SetPixel(x, y, color[tp->iIndex]);
+								}
+								else{
+									pDC->LineTo(x, y);
+								}
 						}
 					}
 
@@ -318,3 +337,44 @@ void CRightDrawAreaView::DrawData()
 
 
 // CRightDrawAreaView 消息处理程序
+
+void CRightDrawAreaView::OnInitialUpdate()
+{
+	CView::OnInitialUpdate();
+
+	m_pTab->InsertItem(0, _T("TAB1"));
+	m_pTab->InsertItem(1, _T("TAB2"));
+	m_pTab->InsertItem(2, _T("TAB3"));
+	m_pTab->InsertItem(3, _T("TAB4"));
+}
+
+int CRightDrawAreaView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CView::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	m_pTab = new CLBTabCtrl();
+	ASSERT(m_pTab);
+
+	// note:  TVS_NOTOOLTIPS is set in CXHtmlTree::PreCreateWindow()
+
+	DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_TABSTOP;// | WS_BORDER;
+
+	CRect rect(0,0,100,100);
+
+	VERIFY(m_pTab->Create(dwStyle, rect, this, IDC_TREE));
+
+
+	return 0;
+}
+
+void CRightDrawAreaView::OnSize(UINT nType, int cx, int cy)
+{
+	CView::OnSize(nType, cx, cy);
+
+	if (m_pTab && ::IsWindow(m_pTab->m_hWnd))
+	{
+		// stretch tree to fill window
+		m_pTab->MoveWindow(0, 0, cx, 22);
+	}
+}
