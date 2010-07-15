@@ -261,10 +261,6 @@
 				Filter="h;hpp;hxx;hm;inl;inc;xsd"
 				>
 				<File
-					RelativePath="..\Common\ButtonEx.h"
-					>
-				</File>
-				<File
 					RelativePath="..\common\CESocket.h"
 					>
 				</File>
@@ -286,14 +282,6 @@
 				</File>
 				<File
 					RelativePath="..\common\DataFile.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Common\DialogEx.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Common\EditEx.h"
 					>
 				</File>
 				<File
@@ -332,19 +320,11 @@
 					RelativePath="..\common\ProgressInfo.h"
 					>
 				</File>
-				<File
-					RelativePath="..\Common\StaticEx.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
 				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 				>
-				<File
-					RelativePath="..\Common\ButtonEx.cpp"
-					>
-				</File>
 				<File
 					RelativePath="..\common\CESocket.cpp"
 					>
@@ -382,14 +362,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Common\DialogEx.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Common\EditEx.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\common\GlobalFuncs.cpp"
 					>
 				</File>
@@ -421,8 +393,40 @@
 					RelativePath="..\common\ProgressInfo.cpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="Controls"
+				>
 				<File
-					RelativePath="..\Common\StaticEx.cpp"
+					RelativePath="..\Common\Controls\ButtonEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\ButtonEx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\DialogEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\DialogEx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\EditEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\EditEx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\StaticEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\StaticEx.h"
 					>
 				</File>
 			</Filter>
