@@ -41,7 +41,7 @@ BEGIN_MESSAGE_MAP(CConnectDlg, CDialog)
 	ON_BN_CLICKED(IDC_CONNECT, &CConnectDlg::OnBnClickedConnect)
 END_MESSAGE_MAP()
 
-
+///µ¥»÷Á¬½Ó
 void CConnectDlg::OnBnClickedConnect()
 {
 	UpdateData();
