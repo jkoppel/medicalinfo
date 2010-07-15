@@ -155,7 +155,7 @@ void CFilterFormView::OnBnClickedBtnTest2()
 	g_pLeftTreeView->SetMultiSelectMode(!g_pLeftTreeView->GetMultiSelectMode());
 	g_pLeftTreeView->InitTree();
 	g_pRightDrawAreaView->RedrawWindow();
-	if(g_pLeftTreeView->GetMultiSelectMode()){
+	if(!g_pLeftTreeView->GetMultiSelectMode()){
 		GetDlgItem(IDC_BTN_TEST2)->SetWindowText(_T("╤Юнд╪Ч"));
 	}
 	else{
