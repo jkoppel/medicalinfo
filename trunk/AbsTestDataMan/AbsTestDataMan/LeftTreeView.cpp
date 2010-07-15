@@ -30,6 +30,9 @@ CLeftTreeView::CLeftTreeView()
 
 CLeftTreeView::~CLeftTreeView()
 {
+	if(g_pTree!=NULL){
+		delete g_pTree;
+	}
 }
 
 
