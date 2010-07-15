@@ -24,8 +24,8 @@ public:
 // Operations
 public:
 	void InitTree(BOOL bReloadMode=FALSE);
-	void SetCheckBoxes(BOOL bCheckBoxes);
-	BOOL GetCheckBoxes();
+	void SetMultiSelectMode(BOOL bMultiSelectMode);
+	BOOL GetMultiSelectMode();
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -46,12 +46,12 @@ protected:
 
 	// Generated message map functions
 protected:
-	CImageList m_ilDataFile;
-	BOOL m_bCheckBoxes;
+	CImageList m_ilDataFile;	//图标列表
+	BOOL m_bMultiSelectMode;	//选中模式：多文件模式或单文件模式
+	HTREEITEM m_pCurrFileItem;	//单文件模式下当前选中的文件结点
 
 	//{{AFX_MSG(CLeftTreeView)
 	afx_msg void OnDblclk(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnSelchangedTree(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
