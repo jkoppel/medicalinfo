@@ -47,8 +47,9 @@ BOOL CPatientDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	SetWindowText(m_sTitle);;
+	SetWindowText(m_sTitle);//显示标题，注意标题要在调用对话框DoModal之前设置好
 
+	//加入三个TAB
 	m_ctrlPatientTab.InsertItem(0, CString("资料1"));
 	m_ctrlPatientTab.InsertItem(1, CString("资料2"));
 	m_ctrlPatientTab.InsertItem(2, CString("资料3"));
@@ -60,6 +61,7 @@ BOOL CPatientDlg::OnInitDialog()
 	m_dlgTab3.Create(IDD_PATIENT_TAB3,GetDlgItem(IDC_TAB));
 	m_dlgTab3.SetParent(GetDlgItem(IDC_TAB));
 
+	//设置三个TAB的位置
 	CRect rs; 
 	m_dlgTab3.GetClientRect(&rs);
 	rs.top+=25;
@@ -87,6 +89,7 @@ BOOL CPatientDlg::OnInitDialog()
 
 void CPatientDlg::OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	//选中哪一个就显示对应的页面
 	int CurSel = m_ctrlPatientTab.GetCurSel(); 
     switch(CurSel) 
     { 
@@ -111,6 +114,7 @@ void CPatientDlg::OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+///设置数据
 void CPatientDlg::SetData(struct UserData data)
 {
 	m_dlgTab1.m_strScancodeID = CString(data.ScancodeID);
@@ -141,6 +145,7 @@ void CPatientDlg::SetData(struct UserData data)
 	m_dlgTab3.UpdateData(FALSE);
 }
 
+///获取数据
 void CPatientDlg::GetData(struct UserData &data)
 {
 	char buf[1024];
@@ -188,6 +193,7 @@ void CPatientDlg::GetData(struct UserData &data)
 	data.Status = m_dlgTab3.m_iStatus;
 }
 
+///单击OK
 void CPatientDlg::OnBnClickedOk()
 {
 	if(!m_dlgTab1.UpdateData(TRUE)){
