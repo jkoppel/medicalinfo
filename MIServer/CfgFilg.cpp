@@ -169,6 +169,14 @@ BOOL CfgFile::GetVarStr(const char *szSection, const char *szVarName, char *szRe
 	return TRUE;
 }
 
+///get all options of one section (line string between two sections) from the config file
+/**
+  * szSection : the section name, e.g. "Settings" \n
+  * szOptions : return the options, or line strings of the sections \n
+  * iMaxOptionNum : the max array count of the szOptions \n
+  * iNumOptionRead : return the read options count \n
+  * return : TRUE/FALSE
+  */
 BOOL CfgFile::GetSectionOptions(const char *szSection, char (*szOptions)[MAX_OPTION_LEN], int iMaxOptionNum, int &iNumOptionRead)
 {
 	int ret;

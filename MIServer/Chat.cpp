@@ -14,8 +14,7 @@ static char THIS_FILE[] = __FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CChat dialog
-// 本类配合CMIServerDlg使用，如果启动了该窗口，则在被连接的时候弹出Chat对话框
-
+// 本对话框类配合CMIServerDlg使用，如果启动了该窗口，则在被连接的时候弹出Chat对话框，提供
 
 CChat::CChat(CWnd* pParent /*=NULL*/)
 	: CDialog(CChat::IDD, pParent)
