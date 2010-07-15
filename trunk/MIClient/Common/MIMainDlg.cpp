@@ -9,12 +9,13 @@
 #endif
 #include "MIMainDlg.h"
 #include "ConnectDlg.h"
-#include "..\\Common\\DialogEx.h"
+#include "..\\Common\\Controls\\DialogEx.h"
 #include "..\\Common\\GlobalVars.h"
 #include "..\\Common\\GlobalFuncs.h"
 #include "..\\Common\\ProgressInfo.h"
 #include "..\\Common\\PatientDlg.h"
 
+///主对话框类
 
 // CMIMainDlg dialog
 
@@ -29,6 +30,7 @@ CMIMainDlg::CMIMainDlg(CWnd* pParent /*=NULL*/)
 	int len = 100;
 	hostent *name;
 
+	//将当前主机的IP地址设置为默认服务器地址
 	gethostname(buf, len);
 	name = gethostbyname(buf);
 	m_strAddress = inet_ntoa(*(in_addr *)name->h_addr_list[0]);
@@ -48,6 +50,7 @@ CMIMainDlg::CMIMainDlg(CWnd* pParent /*=NULL*/)
 	m_pDropList = NULL;
 	m_pDropWnd = NULL;
 
+	//创建右键菜单
 	m_pMenu = new CMenu();
 	m_pMenu->CreatePopupMenu();
 	m_pMenu->AppendMenu(MF_STRING, ID_REC_MOVEPREV, _T("上移"));
@@ -119,7 +122,7 @@ LRESULT CMIMainDlg::OnDisconnect(WPARAM wParam, LPARAM lParam)
 ///设置连接状态
 void CMIMainDlg::SetConnectStatus(BOOL status)
 {
-	if(status){
+	if(status){//连接上
 		GetDlgItem(IDC_CONNECT)->SetWindowText(_T("断开"));
 		GetDlgItem(IDC_ADD)->EnableWindow();
 		GetDlgItem(IDC_DELETE)->EnableWindow();
@@ -128,7 +131,7 @@ void CMIMainDlg::SetConnectStatus(BOOL status)
 		GetDlgItem(IDC_MOVENEXT)->EnableWindow();
 		g_bIsConnected = TRUE;
 	}
-	else{
+	else{//断开
 		GetDlgItem(IDC_CONNECT)->SetWindowText(_T("连接"));
 		GetDlgItem(IDC_ADD)->EnableWindow(FALSE);
 		GetDlgItem(IDC_DELETE)->EnableWindow(FALSE);
@@ -160,9 +163,8 @@ void CMIMainDlg::OnBnClickedConnect()
 	dlg.m_strAddress = m_strAddress;
 	dlg.m_nPort = m_nPort;
 	if(IDOK==dlg.DoModal()){
-		if(g_pClientSocket->Create(SOCK_STREAM)){
- 			if(g_pClientSocket->Connect(dlg.m_strAddress, dlg.m_nPort)){
-				//由于连接一定会成功，所以设置定时器，25秒之后，没有DISCONNECT，则认为连接成功
+		if(g_pClientSocket->Create(SOCK_STREAM)){//先创建socket，再连接
+ 			if(g_pClientSocket->Connect(dlg.m_strAddress, dlg.m_nPort)){//注:这里一定能连接成功，还需进一步和服务器交互，确认真正连接成功
 				m_strAddress = dlg.m_strAddress;
 				m_nPort = dlg.m_nPort;
 				g_ProgressInfo.Show("正在连接服务器...");
@@ -171,11 +173,11 @@ void CMIMainDlg::OnBnClickedConnect()
 				BOOL connected = FALSE;
 				unsigned int timeout = 100;
 				g_bIsDataComing = FALSE;
-				while(timeout-- && !g_bIsDataComing){
+				while(timeout-- && !g_bIsDataComing){//在指定时间内发送联机命令
 					g_pClientSocket->Send("CMD1||\r\n", (int)strlen("CMD1||\r\n"));
 					Sleep(100);
 				}
-				if(g_bIsDataComing && strncmp(g_RecvData, "OK", 2)==0){
+				if(g_bIsDataComing && strncmp(g_RecvData, "OK", 2)==0){//服务器返回了OK命令
 					connected = TRUE;
 				}
 				GetDlgItem(IDC_CONNECT)->EnableWindow(TRUE);
@@ -190,8 +192,10 @@ void CMIMainDlg::OnBnClickedConnect()
 					return;
 				}
 
+				//重置连接状态
 				SetConnectStatus(TRUE);
 
+				//再次发生连接命令，并获取记录信息
 				if(CmdConnect()){
 					if(CmdGetRecordNum(num)){
 						m_nRecNum = num;
@@ -220,6 +224,7 @@ void CMIMainDlg::OnBnClickedConnect()
 ///设置ListBox项目栏
 void CMIMainDlg::InitListBox()
 {
+	//风格:整行选中
 	m_lstPatient.SetExtendedStyle(LVS_EX_FULLROWSELECT|LVS_EX_ONECLICKACTIVATE);//|LVS_EX_HEADERDRAGDROP);
 
 	int i = 0;
@@ -247,6 +252,7 @@ void CMIMainDlg::InitListBox()
 	m_lstPatient.InsertColumn(i++, CString("用药"), LVCFMT_LEFT, 100);
 	m_lstPatient.InsertColumn(i++, CString("既往病史"), LVCFMT_LEFT, 100);
 
+	//设置滚动条信息
 	SCROLLINFO ScrollInfo;
 	ScrollInfo.cbSize = sizeof (SCROLLINFO);
 	ScrollInfo.fMask = SIF_PAGE;
@@ -258,6 +264,11 @@ void CMIMainDlg::InitListBox()
 	m_lstPatient.SetScrollInfo(SB_HORZ, &ScrollInfo);
 }
 
+///更新某一行的数据
+/**
+  * index : 列表框某一行的索引 \n
+  * data : 待显示到该行的病人数据
+  */
 void CMIMainDlg::UpdateRowData(int index, struct UserData data)
 {
 	int i=0;
@@ -300,6 +311,7 @@ void CMIMainDlg::UpdateRowData(int index, struct UserData data)
 	UpdateData(FALSE);
 }
 
+///更新当前页
 void CMIMainDlg::UpdateCurrPage()
 {
 	int ret, index, offset, num, curr_page_size;
@@ -315,6 +327,7 @@ void CMIMainDlg::UpdateCurrPage()
 
 	g_ProgressInfo.Show("正在更新数据");
 
+	//根据当前状态获取记录的ID号列表
 	pID = new int[num+10];
 	if(!CmdGetAllIDs(pID, num, m_nStatusMode)){
 		delete []pID;
@@ -322,6 +335,7 @@ void CMIMainDlg::UpdateCurrPage()
 		return;
 	}
 
+	//根据页面模式显示当前页的所有记录
 	if(m_bPageMode){
 		offset = m_nCurrPageIndex * PAGE_SIZE;
 		m_nPageNum = (num+PAGE_SIZE-1)/PAGE_SIZE;
@@ -334,6 +348,7 @@ void CMIMainDlg::UpdateCurrPage()
 		m_strPageInfo.Format(CString("%d/%d"), 1, 1);
 	}
 
+	//显示所有记录
 	for(index=0;index<curr_page_size;index++){
 		ret = CmdGetRecordByID(pID[offset+index], data);
 		if(ret){
@@ -345,7 +360,7 @@ void CMIMainDlg::UpdateCurrPage()
 	g_ProgressInfo.Hide();
 }
 
-
+///初始化对话框
 BOOL CMIMainDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -365,6 +380,7 @@ BOOL CMIMainDlg::OnInitDialog()
 	m_ctrlPageMode.SetCurSel(1);
 
 /*
+	//设置颜色
 	m_ctrlConnect.SetBkColor(RGB(0,255,0));
 	m_ctrlScancodeID.SetBkColor(RGB(0,255,255));
 	m_ctrlScancodeID_Static.SetBkColor(RGB(0,255,255));
@@ -376,7 +392,7 @@ BOOL CMIMainDlg::OnInitDialog()
 int ReceiveData()
 {
 	UINT timeout = 200;
-	while(g_bIsDataComing==FALSE && timeout--){//每100毫秒查一次，共等待20秒
+	while(g_bIsDataComing==FALSE && timeout--){//每100毫秒查一次，共等待20秒(理论值，实际按运行情况而定)
 		Sleep(100);
 	}
 	if(!g_bIsDataComing){
@@ -402,6 +418,10 @@ BOOL CMIMainDlg::CmdConnect()
 	return TRUE;
 }
 
+///获取记录个数
+/**
+  * num : 返回记录数量
+  */
 BOOL CMIMainDlg::CmdGetRecordNum(int &num)
 {
 	char buf[256];
@@ -434,6 +454,12 @@ BOOL CMIMainDlg::CmdGetRecordNum(int &num)
 	return TRUE;
 }
 
+///获取ID列表
+/**
+  * pID : 返回ID列表 \n
+  * num : 返回ID数量 \n
+  * mode : 传入指定的模式，ALL/UNPROCESSED/PROCESSED
+  */
 BOOL CMIMainDlg::CmdGetAllIDs(int *pID, int &num, int mode)
 {
 	char buf[256];
@@ -495,6 +521,11 @@ BOOL CMIMainDlg::CmdGetAllIDs(int *pID, int &num, int mode)
 	return TRUE;
 }
 
+///根据记录ID号获取记录数据
+/**
+  * ID : 记录ID号 \n
+  * data : 返回记录的数据
+  */
 BOOL CMIMainDlg::CmdGetRecordByID(int ID, struct UserData &data)
 {
 	char buf[256];
@@ -509,6 +540,10 @@ BOOL CMIMainDlg::CmdGetRecordByID(int ID, struct UserData &data)
 	return ParseRecvDataToRec(CString(g_RecvData), data);
 }
 
+///追加记录，并返回记录的ID号
+/**
+  * data : 待追加的数据，同时返回追加后记录的ID号
+  */
 BOOL CMIMainDlg::CmdAppendRecord(struct UserData &data)
 {
 	g_bIsDataComing = FALSE;
@@ -546,6 +581,7 @@ BOOL CMIMainDlg::CmdAppendRecord(struct UserData &data)
 	return TRUE;
 }
 
+///根据ID号删除一条记录
 BOOL CMIMainDlg::CmdDeleteRecordByID(int ID)
 {
 	char buf[256];
@@ -559,6 +595,7 @@ BOOL CMIMainDlg::CmdDeleteRecordByID(int ID)
 	return TRUE;
 }
 
+///根据ID号修改一条记录
 BOOL CMIMainDlg::CmdModifyRecordByID(int ID, struct UserData data)
 {
 	CString cmdStr;
@@ -578,6 +615,7 @@ BOOL CMIMainDlg::CmdModifyRecordByID(int ID, struct UserData data)
 	return TRUE;
 }
 
+///获取下一个可用的Order值
 BOOL CMIMainDlg::CmdGetNextFreeOrder(int &order)
 {
 	g_bIsDataComing = FALSE;
@@ -614,6 +652,7 @@ BOOL CMIMainDlg::CmdGetNextFreeOrder(int &order)
 	return TRUE;
 }
 
+///根据ID号获取记录的Order值
 BOOL CMIMainDlg::CmdGetOrderByID(int ID, int &order)
 {
 	char buf[256];
@@ -647,6 +686,7 @@ BOOL CMIMainDlg::CmdGetOrderByID(int ID, int &order)
 	return TRUE;
 }
 
+///根据ID号设置记录的ID值
 BOOL CMIMainDlg::CmdSetOrderByID(int ID, int order)
 {
 	char buf[256];
@@ -676,6 +716,7 @@ BOOL CMIMainDlg::CmdSetOrderByID(int ID, int order)
 	return TRUE;
 }
 
+///移动记录的Order
 BOOL CMIMainDlg::CmdMoveOrder(int org_order, int dst_order)
 {
 	char buf[256];
@@ -705,6 +746,7 @@ BOOL CMIMainDlg::CmdMoveOrder(int org_order, int dst_order)
 	return TRUE;
 }
 
+///将order上移
 BOOL CMIMainDlg::CmdMoveOrderPrev(int order)
 {
 	char buf[256];
@@ -734,6 +776,7 @@ BOOL CMIMainDlg::CmdMoveOrderPrev(int order)
 	return TRUE;
 }
 
+///将order下移
 BOOL CMIMainDlg::CmdMoveOrderNext(int order)
 {
 	char buf[256];
@@ -763,6 +806,12 @@ BOOL CMIMainDlg::CmdMoveOrderNext(int order)
 	return TRUE;
 }
 
+///根据扫描码查询记录
+/**
+  * scan_code_id : 传入记录的扫描码 \n
+  * pID : 返回ID数组 \n
+  * num : 返回数组个数 \n
+  */
 BOOL CMIMainDlg::CmdSearchByScancodeID(const char *scan_code_id, int *pID, int &num)
 {
 	char buf[256];
@@ -824,7 +873,7 @@ BOOL CMIMainDlg::CmdSearchByScancodeID(const char *scan_code_id, int *pID, int &
 	return TRUE;
 }
 
-
+///单击添加
 void CMIMainDlg::OnBnClickedAdd()
 {
 	int ret;
@@ -838,12 +887,15 @@ void CMIMainDlg::OnBnClickedAdd()
 
 		g_ProgressInfo.Show("正在添加...");
 
+		//先设置好Order值
 		if(!CmdGetNextFreeOrder(data.Order)){
 			ShowMsg("添加失败");
 			return;
 		}
+		//然后追加记录
 		ret = CmdAppendRecord(data);
 		if(ret){
+			//添加成功后进行处理，显示出该数据
 			m_bShowSearchResult = FALSE;
 			m_nStatusMode = MODE_ALL;
 			m_ctrlStatus.SetCurSel(0);
@@ -856,6 +908,7 @@ void CMIMainDlg::OnBnClickedAdd()
 				m_nCurrPageIndex = m_nPageNum - 1;
 				UpdateCurrPage();
 			}
+			//选中该记录
 			m_lstPatient.SetItemState(m_lstPatient.GetItemCount()-1,LVNI_SELECTED,LVNI_SELECTED);
 
 			ShowMsg("添加成功");
@@ -866,6 +919,7 @@ void CMIMainDlg::OnBnClickedAdd()
 	}
 }
 
+///编辑记录
 void CMIMainDlg::OnBnClickedEdit()
 {
 	int index, ID;
@@ -907,6 +961,7 @@ void CMIMainDlg::OnBnClickedEdit()
 	}
 }
 
+///删除记录
 void CMIMainDlg::OnBnClickedDelete() 
 {
 	int index;
@@ -959,7 +1014,7 @@ void CMIMainDlg::OnBnClickedDelete()
 	}
 }
 
-
+///将记录上移
 void CMIMainDlg::OnBnClickedMoveprev()
 {
 	int index;
@@ -1011,6 +1066,7 @@ void CMIMainDlg::OnBnClickedMoveprev()
 	}
 }
 
+///将记录下移
 void CMIMainDlg::OnBnClickedMovenext()
 {
 	int index, page_size;
@@ -1071,6 +1127,7 @@ void CMIMainDlg::OnBnClickedMovenext()
 	}
 }
 
+///显示第一页
 void CMIMainDlg::OnBnClickedPageFirst()
 {
 	if(!g_bIsConnected){
@@ -1090,6 +1147,7 @@ void CMIMainDlg::OnBnClickedPageFirst()
 	UpdateCurrPage();
 }
 
+///显示上一页
 void CMIMainDlg::OnBnClickedPagePrev()
 {
 	if(!g_bIsConnected){
@@ -1109,6 +1167,7 @@ void CMIMainDlg::OnBnClickedPagePrev()
 	UpdateCurrPage();
 }
 
+///显示下一页
 void CMIMainDlg::OnBnClickedPageNext()
 {
 	if(!g_bIsConnected){
@@ -1128,6 +1187,7 @@ void CMIMainDlg::OnBnClickedPageNext()
 	UpdateCurrPage();
 }
 
+///显示最后一页
 void CMIMainDlg::OnBnClickedPageLast()
 {
 	if(!g_bIsConnected){
@@ -1147,6 +1207,7 @@ void CMIMainDlg::OnBnClickedPageLast()
 	UpdateCurrPage();
 }
 
+///切换页面模式
 void CMIMainDlg::OnBnClickedSwitchPagemode()
 {
 	if(m_bShowSearchResult){
@@ -1160,6 +1221,7 @@ void CMIMainDlg::OnBnClickedSwitchPagemode()
 	UpdateCurrPage();
 }
 
+///开始拖动记录
 void CMIMainDlg::OnLvnBegindragListPatient(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
@@ -1197,6 +1259,7 @@ void CMIMainDlg::OnLvnBegindragListPatient(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+///拖动以后移动鼠标
 void CMIMainDlg::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (m_bDragging)
@@ -1280,6 +1343,7 @@ void CMIMainDlg::OnMouseMove(UINT nFlags, CPoint point)
 	CDialogEx::OnMouseMove(nFlags, point);
 }
 
+///鼠标释放动作，将记录放到合适位置
 void CMIMainDlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	if (m_bDragging)
@@ -1398,6 +1462,7 @@ void CMIMainDlg::DropItemOnList(CListCtrl* pDragList, CListCtrl* pDropList)
 	pDropList->SetItemState (lvi.plvi->iItem, LVIS_SELECTED, LVIS_SELECTED);
 }
 
+///状态下拉菜单的选中项改变了
 void CMIMainDlg::OnCbnSelchangeStatus()
 {
 	if(!g_bIsConnected){
@@ -1411,6 +1476,7 @@ void CMIMainDlg::OnCbnSelchangeStatus()
 	UpdateCurrPage();
 }
 
+///点击查询
 void CMIMainDlg::OnBnClickedSearch()
 {
 	if(!g_bIsConnected){
@@ -1454,6 +1520,7 @@ void CMIMainDlg::OnBnClickedSearch()
 	pID = NULL;
 }
 
+///页面模式下拉菜单的选项改变了
 void CMIMainDlg::OnCbnSelchangePagemode()
 {
 	if(m_bShowSearchResult){
@@ -1472,11 +1539,13 @@ void CMIMainDlg::OnCbnSelchangePagemode()
 	UpdateCurrPage();
 }
 
+///单击设置
 void CMIMainDlg::OnBnClickedSetting()
 {
 	ShowMsg("设置");
 }
 
+///右键单击列表框的某一行
 void CMIMainDlg::OnNMRclickListPatient(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	int index;
@@ -1498,16 +1567,19 @@ void CMIMainDlg::OnNMRclickListPatient(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+///上移一条
 void CMIMainDlg::OnRecMovePrev()
 {
 	OnBnClickedMoveprev();
 }
 
+///下移一条
 void CMIMainDlg::OnRecMoveNext()
 {
 	OnBnClickedMovenext();
 }
 
+///上移到第一条
 void CMIMainDlg::OnRecMoveToFirst()
 {
 	int index;
@@ -1571,6 +1643,7 @@ void CMIMainDlg::OnRecMoveToFirst()
 	m_lstPatient.SetItemState(0, LVNI_SELECTED, LVNI_SELECTED);
 }
 
+///下移到最后一条
 void CMIMainDlg::OnRecMoveToLast()
 {
 	int index;
@@ -1634,7 +1707,7 @@ void CMIMainDlg::OnRecMoveToLast()
 	m_lstPatient.SetItemState(m_lstPatient.GetItemCount()-1, LVNI_SELECTED, LVNI_SELECTED);
 }
 
-#ifdef _WIN32_WCE
+#ifdef _WIN32_WCE		//在PDA上面处理鼠标右键
 ///重载窗口处理流程，处理触笔点按事件
 LRESULT CMIMainDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1645,7 +1718,7 @@ LRESULT CMIMainDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if((UINT)wParam==IDC_LIST_PATIENT){
 				pNMHDR = (NMHDR*)lParam;
-				if(pNMHDR->code==GN_CONTEXTMENU){
+				if(pNMHDR->code==GN_CONTEXTMENU){//右键菜单的消息
 					int index;
 					CPoint pt;
 					NMRGINFO* pInfo;
@@ -1661,7 +1734,7 @@ LRESULT CMIMainDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 						break;
 					}
 
-					m_pMenu->TrackPopupMenu(TPM_LEFTALIGN, pt.x, pt.y, this);
+					m_pMenu->TrackPopupMenu(TPM_LEFTALIGN, pt.x, pt.y, this);//弹出菜单
 				}
 				break;
 			}
