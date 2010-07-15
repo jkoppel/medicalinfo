@@ -43,6 +43,7 @@ BOOL CPatientTab2::OnInitDialog()
 	char szOptions[40][256];
 	int num, i;
 
+	//打开INI文件，读取省份，城市，危险因素等数据
 	CfgFile cf;
 	cf.OpenFile(CONFIG_FILE);
 
@@ -103,6 +104,8 @@ END_MESSAGE_MAP()
 
 
 // CPatientTab2 message handlers
+
+///省份下拉框变动
 void CPatientTab2::OnCbnSelchangeProvince()
 {
 	char buf[256];
@@ -114,6 +117,7 @@ void CPatientTab2::OnCbnSelchangeProvince()
 	if(index>=0){
 		CString2Char(m_strProvinceCode[index], buf);
 
+		//重新读入该省份对应的城市值
 		cf.OpenFile(CONFIG_FILE);
 		cf.GetSectionOptions(buf, szOptions, 50, num);
 		cf.CloseFile();
