@@ -10,6 +10,7 @@
 #include "RightDrawAreaView.h"
 #include "DlgDirSetup.h"
 #include "GlobalFuncs.h"
+#include "BitmapEx.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -42,6 +43,120 @@ static UINT indicators[] =
 
 
 // CMainFrame ¹¹Ôì/Îö¹¹
+
+const DWORD STANDARD_PALETTE[] = {00,51,102,153,204,255};
+const INT STANDARD_COLOR_SIZE = 6;
+const INT STANDARD_PALETTE_VAL_DIF = 51;
+static DWORD dwColorMapTable[216] = {0};
+
+void SetMapTable()
+{
+	int  nColorMapIdx = 0;
+	for (int nBlueIdx = 0; nBlueIdx < STANDARD_COLOR_SIZE; ++nBlueIdx)
+	{
+		for(int nGreenIdx = 0; nGreenIdx < STANDARD_COLOR_SIZE; ++nGreenIdx)
+		{
+			for(int nRedIdx = 0; nRedIdx < STANDARD_COLOR_SIZE; ++nRedIdx)
+			{
+				RGBQUAD objColor;
+				objColor.rgbRed    = STANDARD_PALETTE[nRedIdx];
+				objColor.rgbGreen = STANDARD_PALETTE[nGreenIdx];
+				objColor.rgbBlue = STANDARD_PALETTE[nBlueIdx];
+				objColor.rgbReserved = 0;
+				memcpy(&dwColorMapTable[nColorMapIdx],&objColor,sizeof(RGBQUAD));
+				++nColorMapIdx;
+			}
+		}
+	}
+}
+
+UINT GetPixelValue(DWORD uPixelValue_i)
+{
+    UINT uRetValue = 0;
+    UINT uPos = uPixelValue_i / STANDARD_PALETTE_VAL_DIF;
+    if(0 == uPixelValue_i % STANDARD_PALETTE_VAL_DIF)
+    {
+        uRetValue = uPixelValue_i/STANDARD_PALETTE_VAL_DIF;
+    }
+    else
+    {
+        if(abs(uPixelValue_i - STANDARD_PALETTE [uPos]) > 
+           abs(uPixelValue_i - STANDARD_PALETTE [uPos+1]))
+        {
+            uRetValue = uPos+1;
+        }
+        else
+        {
+            uRetValue = uPos;
+        }
+    }
+    return uRetValue;
+}
+
+void ConvertFile()
+{
+	TCHAR tcInputFileName[] = _T("c:\\32BitImage.bmp");
+	CBitmapEx InputImage;
+	InputImage.Load(tcInputFileName);
+	INT nImageHeight = InputImage .GetHeight();
+	INT nImageWidth = InputImage .GetWidth();
+	INT nPixelSize = nImageHeight * nImageWidth;
+	BYTE byBitsPerPixel = 32; // Input image Bits per pixel.
+
+	BYTE *pixels = new BYTE[nPixelSize];
+	for(UINT nRow = 0; nRow < nImageHeight; ++nRow)
+	{
+		for(UINT nCol = 0; nCol < nImageWidth; ++nCol)
+		{
+			DWORD dwPixelVal;
+			UINT i8bppPixel = nRow * nImageWidth + nCol;
+			// Get pixel data from Input image.
+
+			dwPixelVal = InputImage.GetPixel(nCol,nRow) & 0xFFFFFF;
+			// Get RGB value from color data.
+
+			int nRed = dwPixelVal >> 16;
+			int nGreen = (dwPixelVal & 0x00FF00) >> 8 ;
+			int nBlue = dwPixelVal& 0x0000FF;
+			// Get Index of suitable color data in the palette table.
+
+			UINT uRedValue = GetPixelValue(nRed);
+			UINT uGreenValue = GetPixelValue(nGreen);
+			UINT uBlueValue = GetPixelValue(nBlue);
+
+			// Calculate Pixel color position
+
+			// in the color map table using RGB values. 
+
+			// Finally set this index in to the pixel data.
+
+			UINT uPalettePos = uBlueValue*36+uGreenValue*6+uRedValue;
+			pixels[i8bppPixel] =(BYTE)uPalettePos;
+		}
+	}
+}
+
+void CreateDataFileIcons()
+{
+	SetMapTable();
+
+	CBitmapEx bitmap;
+	bitmap.Load(_T("E:\\XBMC\\state_images.bmp"));
+	bitmap.Scale2(16 * 216, 15);
+	for(int y=0;y<15;y++){
+		for(int x=0;x<216;x++){
+			for(int i=0;i<16;i++){
+				if(i>=2 && i<=13 && y>=1 && y<=12){
+					bitmap.SetPixel(x*16+i, y, dwColorMapTable[x]);
+				}
+				else{
+					bitmap.SetPixel(x*16+i, y, 0xFFFFFF);
+				}
+			}
+		}
+	}
+	bitmap.Save(_T("E:\\XBMC\\s1.bmp"));
+}
 
 CMainFrame::CMainFrame()
 {
