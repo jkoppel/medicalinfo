@@ -6,6 +6,7 @@
 #define MAX_FORCE_NUM		1600
 
 #define M_PI	3.1415926
+#pragma pack(8)
 
 struct CCForceSensor          // 力传感器信息 
 { 
