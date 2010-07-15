@@ -9,6 +9,6 @@ BOOL g_bIsConnected;
 ///全局是否已接收到数据
 BOOL g_bIsDataComing = FALSE;
 ///全局接收数据缓冲区
-char g_RecvData[1024];
+char g_RecvData[MAX_BUF_LEN];
 ///全局字符串列表
 CStringList g_strList;

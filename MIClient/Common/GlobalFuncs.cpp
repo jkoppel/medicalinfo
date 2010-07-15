@@ -9,7 +9,7 @@
 
 //关闭提示条
 extern void HideProgressInfo();
-//提示对话框
+//提示对话框(注意函数实现在MIClient.cpp中)
 extern int MyMessageBox(LPCTSTR lpszText, LPCTSTR lpszCaption, UINT nType = MB_OK);
 
 ///将CString转弯char *
@@ -170,6 +170,7 @@ void MakeAddOrModRecordCmd(BOOL IsAdd, struct UserData data, CString &str)
 	MakeSeparatorString(str);
 }
 
+///解析从服务器端发过来的命令串，存到病人数据中
 int ParseRecvDataToRec(CString str, struct UserData &data)
 {
 	char buf[2048];
@@ -183,6 +184,7 @@ int ParseRecvDataToRec(CString str, struct UserData &data)
 		return FALSE;
 	}
 
+	//依次解析每一个字段
 	str = g_strList.GetNext(p);//skip "OK"
 	if(!p){
 		return FALSE;
