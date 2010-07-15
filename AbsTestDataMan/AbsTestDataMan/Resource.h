@@ -18,8 +18,11 @@
 #define IDC_FILTER_GROUP                1005
 #define IDC_BTN_APPLY                   1006
 #define IDC_LIST_DIR                    1007
+#define IDC_BTN_TEST1                   1007
 #define IDC_LISTBUDDY                   1008
+#define IDC_BTN_TEST2                   1008
 #define IDC_PROGRESS                    1009
+#define IDC_BTN_TEST3                   1009
 #define ID_DIR_SETUP                    32771
 #define INDICATOR_LOGO                  61446
 #define INDICATOR_EDIT                  61447
