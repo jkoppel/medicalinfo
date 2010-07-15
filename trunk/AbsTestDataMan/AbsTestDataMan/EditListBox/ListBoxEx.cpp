@@ -1439,6 +1439,9 @@ CListBoxExBuddy::CListBoxExBuddy()
                                               0,
                                               LR_LOADFROMFILE | LR_LOADMAP3DCOLORS ) );
    _unlink( szFileName );
+   if(szFileName){
+      free(szFileName);//we need to free the memory here!
+   }
 
    // Init other data
    m_bButtonPressed = FALSE;
