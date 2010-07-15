@@ -25,7 +25,8 @@ IMPLEMENT_DYNCREATE(CLeftTreeView, CView)
 CLeftTreeView::CLeftTreeView()
 {
 	m_ilDataFile.DeleteImageList();
-	m_bCheckBoxes = TRUE;
+	m_bMultiSelectMode = TRUE;
+	m_pCurrFileItem = NULL;
 }
 
 CLeftTreeView::~CLeftTreeView()
@@ -39,7 +40,6 @@ CLeftTreeView::~CLeftTreeView()
 BEGIN_MESSAGE_MAP(CLeftTreeView, CView)
 	//{{AFX_MSG_MAP(CLeftTreeView)
 	ON_NOTIFY_REFLECT(NM_DBLCLK, OnDblclk)
-	ON_NOTIFY(TVN_SELCHANGED, IDC_TREE, OnSelchangedTree)
 	//}}AFX_MSG_MAP
 	ON_WM_CREATE()
 	ON_WM_SIZE()
@@ -101,7 +101,7 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 
 	g_pTree->DeleteAllItems();
 	g_pTree->SetImageList(&m_ilDataFile, TVSIL_NORMAL);
-	g_pTree->Initialize(m_bCheckBoxes, TRUE);
+	g_pTree->Initialize(TRUE, TRUE);
 	g_pTree->SetSmartCheckBox(TRUE);
 	g_pTree->SetHtml(TRUE);
 	g_pTree->SetImages(TRUE);
@@ -159,37 +159,18 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 	UpdateData(FALSE);
 }
 
-void CLeftTreeView::SetCheckBoxes(BOOL bCheckBoxes)
+void CLeftTreeView::SetMultiSelectMode(BOOL bMultiSelectMode)
 {
-	m_bCheckBoxes = bCheckBoxes;
+	m_bMultiSelectMode = bMultiSelectMode;
 }
 
-BOOL CLeftTreeView::GetCheckBoxes()
+BOOL CLeftTreeView::GetMultiSelectMode()
 {
-	return m_bCheckBoxes;
+	return m_bMultiSelectMode;
 }
 
 void CLeftTreeView::OnDblclk(NMHDR* pNMHDR, LRESULT* pResult) 
 {
-	*pResult = 0;
-}
-
-void CLeftTreeView::OnSelchangedTree(NMHDR* pNMHDR, LRESULT* pResult) 
-{
-	if(!m_bCheckBoxes){
-		NMTREEVIEW* pNMTreeView = (NMTREEVIEW*)pNMHDR;
-
-		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
-		DWORD_PTR p = g_pTree->GetItemData(hItem);
-		if(p!=NULL){
-			g_TestDataTreeMgt.ResetNodeStatus();
-			struct TreeItemData *tp = (struct TreeItemData *)p;
-			tp->bSelected = TRUE;
-		}
-
-		g_pRightDrawAreaView->RedrawWindow();
-	}
-
 	*pResult = 0;
 }
 
@@ -228,10 +209,11 @@ void CLeftTreeView::OnSize(UINT nType, int cx, int cy)
 	}
 }
 
+///用户单击复选框
 LRESULT CLeftTreeView::OnCheckbox(WPARAM wParam, LPARAM lParam)
 //=============================================================================
 {
-	if(m_bCheckBoxes){
+	if(m_bMultiSelectMode){//打开多选模式
 		g_TestDataTreeMgt.ResetNodeStatus();
 		HTREEITEM hItem = g_pTree->GetFirstCheckedItem();
 		while (hItem){
@@ -246,6 +228,134 @@ LRESULT CLeftTreeView::OnCheckbox(WPARAM wParam, LPARAM lParam)
 		}
 
 		g_pRightDrawAreaView->RedrawWindow();
+		return 0;
+	}
+	else{//关闭多选模式，只能在一个文件结点下面进行操作
+		XHTMLTREEMSGDATA *pData = (XHTMLTREEMSGDATA *)wParam;
+		if(pData==NULL){
+			return 0;
+		}
+
+		HTREEITEM hItem_child = NULL;	//孩子结点
+		HTREEITEM hItem_checked = pData->hItem;//当前操作项
+		BOOL bCheck = (BOOL)lParam;		//当前状态
+		DWORD_PTR p;					//指向该项的data_ptr指针
+		struct TreeItemData *tp = NULL;	//该项数据指针对应的结点数据
+		int iNumOfSpeed;				//曲线数量
+		static BOOL bFlagChecked = FALSE;//临时存储是否是从当前流程的SetCheck函数过来的，如果是，则不再处理
+
+		if(bFlagChecked == TRUE){
+			bFlagChecked = FALSE;
+			return 0;
+		}
+		if(hItem_checked==NULL){
+			return 0;
+		}
+
+		if(!bCheck){//从check到没有check
+			if(m_pCurrFileItem==NULL){
+				return 0;
+			}
+			if(!g_pTree->ItemHasChildren(hItem_checked)){//最底下的叶子结点
+				if(!g_pTree->IsChildNodeOf(hItem_checked, m_pCurrFileItem)){
+					//不是当前文件下面的结点,理论上不该出现
+					return 0;
+				}
+				//是当前文件下面的结点
+				if(g_pTree->GetChildrenCheckedCount(m_pCurrFileItem)<=0){//都没有被点中了
+					g_TestDataTreeMgt.ResetNodeStatus();
+					m_pCurrFileItem = NULL;
+					g_pRightDrawAreaView->RedrawWindow();
+					return 0;
+				}
+				//还剩有其它结点被选中，仅需清空当前选中的结点的状态即可
+				p = g_pTree->GetItemData(hItem_checked);
+				tp = (struct TreeItemData *)p;
+				ASSERT(tp);
+				tp->bSelected = FALSE;
+				g_pRightDrawAreaView->RedrawWindow();
+				return 0;
+			}
+			else{//非叶子节点,可能是文件结点,也可能是型号结点
+				hItem_child = g_pTree->GetChildItem(hItem_checked);
+				if(!g_pTree->ItemHasChildren(hItem_child)){//是文件结点
+					if(hItem_checked==m_pCurrFileItem){//当前文件结点从点中到没点中
+						m_pCurrFileItem = NULL;
+						g_TestDataTreeMgt.ResetNodeStatus();
+						g_pRightDrawAreaView->RedrawWindow();
+						return 0;
+					}
+					else{//选中其它结点
+						//视情况而定，目前仅做情况
+						bFlagChecked = TRUE;
+						g_pTree->SetCheck(hItem_checked);
+						g_pRightDrawAreaView->RedrawWindow();
+						return 0;
+					}
+				}
+				else{//是型号结点
+					m_pCurrFileItem = NULL;
+					g_TestDataTreeMgt.ResetNodeStatus();
+					g_pRightDrawAreaView->RedrawWindow();
+					return 0;
+				}					
+			}
+		}
+		else{//从uncheck到check
+			if(!g_pTree->ItemHasChildren(hItem_checked)){//最底下的叶子结点
+				if(m_pCurrFileItem==NULL || g_pTree->IsChildNodeOf(hItem_checked, m_pCurrFileItem)){
+					//先前未选中，或当前选中的是当前文件下面的结点
+					p = g_pTree->GetItemData(hItem_checked);
+					tp = (struct TreeItemData *)p;
+					ASSERT(tp);
+					tp->bSelected = TRUE;
+					m_pCurrFileItem = g_pTree->GetParentItem(hItem_checked);
+					g_pRightDrawAreaView->RedrawWindow();
+					return 0;
+				}
+				else{
+					//先前有选中，并且当前选中的是其它文件结点下面的叶子结点
+					//视情况而定，目前只是不让选
+					bFlagChecked = TRUE;
+					g_pTree->SetCheck(hItem_checked, FALSE);
+					g_pRightDrawAreaView->RedrawWindow();
+					return FALSE;
+				}
+			}
+			else{//非叶子节点,可能是文件结点,也可能是型号结点
+				hItem_child = g_pTree->GetChildItem(hItem_checked);
+				if(g_pTree->GetChildItem(hItem_child)==NULL){//是文件结点
+					if(m_pCurrFileItem==NULL || hItem_checked==m_pCurrFileItem){
+						//先前未选中，或当前选中的是当前文件结点
+						p = g_pTree->GetItemData(hItem_child);
+						ASSERT(p);
+						tp = (struct TreeItemData *)p;
+						ASSERT(tp);
+						iNumOfSpeed = tp->pNode->test_record.iNumOfSpeed;
+						for(int i=0;i<iNumOfSpeed;i++){
+							tp->pNode->tree_item_data[i].bSelected = TRUE;
+						}
+						m_pCurrFileItem = hItem_checked;
+						g_pRightDrawAreaView->RedrawWindow();
+						return 0;
+					}
+					else{//先前有选，且当前选的和上次不一样，视情况而定，目前先不让它操作
+						bFlagChecked = TRUE;
+						g_pTree->SetCheck(hItem_checked, FALSE);
+						g_pRightDrawAreaView->RedrawWindow();
+						return 0;
+					}
+				}
+				else{//是型号结点
+					g_TestDataTreeMgt.ResetNodeStatus();
+					m_pCurrFileItem = NULL;
+					bFlagChecked = TRUE;
+					g_pTree->SetCheck(hItem_checked, FALSE);
+					g_pRightDrawAreaView->RedrawWindow();
+					return 0;
+				}
+			}
+		}
 	}
 
 	return 0;
