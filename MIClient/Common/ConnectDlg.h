@@ -19,7 +19,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	CString m_strAddress;
-	UINT m_nPort;
+	CString m_strAddress;//服务器地址
+	UINT m_nPort;		//服务器端口
 	afx_msg void OnBnClickedConnect();
 };
