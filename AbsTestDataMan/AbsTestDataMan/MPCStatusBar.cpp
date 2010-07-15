@@ -67,6 +67,11 @@ BEGIN_MESSAGE_MAP(MPCStatusBar, CStatusBar)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
+MPCStatusBar::MPCStatusBar()
+{
+	m_pLogoPane = NULL;
+}
+
 MPCStatusBar::~MPCStatusBar()
 {
 	for( int i = 0; i < m_aPans.GetSize(); i++ )
@@ -79,6 +84,7 @@ MPCStatusBar::~MPCStatusBar()
 		}
 		delete m_aPans[i];
 	}
+	//NO need to delete m_pLogoPane again
 }
 
 void MPCStatusBar::OnSize(UINT nType, int cx, int cy) 
@@ -232,9 +238,6 @@ BOOL MPCStatusBar::AddIndicator( int position, UINT paneID )
 	return TRUE;
 }
 
-
-
-
 void MPCStatusBar::RemovePane(int nPaneID)
 {
 	SetRedraw(FALSE);
@@ -288,23 +291,29 @@ void MPCStatusBar::RemovePane(int nPaneID)
 
 void MPCStatusBar::OnUpdateCmdUI(CFrameWnd* pTarget, BOOL bDisableIfNoHandler)
 {
-	AddIndicator(0, INDICATOR_LOGO);
-	int idx = CommandToIndex(INDICATOR_LOGO);
-	SetPaneWidth(idx,120);
-	SetPaneStyle(idx, GetPaneStyle(idx) | SBPS_NOBORDERS );
-
-	// Create a log pane window, and append it to status bar
-	MPCLogoPane * pLogo = new MPCLogoPane;
-	pLogo->Create(_T("清华汽车系"),WS_CHILD|WS_VISIBLE,this,120);
-	pLogo->SetLogoFont(_T("Arial"), 18);
-	AddControl(pLogo,INDICATOR_LOGO);
-
-	SetPaneText(1, _T(""));
+	ShowLogoPane();
 }
 
-BOOL MPCStatusBar::OnCommand(WPARAM wParam, LPARAM lParam)
+void MPCStatusBar::ShowLogoPane()
+{
+	if(m_pLogoPane==NULL){
+		AddIndicator(0, INDICATOR_LOGO);
+		int idx = CommandToIndex(INDICATOR_LOGO);
+		SetPaneWidth(idx,120);
+		SetPaneStyle(idx, GetPaneStyle(idx) | SBPS_NOBORDERS );
+
+		// Create a log pane window, and append it to status bar
+		m_pLogoPane = new MPCLogoPane;
+		m_pLogoPane->Create(_T("清华汽车系"), WS_CHILD | WS_VISIBLE, this, 120);
+		m_pLogoPane->SetLogoFont(_T("Arial"), 18);
+		AddControl(m_pLogoPane,INDICATOR_LOGO);
+		SetPaneText(1, _T(""));
+	}
+}
+
+void MPCStatusBar::HideLogoPane()
 {
 	RemovePane(INDICATOR_LOGO);
-
-	return CStatusBar::OnCommand(wParam, lParam);
+	m_pLogoPane = NULL;//ALREADY deleted by RemovePane
 }
+
