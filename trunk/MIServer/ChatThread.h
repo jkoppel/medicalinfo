@@ -41,7 +41,6 @@ public:
 // Implementation
 protected:
 	CMySocket m_peer;
-	void SendError(int ErrNo);
 
 	// Generated message map functions
 	//{{AFX_MSG(CChatThread)
