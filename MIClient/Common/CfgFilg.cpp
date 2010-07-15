@@ -173,6 +173,7 @@ BOOL CfgFile::GetVarStr(const char *szSection, const char *szVarName, char *szRe
 	return TRUE;
 }
 
+///读取某一节的所有行
 BOOL CfgFile::GetSectionOptions(const char *szSection, char (*szOptions)[MAX_OPTION_LEN], int iMaxOptionNum, int &iNumOptionRead)
 {
 	int ret;
