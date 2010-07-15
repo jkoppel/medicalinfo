@@ -20,8 +20,8 @@
 #define MPCStatusBar_h_
 
 
-
 #include <afxtempl.h>
+#include "MPCLogoPane.h"
 
 ///////////////////////////////////////////////////////////////////////////////////
 // MPCStatusBarPaneControlInfo
@@ -59,8 +59,10 @@ class MPCStatusBar:public CStatusBar
 private:
 	CArray<MPCStatusBarPaneControlInfo*, MPCStatusBarPaneControlInfo*>	m_aPans;
 	
-
 public:
+	MPCLogoPane *m_pLogoPane;
+public:
+	MPCStatusBar();
 	void PositionControls();
 	~MPCStatusBar();
 	MPCStatusBarPaneControlInfo * GetPanControl(int nPaneID);
@@ -70,13 +72,14 @@ public:
 	BOOL GetStatusPane(int nIndex, MPCStatusBarPane & xfxpane);
 	void RemovePane(int nPaneID);
 
+	void ShowLogoPane();
+	void HideLogoPane();
+
 	//{{AFX_MSG(MPCStatusPane)
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 	virtual void OnUpdateCmdUI(CFrameWnd* pTarget, BOOL bDisableIfNoHandler);
-protected:
-	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 };
 
 #endif
