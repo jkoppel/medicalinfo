@@ -200,6 +200,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BitmapEx.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DlgDirSetup.cpp"
 				>
 			</File>
@@ -311,6 +315,10 @@
 			</File>
 			<File
 				RelativePath=".\AbsTestDataManDoc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\BitmapEx.h"
 				>
 			</File>
 			<File
