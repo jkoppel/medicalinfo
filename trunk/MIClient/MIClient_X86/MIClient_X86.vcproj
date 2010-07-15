@@ -44,6 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -68,6 +69,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -363,10 +365,6 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath="..\Common\ButtonEx.h"
-					>
-				</File>
-				<File
 					RelativePath="..\common\CESocket.h"
 					>
 				</File>
@@ -388,14 +386,6 @@
 				</File>
 				<File
 					RelativePath="..\common\DataFile.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Common\DialogEx.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Common\EditEx.h"
 					>
 				</File>
 				<File
@@ -434,18 +424,10 @@
 					RelativePath="..\common\ProgressInfo.h"
 					>
 				</File>
-				<File
-					RelativePath="..\Common\StaticEx.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
 				>
-				<File
-					RelativePath="..\Common\ButtonEx.cpp"
-					>
-				</File>
 				<File
 					RelativePath="..\common\CESocket.cpp"
 					>
@@ -483,14 +465,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Common\DialogEx.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Common\EditEx.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\common\GlobalFuncs.cpp"
 					>
 				</File>
@@ -522,8 +496,40 @@
 					RelativePath="..\common\ProgressInfo.cpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="Controls"
+				>
 				<File
-					RelativePath="..\Common\StaticEx.cpp"
+					RelativePath="..\Common\Controls\ButtonEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\ButtonEx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\DialogEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\DialogEx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\EditEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\EditEx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\StaticEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\Controls\StaticEx.h"
 					>
 				</File>
 			</Filter>
