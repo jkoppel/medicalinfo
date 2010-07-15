@@ -243,7 +243,7 @@ BOOL CTestDataTreeMgt::ReadFile(const char *sFileName, BOOL bNeedProcessData, Fi
 		return FALSE;
 	}
 
-	//略过6718字节
+	//略过30字节
 	if(fseek(pFile, 30, SEEK_SET)!=0){
 		fclose(pFile);
 		return FALSE;
@@ -627,6 +627,7 @@ void CTestDataTreeMgt::ProcessData(FileNodePtr pFileNode)
 			int P[7];
 			int flag[7];
 			int num = 0;
+			//TODO 100
 			for(j=100;j<node.test_record.iNumOfForce[i]-1;j++){
 				if(node.test_record.fDisplacement[i][j]<0 && node.test_record.fDisplacement[i][j+1]>=0){
 					P[num] = j+1;
@@ -642,6 +643,7 @@ void CTestDataTreeMgt::ProcessData(FileNodePtr pFileNode)
 					break;
 				}
 			}
+			//TODO 360,450
 			int T = (P[2] - P[1])/2;
 			for(j=0;j<num;j++){
 				if(flag[j]==1 &&
@@ -674,6 +676,11 @@ void CTestDataTreeMgt::ProcessData(FileNodePtr pFileNode)
 			}
 			node.test_record.fPfm[i] = max;
 			node.test_record.fPym[i] = min;
+
+			//处理微分 (-3Dj + 4Dj+1 - Dj+2) / 2dt
+			//单文件模式的两种模式
+			//文件最多加载一些，没有的就release
+			//
 		}
 	}
 }
