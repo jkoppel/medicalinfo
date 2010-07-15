@@ -36,6 +36,9 @@ public:
 	CString m_strEndTime;
 	CString m_strProductNo;
 	CString m_strOperatorNo;
+	afx_msg void OnBnClickedBtnTest1();
+	afx_msg void OnBnClickedBtnTest2();
+	afx_msg void OnBnClickedBtnTest3();
 };
 
 
