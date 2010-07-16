@@ -45,6 +45,9 @@ CRightDrawAreaView::CRightDrawAreaView()
 
 CRightDrawAreaView::~CRightDrawAreaView()
 {
+	if(m_pTab){
+		delete m_pTab;
+	}
 }
 
 BOOL CRightDrawAreaView::PreCreateWindow(CREATESTRUCT& cs)
