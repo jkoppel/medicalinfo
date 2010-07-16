@@ -143,11 +143,22 @@ void CFilterFormView::OnSize(UINT nType, int cx, int cy)
 	SetScrollRange(1, 0, 0);
 }
 
+UINT MyThreadProc(LPVOID lpParam)
+{
+	unsigned long MAX_COUNT = 0x5FF;
+	unsigned long iMaxCount = MAX_COUNT;
+	while(iMaxCount>0){
+		if(!CDlgProgress::UpdateAndCheck((MAX_COUNT-iMaxCount)/(MAX_COUNT*1.0)*100)){
+			break;
+		}
+		iMaxCount --;
+	}
+	return 0;
+}
 
 void CFilterFormView::OnBnClickedBtnTest1()
 {
-	CDlgProgress dlg;
-	dlg.DoModal();
+	CDlgProgress::StartThread(MyThreadProc, _T("ÕýÔÚ²âÊÔ..."));
 }
 
 void CFilterFormView::OnBnClickedBtnTest2()
