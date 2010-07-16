@@ -89,7 +89,6 @@ void CLeftTreeView::OnInitialUpdate()
 
 void CLeftTreeView::InitTree(BOOL bReloadMode)
 {
-	CTestDataTreeMgt mgt;
 	if(!bReloadMode){
 		g_TestDataTreeMgt.InitTree();
 	}
@@ -155,7 +154,10 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 		pProductNode = pProductNode->pNext;
 	}
 
-	g_pTree->Expand(g_pTree->GetRootItem(), TVE_EXPAND);
+	g_pTree->Expand(g_pTree->GetFirstVisibleItem(), TVE_EXPAND);
+	if(g_pTree->ItemHasChildren(g_pTree->GetFirstVisibleItem())){
+		g_pTree->Expand(g_pTree->GetChildItem(g_pTree->GetFirstVisibleItem()), TVE_EXPAND);
+	}
 	UpdateData(FALSE);
 }
 
