@@ -8,6 +8,7 @@ extern BOOL PeekAndPump();
 
 // CDlgProgress dialog
 
+///进程对话框类，用来提示进度，并允许用户取消，避免在执行过程中出现死机状态时间过长
 class CDlgProgress : public CDialog
 {
 	DECLARE_DYNAMIC(CDlgProgress)
@@ -18,26 +19,25 @@ public:
 
 // Dialog Data
 	enum { IDD = IDD_PROGRESS };
-	enum { THREAD_LOAD_NODE = 1,};
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 public:
-	CSkinProgress *m_pProgress;
+	int m_iMaxPos;					//进度条的最大位置，默认100
+	CString m_strPromptInfo;		//提示信息
+	CSkinProgress *m_pProgress;		//进度条对象
 
-	int m_iThreadType;
-	static CDlgProgress *m_pDlg;
-	static CWinThread *m_pThread;
-	static UINT ThreadProc(LPVOID lpParam);
+	static CDlgProgress *m_pDlg;	//对话框对象
+	static CWinThread *m_pThread;	//启动的进程句柄
+	static AFX_THREADPROC m_ThreadProc;//用户传入进来的进程函数，即用户要执行的任务在该函数中实现
+	static BOOL StartThread(AFX_THREADPROC ThreadProc, LPCTSTR sPromptInfo=NULL, int iMaxPos=100);//启动进程
+	static BOOL UpdateAndCheck(int iPercent);//更新百分比，并检查用户是否点了取消
 public:
-	void SetThreadType(int iThreadType);
 	virtual BOOL OnInitDialog();
-	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnClose();
 	LRESULT OnUpdateData(WPARAM wParam, LPARAM lParam);
 	virtual BOOL DestroyWindow();
-	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 };
