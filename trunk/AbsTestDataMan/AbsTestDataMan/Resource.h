@@ -23,6 +23,7 @@
 #define IDC_BTN_TEST2                   1008
 #define IDC_PROGRESS                    1009
 #define IDC_BTN_TEST3                   1009
+#define IDC_PROMPT_INFO                 1011
 #define ID_DIR_SETUP                    32771
 #define INDICATOR_LOGO                  61446
 #define INDICATOR_EDIT                  61447
@@ -33,7 +34,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        134
 #define _APS_NEXT_COMMAND_VALUE         32772
-#define _APS_NEXT_CONTROL_VALUE         1010
+#define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
