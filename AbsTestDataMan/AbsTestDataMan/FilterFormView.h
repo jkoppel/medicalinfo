@@ -1,6 +1,7 @@
 #pragma once
 #include "afxwin.h"
 #include "Resource.h"
+#include "afxdtctl.h"
 
 
 // CFilterFormView form view
@@ -39,6 +40,10 @@ public:
 	afx_msg void OnBnClickedBtnTest1();
 	afx_msg void OnBnClickedBtnTest2();
 	afx_msg void OnBnClickedBtnTest3();
+	CDateTimeCtrl m_ctrlDT_Start_Time;
+	CDateTimeCtrl m_ctrlDT_Start_Date;
+	CDateTimeCtrl m_ctrlDT_End_Date;
+	CDateTimeCtrl m_ctrlDT_End_Time;
 };
 
 
