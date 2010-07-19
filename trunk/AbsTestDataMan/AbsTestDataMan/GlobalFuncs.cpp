@@ -46,254 +46,6 @@ void CString2char(char *szDst, CString strSrc)
 	strSrc.ReleaseBuffer();
 }
 
-
-BOOL LoadFile(const char *file, struct TestRecordFileNode &node)
-{
-	int ret, i, j;
-	FILE *fp = NULL;
-	char buf[256], buf1[256];
-	double min, max, avg;
-
-	if(file==NULL || strlen(file)==0){
-		return FALSE;
-	}
-
-	if(fopen_s(&fp, file, "rb")!=0){
-		return FALSE;
-	}
-	if(fp==NULL){
-		return FALSE;
-	}
-
-	//查看文件头
-	memset(buf, 0, sizeof(buf));
-	fread(buf, 23, 1, fp);
-	sprintf_s(buf1, "%s", "MyTester Data File ");
-	if(strncmp(buf, buf1, strlen(buf1))!=0){
-		fclose(fp);
-		return FALSE;
-	}
-	//获取版本号
-	double fDataVer = 0.0;
-	if(isdigit(buf[19]) && buf[20]=='.' && isdigit(buf[21])){
-		fDataVer = atof(buf+19);
-	}
-	else{
-		fclose(fp);
-		return FALSE;
-	}
-
-	//略过6718字节
-	if(fseek(fp, 30, SEEK_SET)!=0){
-		fclose(fp);
-		return FALSE;
-	}
-
-	ret = (int)fread(&node.machine_info, sizeof(struct CCMachineInfo), 1, fp);
-	if(ret!=1){
-		fclose(fp);
-		return FALSE;
-	}
-
-	ret = (int)fread(&node.product_info, sizeof(struct CCProductInfo), 1, fp);
-	if(ret!=1){
-		fclose(fp);
-		return FALSE;
-	}
-
-	//直接读取数据
-	ret = (int)fread(&node.test_record, sizeof(struct CCTestRecord), 1, fp);
-	fclose(fp);
-	if(ret!=1){
-		return FALSE;
-	}
-
-	char2TCHAR(node.addition_info.sFile, file, strlen(file)+1);
-
-	memset(node.tree_item_data, 0, sizeof(node.tree_item_data));
-	node.bDataProcessed = FALSE;
-	for(i=0;i<node.test_record.iNumOfSpeed;i++){
-		node.tree_item_data[i].iIndex = i;
-		node.tree_item_data[i].pNode = &node;
-	}
-
-	//对文件做处理
-	memset(&node.addition_info, 0, sizeof(node.addition_info));
-	if(node.test_record.bDataValid==FALSE){
-		return TRUE;
-	}
-	if(node.test_record.bNormalSpeed){
-		for(i=0;i<node.test_record.iNumOfSpeed;i++){
-			j = node.test_record.iSpdIndex[i];
-			node.test_record.fSetSpeed[i] = node.product_info.fSpeed0[j];
-			if(node.product_info.bDifferentOffset){
-				node.test_record.fSetOffset[i] = node.product_info.fSpeedOffset[j];
-			}
-			else{
-				node.test_record.fSetOffset[i] = node.product_info.fOffset;
-			}
-
-			min = node.test_record.fDisplacement[i][0];
-			max = min;
-			for(j=0;j<node.test_record.iNumOfSpeed;j++){
-				if(node.test_record.fDisplacement[i][j] < min){
-					min = node.test_record.fDisplacement[i][j];
-				}
-				if(node.test_record.fDisplacement[i][j] > max){
-					max = node.test_record.fDisplacement[i][j];
-				}
-			}
-			avg = (max+min)/2;
-			for(j=0;j<node.test_record.iNumOfForce[i];j++){
-				node.test_record.fDisplacement[i][j] -= avg;
-			}
-			node.addition_info.fDisplacementLength[i] = (max-min)/2;
-
-			int P[7];
-			int flag[7];
-			int num = 0;
-			for(j=100;j<node.test_record.iNumOfForce[i]-1;j++){
-				if(node.test_record.fDisplacement[i][j]<0 && node.test_record.fDisplacement[i][j+1]>=0){
-					P[num] = j+1;
-					flag[num] = 0;
-					num++;
-				}
-				else if(node.test_record.fDisplacement[i][j]>0 && node.test_record.fDisplacement[i][j+1]<=0){
-					P[num] = j+1;
-					flag[num] = 1;
-					num++;
-				}
-				if(num>=7){
-					break;
-				}
-			}
-			int T = (P[2] - P[1])/2;
-			for(j=0;j<num;j++){
-				if(flag[j]==1 &&
-					P[j]+T>=node.product_info.iDataBandStart &&
-					P[j]+T<=node.product_info.iDataBandStart+node.product_info.iDataBandLen){
-						node.addition_info.iDataBandStart[i] = P[j] + T;
-						node.addition_info.iDataBandLen[i] = (P[2] - P[1])*2;
-						break;
-				}
-			}
-			node.test_record.fRealSpeed[i] = 2 * M_PI * node.test_record.fDataFreq[i] / node.addition_info.iDataBandLen[i] * node.test_record.fRealSpeed[i];
-
-			memcpy(node.addition_info.fForceOfFilter[i]+node.addition_info.iDataBandStart[i],
-					node.test_record.fForce[i]+node.addition_info.iDataBandStart[i],
-					node.addition_info.iDataBandLen[i] * sizeof(double));
-			filter_new(node.addition_info.fForceOfFilter[i] + node.addition_info.iDataBandStart[i],
-						node.test_record.fDataFreq[i],
-						10*node.test_record.fSetSpeed[i]/node.test_record.fSetOffset[i]/(2*M_PI), 
-						node.addition_info.iDataBandLen[i]);
-
-			min = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]];
-			max = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]];
-			for(j=0;j<node.addition_info.iDataBandLen[i];j++){
-				if(node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j]<min){
-					min = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j];
-				}
-				if(node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j]>max){
-					max = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j];
-				}
-			}
-			node.test_record.fPfm[i] = max;
-			node.test_record.fPym[i] = min;
-		}
-	}
-
-	/*
-	if(node.test_record.bFrictionSpeed){
-		for(i=0;i<node.test_record.iFrictionNumOfSpeed;i++){
-			j = node.test_record.iFrictionSpdIndex[i];
-			node.test_record.fFrictionSetSpeed[i] = node.product_info.fSpeed0[j];
-			if(node.product_info.bDifferentOffset){
-				node.test_record.fFrictionSetOffset[i] = node.product_info.fSpeedOffset[j];
-			}
-			else{
-				node.test_record.fFrictionSetOffset[i] = node.product_info.fOffset;
-			}
-
-			min = node.test_record.fFrictionDisplacement[i][0];
-			max = min;
-			for(j=0;j<node.test_record.iFrictionNumOfSpeed;j++){
-				if(node.test_record.fFrictionDisplacement[i][j] < min){
-					min = node.test_record.fFrictionDisplacement[i][j];
-				}
-				if(node.test_record.fFrictionDisplacement[i][j] > max){
-					max = node.test_record.fFrictionDisplacement[i][j];
-				}
-			}
-			avg = (max+min)/2;
-			for(j=0;j<node.test_record.iFrictionNumOfForce[i];j++){
-				node.test_record.fFrictionDisplacement[i][j] -= avg;
-			}
-			node.addition_info.fFrictionDisplacementLength[i] = (max-min)/2;
-
-			int P[7];
-			int flag[7];
-			int num = 0;
-			for(j=100;j<node.test_record.iFrictionNumOfForce[i]-1;j++){
-				if(node.test_record.fFrictionDisplacement[i][j]<0 && node.test_record.fFrictionDisplacement[i][j+1]>=0){
-					P[num] = j+1;
-					flag[num] = 0;
-					num++;
-				}
-				else if(node.test_record.fFrictionDisplacement[i][j]>0 && node.test_record.fFrictionDisplacement[i][j+1]<=0){
-					P[num] = j+1;
-					flag[num] = 1;
-					num++;
-				}
-				if(num>=7){
-					break;
-				}
-			}
-			int PP[2];
-			int T = (P[2] - P[1])/2;
-			for(j=0;j<num;j++){
-				if(flag[j]==1 &&
-					P[j]+T>=node.product_info.iDataBandStart &&
-					P[j]+T<=node.product_info.iDataBandStart+node.product_info.iDataBandLen){
-						node.addition_info.iDataBandStart[i] = P[j] + T;
-						node.addition_info.iDataBandLen[i] = (P[2] - P[1])*2;
-						break;
-				}
-			}
-			node.test_record.fFrictionRealSpeed[i] = 2 * M_PI * node.test_record.fFrictionDataFreq[i] / node.addition_info.iFrictionDataBandLen[i] * node.test_record.fFrictionRealSpeed[i];
-
-			memcpy(node.addition_info.fForceOfFilter[i]+node.addition_info.iDataBandStart[i],
-					node.test_record.fForce[i]+node.addition_info.iDataBandStart[i],
-					node.addition_info.iDataBandLen[i] * sizeof(double));
-			filter_new(node.addition_info.fForceOfFilter[i] + node.addition_info.iDataBandStart[i],
-						node.test_record.fDataFreq[i],
-						10*node.test_record.fSetSpeed[i]/node.test_record.fSetOffset[i]/(2*M_PI), 
-						node.addition_info.iDataBandLen[i]);
-
-			min = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]];
-			max = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]];
-			for(j=0;j<node.addition_info.iDataBandLen[i];j++){
-				if(node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j]<min){
-					min = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j];
-				}
-				if(node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j]>max){
-					max = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j];
-				}
-			}
-			node.test_record.fPfm[i] = max;
-			node.test_record.fPym[i] = min;
-		}
-	}
-	*/
-
-	node.bDataProcessed = TRUE;
-	return TRUE;
-}
-
-BOOL SaveFile(const char *file, struct CCTestRecord rec)
-{
-	return TRUE;
-}
-
 BOOL IsFileInConfigDirList(CString strFile)
 {
 	int i;
@@ -575,7 +327,7 @@ void TestMime()
 
     // fold the long lines in the headers
 
-    CMimeEnvironment::SetAutoFolding(true); 
+    CMimeEnvironment::SetAutoFolding(TRUE); 
     int nSize = mail.GetLength();
     char* pBuff = new char[nSize];
     nSize = mail.Store(pBuff, nSize);
@@ -847,436 +599,312 @@ int fir_dsgn(int Len, double FreqS, double FreqB , double **Coef1)
 	return (Order);    /* never reach here */ 
 } 
 
+#include <stdio.h>
+#include <string.h>
 
+//在lpszSour中查找lpszFind,从nStart开始
+int FindString(const char * lpszSour,const char * lpszFind,int nStart=0);
+//带通配符'?','*'的字符串匹配,bMatchCase=TRUE区分大小写
+BOOL MatchString(const char * lpszSour,const char * lpszMatch,BOOL bMatchCase=TRUE);
+//多重匹配
+BOOL MultiMatch(const char * lpszSour,const char * lpszMatch,int nMatchLogic=0,BOOL bRetReversed=FALSE,BOOL bMatchCase=TRUE);
 
-/*
-本主题演示如何将各种 C++ 字符串类型转换为其他字符串。可以转换的字符串类型包括 char *、wchar_t*、_bstr_t、CComBSTR、CString、basic_string 和 System.String。在所有情况下，在将字符串转换为新类型时，都会创建字符串的副本。对新字符串进行的任何更改都不会影响原始字符串，反之亦然。
+//功 能: 在lpszSour中查找字符串lpszFind,lpszFind中可以包含通配符'?'
+//参 数: nStart未在lpszSour中的起始查找位置
+//返回值: 成功返回匹配位置,否则返回-1
 
-从 char * 转换
-示例
-说明
-此示例演示如何从 char * 转换为上面列出的其他字符串类型。
-
-// convert_from_char.cpp
-// compile with /clr /link comsuppw.lib
-#include <iostream>
-#include <stdlib.h>
-#include <string>
-#include "atlbase.h"
-#include "atlstr.h"
-#include "comutil.h"
-using namespace std;
-using namespace System;
-int main()
+int FindString(const char * lpszSour,const char * lpszFind,int nStart/*=0*/)
 {
-	char *orig = "Hello, World!";
-	cout << orig << " (char *)" << endl;
-	// Convert to a wchar_t*
-	size_t origsize = strlen(orig) + 1;
-	const size_t newsize = 100;
-	size_t convertedChars = 0;
-	wchar_t wcstring[newsize];
-	mbstowcs_s(&convertedChars, wcstring, origsize, orig, _TRUNCATE);
-	wcscat_s(wcstring, L" (wchar_t *)");
-	wcout << wcstring << endl;
-	// Convert to a _bstr_t
-	_bstr_t bstrt(orig);
-	bstrt += " (_bstr_t)";
-	cout << bstrt << endl;
-	// Convert to a CComBSTR
-	CComBSTR ccombstr(orig);
-	if (ccombstr.Append(L" (CComBSTR)") == S_OK)
+	if(lpszSour==NULL || lpszFind==NULL || nStart<0)
+		return -1;
+	int m=strlen(lpszSour);
+	int n=strlen(lpszFind);
+	if(nStart+n>m)
+		return -1;
+	if(n==0)
+		return nStart;
+	//KMP begin
+	int * next=new int[n]; //查找字符串的next数组
+	--n;
+	int j,k;
+	j=0,k=-1;
+	next[0]=-1;
+	while(j<n)
 	{
-		CW2A printstr(ccombstr);
-		cout << printstr << endl;
+		if(k==-1 || lpszFind[k]=='?' || lpszFind[j]==lpszFind[k])
+		{
+			++j,++k;
+			next[j]=k;
+		}
+		else
+			k=next[k];
 	}
-	// Convert to a CString
-	CString cstring(orig);
-	cstring += " (CString)";
-	cout << cstring << endl;
-	// Convert to a basic_string
-	string basicstring(orig);
-	basicstring += " (basic_string)";
-	cout << basicstring << endl;
-	// Convert to a System::String
-	String ^systemstring = gcnew String(orig);
-	systemstring += " (System::String)";
-	Console::WriteLine("{0}", systemstring);
-	delete systemstring;
-}
-输出
-Hello, World! (char *)
-Hello, World! (wchar_t *)
-Hello, World! (_bstr_t)
-Hello, World! (CComBSTR)
-Hello, World! (CString)
-Hello, World! (basic_string)
-Hello, World! (System::String)
-从 wchar_t * 转换
-示例
-说明
-此示例演示如何从 wchar_t * 转换为上面列出的其他字符串类型。
-
-// convert_from_wchar_t.cpp
-// compile with /clr /link comsuppw.lib
-#include <iostream>
-#include <stdlib.h>
-#include <string>
-#include "atlbase.h"
-#include "atlstr.h"
-#include "comutil.h"
-using namespace std;
-using namespace System;
-int main()
-{
-	wchar_t *orig = L"Hello, World!";
-	wcout << orig << L" (wchar_t *)" << endl;
-	// Convert to a char*
-	size_t origsize = wcslen(orig) + 1;
-	const size_t newsize = 100;
-	size_t convertedChars = 0;
-	char nstring[newsize];
-	wcstombs_s(&convertedChars, nstring, origsize, orig, _TRUNCATE);
-	strcat_s(nstring, " (char *)");
-	cout << nstring << endl;
-	// Convert to a _bstr_t
-	_bstr_t bstrt(orig);
-	bstrt += " (_bstr_t)";
-	cout << bstrt << endl;
-	// Convert to a CComBSTR
-	CComBSTR ccombstr(orig);
-	if (ccombstr.Append(L" (CComBSTR)") == S_OK)
+	++n;
+	int i=nStart;
+	j=0;
+	while(i<m && j<n)
 	{
-		CW2A printstr(ccombstr);
-		cout << printstr << endl;
+		if(j==-1 || lpszFind[j]=='?' || lpszSour[i]==lpszFind[j])
+		{
+			++i;
+			++j;
+		}
+		else
+			j=next[j];
 	}
-	// Convert to a CString
-	CString cstring(orig);
-	cstring += " (CString)";
-	cout << cstring << endl;
-	// Convert to a basic_string
-	wstring basicstring(orig);
-	basicstring += L" (basic_string)";
-	wcout << basicstring << endl;
-	// Convert to a System::String
-	String ^systemstring = gcnew String(orig);
-	systemstring += " (System::String)";
-	Console::WriteLine("{0}", systemstring);
-	delete systemstring;
+	delete [] next;
+	if(j>=n)
+		return i-n;
+	else
+		return -1;
 }
-输出
-Hello, World! (wchar_t *)
-Hello, World! (char *)
-Hello, World! (_bstr_t)
-Hello, World! (CComBSTR)
-Hello, World! (CString)
-Hello, World! (basic_string)
-Hello, World! (System::String)
-从 _bstr_t 转换
-示例
-说明
-此示例演示如何从 _bstr_t 转换为上面列出的其他字符串类型。
 
-// convert_from_bstr_t.cpp
-// compile with /clr /link comsuppw.lib
-#include <iostream>
-#include <stdlib.h>
-#include <string>
-#include "atlbase.h"
-#include "atlstr.h"
-#include "comutil.h"
-using namespace std;
-using namespace System;
-int main()
+//功 能: 带通配符的字符串匹配
+//参 数: lpszSour是一个普通字符串
+//    lpszMatch是一个可以包含通配符的字符串
+//    bMatchCase=TRUE:区分大小写,=FALSE不区分大小写
+//返回值: 匹配返回TRUE,否则返回FALSE
+//说 明: '*' 匹配任意长度字符串,包括空串;'?'匹配任意一个字符,非空
+BOOL MatchString(const char * lpszSour,const char * lpszMatch,BOOL bMatchCase/*=TRUE*/)
 {
-	_bstr_t orig("Hello, World!");
-	wcout << orig << " (_bstr_t)" << endl;
-	// Convert to a char*
-	const size_t newsize = 100;
-	char nstring[newsize];
-	strcpy_s(nstring, (char *)orig);
-	strcat_s(nstring, " (char *)");
-	cout << nstring << endl;
-	// Convert to a wchar_t*
-	wchar_t wcstring[newsize];
-	wcscpy_s(wcstring, (wchar_t *)orig);
-	wcscat_s(wcstring, L" (wchar_t *)");
-	wcout << wcstring << endl;
-	// Convert to a CComBSTR
-	CComBSTR ccombstr((char *)orig);
-	if (ccombstr.Append(L" (CComBSTR)") == S_OK)
+	if(lpszSour==NULL || lpszMatch==NULL)
+		return FALSE;
+	if(lpszMatch[0]==0) //模式串空
 	{
-		CW2A printstr(ccombstr);
-		cout << printstr << endl;
+		if(lpszSour[0]==0)
+			return TRUE;
+		else
+			return FALSE;
 	}
-	// Convert to a CString
-	CString cstring((char *)orig);
-	cstring += " (CString)";
-	cout << cstring << endl;
-	// Convert to a basic_string
-	string basicstring((char *)orig);
-	basicstring += " (basic_string)";
-	cout << basicstring << endl;
-	// Convert to a System::String
-	String ^systemstring = gcnew String((char *)orig);
-	systemstring += " (System::String)";
-	Console::WriteLine("{0}", systemstring);
-	delete systemstring;
-}
-输出
-Hello, World! (_bstr_t)
-Hello, World! (char *)
-Hello, World! (wchar_t *)
-Hello, World! (CComBSTR)
-Hello, World! (CString)
-Hello, World! (basic_string)
-Hello, World! (System::String)
-从 CComBSTR 转换
-示例
-说明
-此示例演示如何从 CComBSTR 转换为上面列出的其他字符串类型。
-
-// convert_from_ccombstr.cpp
-// compile with /clr /link comsuppw.lib
-#include <iostream>
-#include <stdlib.h>
-#include <string>
-#include "atlbase.h"
-#include "atlstr.h"
-#include "comutil.h"
-#include "vcclr.h"
-using namespace std;
-using namespace System;
-using namespace System::Runtime::InteropServices;
-int main()
-{
-	CComBSTR orig("Hello, World!");
-	CW2A printstr(orig);
-	cout << printstr << " (CComBSTR)" << endl;
-	// Convert to a char*
-	const size_t newsize = 100;
-	char nstring[newsize];
-	CW2A tmpstr1(orig);
-	strcpy_s(nstring, tmpstr1);
-	strcat_s(nstring, " (char *)");
-	cout << nstring << endl;
-	// Convert to a wchar_t*
-	wchar_t wcstring[newsize];
-	wcscpy_s(wcstring, orig);
-	wcscat_s(wcstring, L" (wchar_t *)");
-	wcout << wcstring << endl;
-	// Convert to a _bstr_t
-	_bstr_t bstrt(orig);
-	bstrt += " (_bstr_t)";
-	cout << bstrt << endl;
-	// Convert to a CString
-	CString cstring(orig);
-	cstring += " (CString)";
-	cout << cstring << endl;
-	// Convert to a basic_string
-	wstring basicstring(orig);
-	basicstring += L" (basic_string)";
-	wcout << basicstring << endl;
-	// Convert to a System::String
-	String ^systemstring = gcnew String(orig);
-	systemstring += " (System::String)";
-	Console::WriteLine("{0}", systemstring);
-	delete systemstring;
-}
-输出
-Hello, World! (CComBSTR)
-Hello, World! (char *)
-Hello, World! (wchar_t *)
-Hello, World! (_bstr_t)
-Hello, World! (CString)
-Hello, World! (basic_string)
-Hello, World! (System::String)
-从 CString 转换
-示例
-说明
-此示例演示如何从 CString 转换为上面列出的其他字符串类型。
-
-// convert_from_cstring.cpp
-// compile with /clr /link comsuppw.lib
-#include <iostream>
-#include <stdlib.h>
-#include <string>
-#include "atlbase.h"
-#include "atlstr.h"
-#include "comutil.h"
-using namespace std;
-using namespace System;
-int main()
-{
-	CString orig("Hello, World!");
-	wcout << orig << " (CString)" << endl;
-	// Convert to a char*
-	const size_t newsize = 100;
-	char nstring[newsize];
-	strcpy_s(nstring, orig);
-	strcat_s(nstring, " (char *)");
-	cout << nstring << endl;
-	// Convert to a wchar_t*
-	// You must first convert to a char * for this to work.
-	size_t origsize = strlen(orig) + 1;
-	size_t convertedChars = 0;
-	wchar_t wcstring[newsize];
-	mbstowcs_s(&convertedChars, wcstring, origsize, orig, _TRUNCATE);
-	wcscat_s(wcstring, L" (wchar_t *)");
-	wcout << wcstring << endl;
-	// Convert to a _bstr_t
-	_bstr_t bstrt(orig);
-	bstrt += " (_bstr_t)";
-	cout << bstrt << endl;
-	// Convert to a CComBSTR
-	CComBSTR ccombstr(orig);
-	if (ccombstr.Append(L" (CComBSTR)") == S_OK)
+	int i=0,j=0;
+	char * szSource=new char[(j=strlen(lpszSour)+1)]; //比较用临时源字符串
+	if(bMatchCase)
 	{
-		CW2A printstr(ccombstr);
-		cout << printstr << endl;
+		while(* (szSource+i)=*(lpszSour+i++));
 	}
-	// Convert to a basic_string
-	string basicstring(orig);
-	basicstring += " (basic_string)";
-	cout << basicstring << endl;
-	// Convert to a System::String
-	String ^systemstring = gcnew String(orig);
-	systemstring += " (System::String)";
-	Console::WriteLine("{0}", systemstring);
-	delete systemstring;
-}
-输出
-Hello, World! (CString)
-Hello, World! (char *)
-Hello, World! (wchar_t *)
-Hello, World! (_bstr_t)
-Hello, World! (CComBSTR)
-Hello, World! (basic_string)
-Hello, World! (System::String)
-从 basic_string 转换
-示例
-说明
-此示例演示如何从 basic_string 转换为上面列出的其他字符串类型。
-
-// convert_from_basic_string.cpp
-// compile with /clr /link comsuppw.lib
-#include <iostream>
-#include <stdlib.h>
-#include <string>
-#include "atlbase.h"
-#include "atlstr.h"
-#include "comutil.h"
-using namespace std;
-using namespace System;
-int main()
-{
-	string orig("Hello, World!");
-	cout << orig << " (basic_string)" << endl;
-	// Convert to a char*
-	const size_t newsize = 100;
-	char nstring[newsize];
-	strcpy_s(nstring, orig.c_str());
-	strcat_s(nstring, " (char *)");
-	cout << nstring << endl;
-	// Convert to a wchar_t*
-	// You must first convert to a char * for this to work.
-	size_t origsize = strlen(orig.c_str()) + 1;
-	size_t convertedChars = 0;
-	wchar_t wcstring[newsize];
-	mbstowcs_s(&convertedChars, wcstring, origsize, orig.c_str(), _TRUNCATE);
-	wcscat_s(wcstring, L" (wchar_t *)");
-	wcout << wcstring << endl;
-	// Convert to a _bstr_t
-	_bstr_t bstrt(orig.c_str());
-	bstrt += " (_bstr_t)";
-	cout << bstrt << endl;
-	// Convert to a CComBSTR
-	CComBSTR ccombstr(orig.c_str());
-	if (ccombstr.Append(L" (CComBSTR)") == S_OK)
+	else
 	{
-		CW2A printstr(ccombstr);
-		cout << printstr << endl;
+		i=0;
+		while(lpszSour[i])
+		{
+			if(lpszSour[i]>='A' && lpszSour[i]<='Z')
+				szSource[i]=lpszSour[i]-'A'+'a';
+			else
+				szSource[i]=lpszSour[i];
+			++i;
+		}
+		szSource[i]=0; //end of source
 	}
-	// Convert to a CString
-	CString cstring(orig.c_str());
-	cstring += " (CString)";
-	cout << cstring << endl;
-	// Convert to a System::String
-	String ^systemstring = gcnew String(orig.c_str());
-	systemstring += " (System::String)";
-	Console::WriteLine("{0}", systemstring);
-	delete systemstring;
-}
-输出
-Hello, World! (basic_string)
-Hello, World! (char *)
-Hello, World! (wchar_t *)
-Hello, World! (_bstr_t)
-Hello, World! (CComBSTR)
-Hello, World! (CString)
-Hello, World! (System::String)
-从 System::String 转换
-示例
-说明
-此示例演示如何从 System.String 转换为上面列出的其他字符串类型。
-
-// convert_from_system_string.cpp
-// compile with /clr /link comsuppw.lib
-#include <iostream>
-#include <stdlib.h>
-#include <string>
-#include "atlbase.h"
-#include "atlstr.h"
-#include "comutil.h"
-#include "vcclr.h"
-using namespace std;
-using namespace System;
-using namespace System::Runtime::InteropServices;
-int main()
-{
-	String ^orig = gcnew String("Hello, World!");
-	Console::WriteLine("{0} (System::String)", orig);
-	pin_ptr<const wchar_t> wch = PtrToStringChars(orig);
-	// Convert to a char*
-	size_t origsize = wcslen(wch) + 1;
-	const size_t newsize = 100;
-	size_t convertedChars = 0;
-	char nstring[newsize];
-	wcstombs_s(&convertedChars, nstring, origsize, wch, _TRUNCATE);
-	strcat_s(nstring, " (char *)");
-	cout << nstring << endl;
-	// Convert to a wchar_t*
-	wchar_t wcstring[newsize];
-	wcscpy_s(wcstring, wch);
-	wcscat_s(wcstring, L" (wchar_t *)");
-	wcout << wcstring << endl;
-	// Convert to a _bstr_t
-	_bstr_t bstrt(wch);
-	bstrt += " (_bstr_t)";
-	cout << bstrt << endl;
-	// Convert to a CComBSTR
-	CComBSTR ccombstr(wch);
-	if (ccombstr.Append(L" (CComBSTR)") == S_OK)
+	char * szMatcher=new char[strlen(lpszMatch)+1]; //比较用临时匹配字符串
+	//把lpszMatch里面连续的'*'合并成一个'*'后复制到szMatcher中
+	i=j=0;
+	while(lpszMatch[i])
 	{
-		CW2A printstr(ccombstr);
-		cout << printstr << endl;
+		szMatcher[j++]=(! bMatchCase) ? ((lpszMatch[i]>='A' && lpszMatch[i]<='Z') ? lpszMatch[i]-'A'+'a' : lpszMatch[i]) : lpszMatch[i];
+		if(lpszMatch[i]=='*')
+		{
+			while(lpszMatch[++i]=='*');
+		}
+		else
+			++i;
 	}
-	// Convert to a CString
-	CString cstring(wch);
-	cstring += " (CString)";
-	cout << cstring << endl;
-	// Convert to a basic_string
-	wstring basicstring(wch);
-	basicstring += L" (basic_string)";
-	wcout << basicstring << endl;
-	delete orig;
+	szMatcher[j]=0;
+	//开始匹配
+	int nMatchOffset,nSourOffset;
+	BOOL bIsMatched=TRUE;
+	nMatchOffset=nSourOffset=0;
+	while(szMatcher[nMatchOffset])
+	{
+		if(szMatcher[nMatchOffset]=='*')
+		{
+			if(szMatcher[nMatchOffset+1]==0) //szMatcher[nMatchOffset]是最后一个字符
+			{
+				bIsMatched=TRUE;
+				break;
+			}
+			else //szMatcher[nMatchOffset+1]只能是'?'或普通字符
+			{
+				int nSubOffset=nMatchOffset+1;
+				while(szMatcher[nSubOffset])
+				{
+					if(szMatcher[nSubOffset]=='*')
+						break;
+					++nSubOffset;
+				}
+				if(strlen(szSource+nSourOffset)<size_t(nSubOffset-nMatchOffset-1)) //源字符串剩下的长度小于匹配串剩下的长度
+				{
+					bIsMatched=FALSE;
+					break;
+				}
+				if(! szMatcher[nSubOffset]) //nSubOffset 达到szMatcher 末尾 ; 检查剩下部分字符是否一一匹配
+				{
+					--nSubOffset;
+					int nTempSourOffset=strlen(szSource)-1;
+					//从后向前进行匹配
+					while(szMatcher[nSubOffset]!='*')
+					{
+						if(szMatcher[nSubOffset]=='?')
+							;
+						else
+						{
+							if(szMatcher[nSubOffset]!=szSource[nTempSourOffset])
+							{
+								bIsMatched=FALSE;
+								break;
+							}
+						}
+						--nSubOffset;
+						--nTempSourOffset;
+					}
+					break;
+				}
+				else //szMatcher[nSubOffset]=='*'
+				{
+					nSubOffset-=nMatchOffset;
+					char * szTempFinder=new char[nSubOffset];
+					--nSubOffset;
+					memcpy(szTempFinder,szMatcher+nMatchOffset+1,nSubOffset);
+					szTempFinder[nSubOffset]=0;
+					int nPos=FindString(szSource+nSourOffset,szTempFinder,0);
+					delete [] szTempFinder;
+					if(nPos!=-1) //在szSource+nSourOffset中找到szTempFinder
+					{
+						nMatchOffset+=nSubOffset;
+						nSourOffset+=(nPos+nSubOffset-1);
+					}
+					else
+					{
+						bIsMatched=FALSE;
+						break;
+					}
+				}
+			}
+		}
+		else if(szMatcher[nMatchOffset]=='?')
+		{
+			if(! szSource[nSourOffset])
+			{
+				bIsMatched=FALSE;
+				break;
+			}
+			if(! szMatcher[nMatchOffset+1] && szSource[nSourOffset+1]) //szMatcher最后一个字符 szSource非最后一个字符
+			{
+				bIsMatched=FALSE;
+				break;
+			}
+			++nMatchOffset;
+			++nSourOffset;
+		}
+		else //szMatcher[nMatchOffset] 为常规字符
+		{
+			if(szSource[nSourOffset]!=szMatcher[nMatchOffset])
+			{
+				bIsMatched=FALSE;
+				break;
+			}
+			if(! szMatcher[nMatchOffset+1] && szSource[nSourOffset+1])
+			{
+				bIsMatched=FALSE;
+				break;
+			}
+			++nMatchOffset;
+			++nSourOffset;
+		}
+	}
+	delete [] szSource;
+	delete [] szMatcher;
+	return bIsMatched;
 }
-输出
-Hello, World! (System::String)
-Hello, World! (char *)
-Hello, World! (wchar_t *)
-Hello, World! (_bstr_t)
-Hello, World! (CComBSTR)
-Hello, World! (CString)
-Hello, World! (basic_string)
-*/
+
+//功 能: 多重匹配,不同匹配字符串之间用','隔开;"*.h,*.cpp",可以匹配"*.h","*.cpp";
+//参 数: nMatchLogic=0,不同匹配求或,else求与; bMatchCase: 是否大小敏感
+//返回值: 如果bRetReversed=0,匹配返回TRUE; 否则不匹配返回TRUE
+BOOL MultiMatching(const char * lpszSour,const char * lpszMatch,int nMatchLogic/*=0*/,BOOL bRetReversed/*=0*/,BOOL bMatchCase/*=TRUE*/)   
+{
+	if(lpszSour==NULL || lpszMatch==NULL)
+		return FALSE;
+	char * szSubMatch=new char[strlen(lpszMatch)+1];
+	BOOL bIsMatch;
+	if(nMatchLogic==0) //或
+	{
+		bIsMatch=0;
+		int i=0,j=0;
+		while(TRUE)
+		{
+			if(lpszMatch[i]!=0 && lpszMatch[i]!=',')
+				szSubMatch[j++]=lpszMatch[i];
+			else
+			{
+				szSubMatch[j]=0;
+				if(j!=0)
+				{
+					bIsMatch=MatchString(lpszSour,szSubMatch,bMatchCase);
+					if(bIsMatch)
+						break;
+				}
+				j=0;
+			}
+			if(lpszMatch[i]==0)
+				break;
+			++i;
+		}
+	}
+	else //与
+	{
+		bIsMatch=1;
+		int i=0,j=0;
+		while(TRUE)
+		{
+			if(lpszMatch[i]!=0 && lpszMatch[i]!=',')
+				szSubMatch[j++]=lpszMatch[i];
+			else
+			{
+				szSubMatch[j]=0;
+				bIsMatch=MatchString(lpszSour,szSubMatch,bMatchCase);
+				if(! bIsMatch)
+					break;
+				j=0;
+			}
+			if(lpszMatch[i]==0)
+				break;
+			++i;
+		}
+	}
+	delete [] szSubMatch;
+	if(bRetReversed)
+		return ! bIsMatch;
+	else
+		return bIsMatch;
+}
+
+int n = 10,q;
+char dic[2000][1000];
+
+int TestStringMatch()
+{
+	char s[] = "123AABBCC11";
+	char s1[] = "123DF";
+
+	BOOL ret;
+	ret = MatchString(s, s1);
+	/*
+	int i;
+	scanf("%d",&n);
+	for(i=0;i<n;++i)
+		scanf("%s",dic[i]);
+	scanf("%d",&q);
+	for(i=0;i<q;++i)
+	{
+		char tmp[10000];
+		scanf("%s",tmp);
+		int ans=0;
+		for(int j=0;j<n;++j)
+		{
+			if(MatchString(dic[j],tmp))
+				++ans;
+		}
+		printf("%d\n",ans);
+	}
+	*/
+	return 0;
+}
