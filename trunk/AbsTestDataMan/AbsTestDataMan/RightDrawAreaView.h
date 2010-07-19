@@ -13,7 +13,7 @@ protected: // 仅从序列化创建
 	DECLARE_DYNCREATE(CRightDrawAreaView)
 
 	//图像显示模式
-	enum DRAW_MODE { DM_NONE=0, DM_NORAML_ONLY, DM_FILTER_ONLY, DM_ALL };
+	enum DRAW_MODE { DM_NONE=0, DM_NORMAL_ONLY, DM_FILTER_ONLY, DM_ALL };
 // 属性
 public:
 	int m_iCurrTabIndex;		//当前选中页面
@@ -28,7 +28,12 @@ public:
 // 操作
 public:
 	CAbsTestDataManDoc* GetDocument() const;
-	void DrawData();			//显示数据
+	void Draw_Force_Vs_Position();
+	void Draw_Force_Vs_PositionAndSpeed();
+	void Draw_Force_Vs_Speed();
+	void Draw_MaxForce_Vs_Speed();
+	void Draw_Force_Vs_Time();
+	void Draw_Friction_Force_Vs_Position();
 	void SetDrawMode(CRightDrawAreaView::DRAW_MODE iMode);
 	CRightDrawAreaView::DRAW_MODE GetDrawMode();
 
@@ -58,6 +63,7 @@ public:
 	virtual void OnInitialUpdate();
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 #ifndef _DEBUG  // RightDrawAreaView.cpp 中的调试版本
