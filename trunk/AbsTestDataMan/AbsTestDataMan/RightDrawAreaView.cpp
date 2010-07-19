@@ -7,6 +7,7 @@
 #include "AbsTestDataManDoc.h"
 #include "RightDrawAreaView.h"
 #include "GlobalVars.h"
+#include "GlobalFuncs.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -19,6 +20,7 @@ IMPLEMENT_DYNCREATE(CRightDrawAreaView, CView)
 
 BEGIN_MESSAGE_MAP(CRightDrawAreaView, CView)
 	// ±ê×¼´òÓ¡ÃüÁî
+	ON_NOTIFY(TCN_SELCHANGE, IDC_DRAW_TAB, &CRightDrawAreaView::OnTcnSelchangeTab)
 	ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
@@ -68,7 +70,29 @@ void CRightDrawAreaView::OnDraw(CDC* /*pDC*/)
 		return;
 
 	//»­Í¼
-	DrawData();
+	int iIndex = m_pTab->GetCurSel();
+	switch(iIndex){
+		case 0:
+			Draw_Force_Vs_Position();
+			break;
+		case 1:
+			Draw_Force_Vs_Speed();
+			break;
+		case 2:
+			Draw_Force_Vs_PositionAndSpeed();
+			break;
+		case 3:
+			Draw_MaxForce_Vs_Speed();
+			break;
+		case 4:
+			Draw_Force_Vs_Time();
+			break;
+		case 5:
+			Draw_Friction_Force_Vs_Position();
+			break;
+		default:
+			break;
+	}
 }
 
 void CRightDrawAreaView::SetDrawMode(CRightDrawAreaView::DRAW_MODE iMode)
@@ -120,6 +144,7 @@ CAbsTestDataManDoc* CRightDrawAreaView::GetDocument() const // ·Çµ÷ÊÔ°æ±¾ÊÇÄÚÁªµ
 }
 #endif //_DEBUG
 
+#if 0
 void CRightDrawAreaView::DrawData()
 {
 	RECT rect;
@@ -250,94 +275,1164 @@ void CRightDrawAreaView::DrawData()
 	while(pProductNode!=NULL){
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
 		while(pFileNode!=NULL){
-			for(int iIndex=0;iIndex<pFileNode->test_record.iNumOfSpeed;iIndex++){
+			int flag_selected = 0;
+			for(int iIndex=0;iIndex<pFileNode->test_record_header.iNumOfSpeed;iIndex++){
 				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
 				if(tp->bSelected){
-					if(tp->pNode->bDataProcessed==FALSE){
-						g_TestDataTreeMgt.ProcessData(tp->pNode);
+					flag_selected = 1;
+					if(tp->pNode->bProcessed==FALSE){
+						char sFileName[256];
+						TCHAR2char(sFileName, tp->pNode->sFileName, _tcslen(tp->pNode->sFileName));
+						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
 					}
 
 					pen.DeleteObject();
 					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
 					pDC->SelectObject(&pen);
 
-					if(m_iDrawMode & DM_NORAML_ONLY){
-						for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
-							j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
-							j++){
-								//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-								x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-								//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-								y = (int)(m_pntClientAreaOrig.y - tp->pNode->test_record.fForce[tp->iIndex][j] * (yspan/250));
-								if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
-									pDC->MoveTo(x, y);
-									pDC->SetPixel(x, y, color[tp->iIndex]);
-								}
-								else{
-									pDC->LineTo(x, y);
-								}
+					if(m_iDrawMode & DM_NORMAL_ONLY){
+						int x_start, y_start;
+						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
+							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
+							x = (int)(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
+							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fForce[tp->iIndex][j] * (yspan/250));
+							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
+								pDC->MoveTo(x, y);
+								x_start = x;
+								y_start = y;
+								pDC->SetPixel(x, y, color[tp->iIndex]);
+							}
+							else{
+								pDC->LineTo(x, y);
+							}
 						}
+						pDC->LineTo(x_start, y_start);
 					}
 
 					if(m_iDrawMode & DM_FILTER_ONLY){
-						for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
-							j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
-							j++){
-								//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-								x = (int)(tp->pNode->test_record.fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-								//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-								y = (int)(m_pntClientAreaOrig.y - tp->pNode->addition_info.fForceOfFilter[tp->iIndex][j] * (yspan/250));
-								if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
-									pDC->MoveTo(x, y);
-									pDC->SetPixel(x, y, color[tp->iIndex]);
-								}
-								else{
-									pDC->LineTo(x, y);
-								}
+						int x_start, y_start; 
+						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
+							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
+							x = (int)(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
+							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][j] * (yspan/250));
+							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
+								pDC->MoveTo(x, y);
+								x_start = x;
+								y_start = y;
+								pDC->SetPixel(x, y, color[tp->iIndex]);
+							}
+							else{
+								pDC->LineTo(x, y);
+							}
+						}
+						pDC->LineTo(x_start, y_start);
+					}
+
+					//Á¦-ËÙ¶ÈÇúÏß
+					double *pStart = NULL;
+					for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
+						/*
+						double tmp;
+						pStart = &(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j]);
+						if(j<=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex]-3){
+							tmp = ( -3 * (*pStart) + 4 * (*(pStart+1)) - 1 * (*(pStart+2)) ) / 2 * tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+						}
+						else if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex]-2){
+							tmp = ( -3 * (*pStart) + 4 * (*(pStart+1)) - 1 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]]) ) / 2 / tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+						}
+						else{
+							tmp = ( -3 * (*pStart) + 4 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]]) - 1 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+1]) ) / 2 / tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+						}
+						*///Õý³£µÄÇóÖµ
+						//²ÉÓÃ20¸öµãÇóÆ½¾ùµÄ·½·¨
+						double tmp = 0;
+						pStart = &(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j]);
+						for(int k=0;k<10;k++){
+							tmp += *(pStart+k+10) - *(pStart+k);
+						}
+						tmp = tmp / 100 * tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+							
+						//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
+						tmp = tmp * 100 * xspan / 10;
+						tmp += m_pntClientAreaOrig.x;
+						x = (int)tmp;
+						//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
+						y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fForce[tp->iIndex][j] * (yspan/250));
+						if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
+							pDC->MoveTo(x, y);
+							pDC->SetPixel(x, y, color[tp->iIndex]);
+						}
+						else{
+							pDC->LineTo(x, y);
 						}
 					}
 
-		/*
-		for(j=tp->pNode->addition_info.iDataBandStart[tp->iIndex];
-			j<tp->pNode->addition_info.iDataBandStart[tp->iIndex]+tp->pNode->addition_info.iDataBandLen[tp->iIndex];
-			j++){
-			//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-			double tmp;
-			tmp = (j-tp->pNode->addition_info.iDataBandStart[tp->iIndex]-tp->pNode->addition_info.iDataBandLen[tp->iIndex]/2);
-			//tmp /= tp->pNode->test_record.fDataFreq[tp->iIndex];
-			tmp *= xspan / 100;
-			tmp += m_pntClientAreaOrig.x;
-			x = (int)tmp;
-			//x = (int)((j-tp->pNode->addition_info.iDataBandStart[tp->iIndex])  * (xspan/100) / tp->pNode->test_record.fDataFreq[tp->iIndex] + m_pntClientAreaOrig.x);
-			//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-			y = (int)(m_pntClientAreaOrig.y - tp->pNode->addition_info.fForceOfFilter[tp->iIndex][j] * (yspan/250));
-			if(j==tp->pNode->addition_info.iDataBandStart[tp->iIndex]){
-				pDC->MoveTo(x, y);
-				pDC->SetPixel(x, y, color[tp->iIndex]);
-			}
-			else{
-				pDC->LineTo(x, y);
-			}
-			if(tp->pNode->test_record.fForce[tp->iIndex][300+j]>1000){
-				AfxMessageBox("Hello World!");
-			}
-		}
-		*/
+					//Á¦-Ê±¼äÇúÏß
+					for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
+						//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
+						double tmp;
+						tmp = j-tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];
+						tmp /= tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+						tmp *= xspan * 5;
+						tmp += m_pntClientAreaOrig.x;
+						x = (int)tmp;
+						//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
+						y = (int)(m_pntClientAreaOrig.y - tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][j] * (yspan/250));
+						if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
+							pDC->MoveTo(x, y);
+							pDC->SetPixel(x, y, color[tp->iIndex]);
+						}
+						else{
+							pDC->LineTo(x, y);
+						}
+					}
 
 					iNumDrawed ++;
 					if(iNumDrawed>=20){
 						break;
 					}
-				}
+				}//END OF IF
+			}//END OF FOR
+			if(flag_selected==0 && pFileNode->bProcessed){
+				delete pFileNode->pMachineInfo;
+				pFileNode->pMachineInfo = NULL;
+				delete pFileNode->pProductInfo;
+				pFileNode->pProductInfo = NULL;
+				delete pFileNode->pTestRecord;
+				pFileNode->pTestRecord = NULL;
+				delete pFileNode->pAdditionInfo;
+				pFileNode->pAdditionInfo = NULL;
+				pFileNode->bProcessed = FALSE;
 			}
 			pFileNode = pFileNode->pNext;
-		}
+		}//END OF WHILE
+		pProductNode = pProductNode->pNext;
+	}
+
+	pDC->SelectObject(oldFont);
+}
+#endif
+
+void CRightDrawAreaView::Draw_Force_Vs_Position()
+{
+	RECT rect;
+	CPen pen;
+	CBrush brush;
+	int i, j, x, y;
+	char buf[100];
+	struct CCTestRecord *pRec = NULL;
+	CFont fontLogo,*oldFont;
+
+	GetClientRect(&rect);
+	if(rect.bottom<100 || rect.right<100){
+		return;
+	}
+	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
+	m_pntClientAreaRef.x = rect.left + 50;
+	m_pntClientAreaRef.y = rect.bottom - 50;
+	m_nClientAreaWidth = rect.right - rect.left - 100;
+	m_nClientAreaHeight = rect.bottom - rect.top - 100;
+
+	CDC *pDC=GetDC();
+
+	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
+	pDC->SelectObject(&pen);
+	//»­ºáÖá
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
+	//»­×ÝÖá
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
+
+	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
+	double xspan = m_nClientAreaWidth / 11.0;
+	double yspan= m_nClientAreaHeight / 5.5;
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
+
+		sprintf_s(buf, "%d", (i-5)*10);
+		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
+		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
+		rect.top = m_pntClientAreaRef.y;
+		rect.bottom = m_pntClientAreaRef.y + 25;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+
+		sprintf_s(buf, "%d", (4-i)*250);
+		rect.left = m_pntClientAreaRef.x - 5 - 40;
+		rect.right = m_pntClientAreaRef.x - 5;
+		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
+		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
+	}
+	//Ô­µãÎ»ÖÃ
+	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
+	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
+
+	pen.DeleteObject();
+
+	//»­×ÝºáÐéÏß
+	LOGBRUSH logbrush;
+	logbrush.lbColor = RGB(192,192,192); 
+	logbrush.lbStyle = PS_SOLID;
+	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
+	pDC->SelectObject(&pen);
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+	}
+	pen.DeleteObject();
+
+	//±êÊ¶Ô­µã
+	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
+
+	//»­±êÊ¶
+	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
+	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
+
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
+	rect.top = m_pntClientAreaRef.y + 20;
+	rect.bottom = m_pntClientAreaRef.y + 40;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN,_T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	rect.left = m_pntClientAreaRef.x - 48;
+	rect.right = m_pntClientAreaRef.x - 28;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
+						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+						DEFAULT_PITCH, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	if(g_pTree==NULL){
+		return;
+	}
+
+	int iNumDrawed = 0;
+	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.m_pProductTreeRoot;
+	ProductNodePtr pProductNode = g_TestDataTreeMgt.m_pProductTreeRoot->pProductNodeListHead->pNext;
+	while(pProductNode!=NULL){
+		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
+		while(pFileNode!=NULL){
+			int flag_selected = 0;
+			for(int iIndex=0;iIndex<pFileNode->test_record_header.iNumOfSpeed;iIndex++){
+				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
+				if(tp->bSelected){
+					flag_selected = 1;
+					if(tp->pNode->bProcessed==FALSE){
+						char sFileName[256];
+						TCHAR2char(sFileName, tp->pNode->sFileName, _tcslen(tp->pNode->sFileName));
+						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
+					}
+
+					pen.DeleteObject();
+					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
+					pDC->SelectObject(&pen);
+
+					if(m_iDrawMode & DM_NORMAL_ONLY){
+						int x_start, y_start;
+						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
+							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
+							x = (int)(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
+							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fForce[tp->iIndex][j] * (yspan/250));
+							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
+								pDC->MoveTo(x, y);
+								x_start = x;
+								y_start = y;
+								pDC->SetPixel(x, y, color[tp->iIndex]);
+							}
+							else{
+								pDC->LineTo(x, y);
+							}
+						}
+						pDC->LineTo(x_start, y_start);
+					}
+
+					if(m_iDrawMode & DM_FILTER_ONLY){
+						int x_start, y_start; 
+						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
+							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
+							x = (int)(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
+							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][j] * (yspan/250));
+							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
+								pDC->MoveTo(x, y);
+								x_start = x;
+								y_start = y;
+								pDC->SetPixel(x, y, color[tp->iIndex]);
+							}
+							else{
+								pDC->LineTo(x, y);
+							}
+						}
+						pDC->LineTo(x_start, y_start);
+					}
+
+					iNumDrawed ++;
+					if(iNumDrawed>=20){
+						break;
+					}
+				}//END OF IF
+			}//END OF FOR
+			if(flag_selected==0 && pFileNode->bProcessed){
+				delete pFileNode->pMachineInfo;
+				pFileNode->pMachineInfo = NULL;
+				delete pFileNode->pProductInfo;
+				pFileNode->pProductInfo = NULL;
+				delete pFileNode->pTestRecord;
+				pFileNode->pTestRecord = NULL;
+				delete pFileNode->pAdditionInfo;
+				pFileNode->pAdditionInfo = NULL;
+				pFileNode->bProcessed = FALSE;
+			}
+			pFileNode = pFileNode->pNext;
+		}//END OF WHILE
 		pProductNode = pProductNode->pNext;
 	}
 
 	pDC->SelectObject(oldFont);
 }
 
+void CRightDrawAreaView::Draw_Force_Vs_PositionAndSpeed()
+{
+	RECT rect;
+	CPen pen;
+	CBrush brush;
+	int i, j, x, y;
+	char buf[100];
+	struct CCTestRecord *pRec = NULL;
+	CFont fontLogo,*oldFont;
+
+	GetClientRect(&rect);
+	if(rect.bottom<100 || rect.right<100){
+		return;
+	}
+	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
+	m_pntClientAreaRef.x = rect.left + 50;
+	m_pntClientAreaRef.y = rect.bottom - 50;
+	m_nClientAreaWidth = rect.right - rect.left - 100;
+	m_nClientAreaHeight = rect.bottom - rect.top - 100;
+
+	CDC *pDC=GetDC();
+
+	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
+	pDC->SelectObject(&pen);
+	//»­ºáÖá
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
+	//»­×ÝÖá
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
+
+	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
+	double xspan = m_nClientAreaWidth / 11.0;
+	double yspan= m_nClientAreaHeight / 5.5;
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
+
+		sprintf_s(buf, "%d", (i-5)*10);
+		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
+		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
+		rect.top = m_pntClientAreaRef.y;
+		rect.bottom = m_pntClientAreaRef.y + 25;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+
+		sprintf_s(buf, "%d", (4-i)*250);
+		rect.left = m_pntClientAreaRef.x - 5 - 40;
+		rect.right = m_pntClientAreaRef.x - 5;
+		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
+		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
+	}
+	//Ô­µãÎ»ÖÃ
+	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
+	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
+
+	pen.DeleteObject();
+
+	//»­×ÝºáÐéÏß
+	LOGBRUSH logbrush;
+	logbrush.lbColor = RGB(192,192,192); 
+	logbrush.lbStyle = PS_SOLID;
+	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
+	pDC->SelectObject(&pen);
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+	}
+	pen.DeleteObject();
+
+	//±êÊ¶Ô­µã
+	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
+
+	//»­±êÊ¶
+	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
+	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
+
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
+	rect.top = m_pntClientAreaRef.y + 20;
+	rect.bottom = m_pntClientAreaRef.y + 40;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN,_T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	rect.left = m_pntClientAreaRef.x - 48;
+	rect.right = m_pntClientAreaRef.x - 28;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
+						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+						DEFAULT_PITCH, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	if(g_pTree==NULL){
+		return;
+	}
+
+	int iNumDrawed = 0;
+	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.m_pProductTreeRoot;
+	ProductNodePtr pProductNode = g_TestDataTreeMgt.m_pProductTreeRoot->pProductNodeListHead->pNext;
+	while(pProductNode!=NULL){
+		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
+		while(pFileNode!=NULL){
+			int flag_selected = 0;
+			for(int iIndex=0;iIndex<pFileNode->test_record_header.iNumOfSpeed;iIndex++){
+				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
+				if(tp->bSelected){
+					flag_selected = 1;
+					if(tp->pNode->bProcessed==FALSE){
+						char sFileName[256];
+						TCHAR2char(sFileName, tp->pNode->sFileName, _tcslen(tp->pNode->sFileName));
+						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
+					}
+
+					pen.DeleteObject();
+					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
+					pDC->SelectObject(&pen);
+
+
+					iNumDrawed ++;
+					if(iNumDrawed>=20){
+						break;
+					}
+				}//END OF IF
+			}//END OF FOR
+			if(flag_selected==0 && pFileNode->bProcessed){
+				delete pFileNode->pMachineInfo;
+				pFileNode->pMachineInfo = NULL;
+				delete pFileNode->pProductInfo;
+				pFileNode->pProductInfo = NULL;
+				delete pFileNode->pTestRecord;
+				pFileNode->pTestRecord = NULL;
+				delete pFileNode->pAdditionInfo;
+				pFileNode->pAdditionInfo = NULL;
+				pFileNode->bProcessed = FALSE;
+			}
+			pFileNode = pFileNode->pNext;
+		}//END OF WHILE
+		pProductNode = pProductNode->pNext;
+	}
+
+	pDC->SelectObject(oldFont);
+}
+
+void CRightDrawAreaView::Draw_Force_Vs_Speed()
+{
+	RECT rect;
+	CPen pen;
+	CBrush brush;
+	int i, j, x, y;
+	char buf[100];
+	struct CCTestRecord *pRec = NULL;
+	CFont fontLogo,*oldFont;
+
+	GetClientRect(&rect);
+	if(rect.bottom<100 || rect.right<100){
+		return;
+	}
+	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
+	m_pntClientAreaRef.x = rect.left + 50;
+	m_pntClientAreaRef.y = rect.bottom - 50;
+	m_nClientAreaWidth = rect.right - rect.left - 100;
+	m_nClientAreaHeight = rect.bottom - rect.top - 100;
+
+	CDC *pDC=GetDC();
+
+	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
+	pDC->SelectObject(&pen);
+	//»­ºáÖá
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
+	//»­×ÝÖá
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
+
+	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
+	double xspan = m_nClientAreaWidth / 11.0;
+	double yspan= m_nClientAreaHeight / 5.5;
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
+
+		sprintf_s(buf, "%d", (i-5)*10);
+		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
+		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
+		rect.top = m_pntClientAreaRef.y;
+		rect.bottom = m_pntClientAreaRef.y + 25;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+
+		sprintf_s(buf, "%d", (4-i)*250);
+		rect.left = m_pntClientAreaRef.x - 5 - 40;
+		rect.right = m_pntClientAreaRef.x - 5;
+		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
+		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
+	}
+	//Ô­µãÎ»ÖÃ
+	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
+	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
+
+	pen.DeleteObject();
+
+	//»­×ÝºáÐéÏß
+	LOGBRUSH logbrush;
+	logbrush.lbColor = RGB(192,192,192); 
+	logbrush.lbStyle = PS_SOLID;
+	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
+	pDC->SelectObject(&pen);
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+	}
+	pen.DeleteObject();
+
+	//±êÊ¶Ô­µã
+	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
+
+	//»­±êÊ¶
+	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
+	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
+
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
+	rect.top = m_pntClientAreaRef.y + 20;
+	rect.bottom = m_pntClientAreaRef.y + 40;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN,_T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	rect.left = m_pntClientAreaRef.x - 48;
+	rect.right = m_pntClientAreaRef.x - 28;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
+						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+						DEFAULT_PITCH, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	if(g_pTree==NULL){
+		return;
+	}
+
+	int iNumDrawed = 0;
+	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.m_pProductTreeRoot;
+	ProductNodePtr pProductNode = g_TestDataTreeMgt.m_pProductTreeRoot->pProductNodeListHead->pNext;
+	while(pProductNode!=NULL){
+		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
+		while(pFileNode!=NULL){
+			int flag_selected = 0;
+			for(int iIndex=0;iIndex<pFileNode->test_record_header.iNumOfSpeed;iIndex++){
+				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
+				if(tp->bSelected){
+					flag_selected = 1;
+					if(tp->pNode->bProcessed==FALSE){
+						char sFileName[256];
+						TCHAR2char(sFileName, tp->pNode->sFileName, _tcslen(tp->pNode->sFileName));
+						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
+					}
+
+					pen.DeleteObject();
+					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
+					pDC->SelectObject(&pen);
+
+					//Á¦-ËÙ¶ÈÇúÏß
+					if(m_iDrawMode & DM_NORMAL_ONLY){
+						double *pStart = NULL;
+						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
+							/*
+							double tmp;
+							pStart = &(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j]);
+							if(j<=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex]-3){
+								tmp = ( -3 * (*pStart) + 4 * (*(pStart+1)) - 1 * (*(pStart+2)) ) / 2 * tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+							}
+							else if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex]-2){
+								tmp = ( -3 * (*pStart) + 4 * (*(pStart+1)) - 1 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]]) ) / 2 / tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+							}
+							else{
+								tmp = ( -3 * (*pStart) + 4 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]]) - 1 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+1]) ) / 2 / tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+							}
+							*///Õý³£µÄÇóÖµ
+							//²ÉÓÃ20¸öµãÇóÆ½¾ùµÄ·½·¨
+							double tmp = 0;
+							pStart = &(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j]);
+							for(int k=0;k<10;k++){
+								tmp += *(pStart+k+10) - *(pStart+k);
+							}
+							tmp = tmp / 100 * tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+								
+							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
+							tmp = tmp * 100 * xspan / 10;
+							tmp += m_pntClientAreaOrig.x;
+							x = (int)tmp;
+							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
+							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fForce[tp->iIndex][j] * (yspan/250));
+							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
+								pDC->MoveTo(x, y);
+								pDC->SetPixel(x, y, color[tp->iIndex]);
+							}
+							else{
+								pDC->LineTo(x, y);
+							}
+						}
+					}
+					if(m_iDrawMode & DM_FILTER_ONLY){
+						double *pStart = NULL;
+						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
+							/*
+							double tmp;
+							pStart = &(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j]);
+							if(j<=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex]-3){
+								tmp = ( -3 * (*pStart) + 4 * (*(pStart+1)) - 1 * (*(pStart+2)) ) / 2 * tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+							}
+							else if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex]-2){
+								tmp = ( -3 * (*pStart) + 4 * (*(pStart+1)) - 1 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]]) ) / 2 / tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+							}
+							else{
+								tmp = ( -3 * (*pStart) + 4 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]]) - 1 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+1]) ) / 2 / tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+							}
+							*///Õý³£µÄÇóÖµ
+							//²ÉÓÃ20¸öµãÇóÆ½¾ùµÄ·½·¨
+							double tmp = 0;
+							pStart = &(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j]);
+							for(int k=0;k<10;k++){
+								tmp += *(pStart+k+10) - *(pStart+k);
+							}
+							tmp = tmp / 100 * tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+								
+							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
+							tmp = tmp * 100 * xspan / 10;
+							tmp += m_pntClientAreaOrig.x;
+							x = (int)tmp;
+							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
+							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][j] * (yspan/250));
+							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
+								pDC->MoveTo(x, y);
+								pDC->SetPixel(x, y, color[tp->iIndex]);
+							}
+							else{
+								pDC->LineTo(x, y);
+							}
+						}
+					}
+
+					iNumDrawed ++;
+					if(iNumDrawed>=20){
+						break;
+					}
+				}//END OF IF
+			}//END OF FOR
+			if(flag_selected==0 && pFileNode->bProcessed){
+				delete pFileNode->pMachineInfo;
+				pFileNode->pMachineInfo = NULL;
+				delete pFileNode->pProductInfo;
+				pFileNode->pProductInfo = NULL;
+				delete pFileNode->pTestRecord;
+				pFileNode->pTestRecord = NULL;
+				delete pFileNode->pAdditionInfo;
+				pFileNode->pAdditionInfo = NULL;
+				pFileNode->bProcessed = FALSE;
+			}
+			pFileNode = pFileNode->pNext;
+		}//END OF WHILE
+		pProductNode = pProductNode->pNext;
+	}
+
+	pDC->SelectObject(oldFont);
+}
+
+void CRightDrawAreaView::Draw_MaxForce_Vs_Speed()
+{
+	RECT rect;
+	CPen pen;
+	CBrush brush;
+	int i, j, x, y;
+	char buf[100];
+	struct CCTestRecord *pRec = NULL;
+	CFont fontLogo,*oldFont;
+
+	GetClientRect(&rect);
+	if(rect.bottom<100 || rect.right<100){
+		return;
+	}
+	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
+	m_pntClientAreaRef.x = rect.left + 50;
+	m_pntClientAreaRef.y = rect.bottom - 50;
+	m_nClientAreaWidth = rect.right - rect.left - 100;
+	m_nClientAreaHeight = rect.bottom - rect.top - 100;
+
+	CDC *pDC=GetDC();
+
+	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
+	pDC->SelectObject(&pen);
+	//»­ºáÖá
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
+	//»­×ÝÖá
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
+
+	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
+	double xspan = m_nClientAreaWidth / 11.0;
+	double yspan= m_nClientAreaHeight / 5.5;
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
+
+		sprintf_s(buf, "%d", (i-5)*10);
+		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
+		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
+		rect.top = m_pntClientAreaRef.y;
+		rect.bottom = m_pntClientAreaRef.y + 25;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+
+		sprintf_s(buf, "%d", (4-i)*250);
+		rect.left = m_pntClientAreaRef.x - 5 - 40;
+		rect.right = m_pntClientAreaRef.x - 5;
+		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
+		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
+	}
+	//Ô­µãÎ»ÖÃ
+	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
+	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
+
+	pen.DeleteObject();
+
+	//»­×ÝºáÐéÏß
+	LOGBRUSH logbrush;
+	logbrush.lbColor = RGB(192,192,192); 
+	logbrush.lbStyle = PS_SOLID;
+	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
+	pDC->SelectObject(&pen);
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+	}
+	pen.DeleteObject();
+
+	//±êÊ¶Ô­µã
+	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
+
+	//»­±êÊ¶
+	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
+	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
+
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
+	rect.top = m_pntClientAreaRef.y + 20;
+	rect.bottom = m_pntClientAreaRef.y + 40;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN,_T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	rect.left = m_pntClientAreaRef.x - 48;
+	rect.right = m_pntClientAreaRef.x - 28;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
+						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+						DEFAULT_PITCH, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	if(g_pTree==NULL){
+		return;
+	}
+
+	int iNumDrawed = 0;
+	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.m_pProductTreeRoot;
+	ProductNodePtr pProductNode = g_TestDataTreeMgt.m_pProductTreeRoot->pProductNodeListHead->pNext;
+	while(pProductNode!=NULL){
+		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
+		while(pFileNode!=NULL){
+			int flag_selected = 0;
+			for(int iIndex=0;iIndex<pFileNode->test_record_header.iNumOfSpeed;iIndex++){
+				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
+				if(tp->bSelected){
+					flag_selected = 1;
+					if(tp->pNode->bProcessed==FALSE){
+						char sFileName[256];
+						TCHAR2char(sFileName, tp->pNode->sFileName, _tcslen(tp->pNode->sFileName));
+						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
+					}
+
+					pen.DeleteObject();
+					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
+					pDC->SelectObject(&pen);
+
+
+					iNumDrawed ++;
+					if(iNumDrawed>=20){
+						break;
+					}
+				}//END OF IF
+			}//END OF FOR
+			if(flag_selected==0 && pFileNode->bProcessed){
+				delete pFileNode->pMachineInfo;
+				pFileNode->pMachineInfo = NULL;
+				delete pFileNode->pProductInfo;
+				pFileNode->pProductInfo = NULL;
+				delete pFileNode->pTestRecord;
+				pFileNode->pTestRecord = NULL;
+				delete pFileNode->pAdditionInfo;
+				pFileNode->pAdditionInfo = NULL;
+				pFileNode->bProcessed = FALSE;
+			}
+			pFileNode = pFileNode->pNext;
+		}//END OF WHILE
+		pProductNode = pProductNode->pNext;
+	}
+
+	pDC->SelectObject(oldFont);
+}
+
+void CRightDrawAreaView::Draw_Force_Vs_Time()
+{
+	RECT rect;
+	CPen pen;
+	CBrush brush;
+	int i, j, x, y;
+	char buf[100];
+	struct CCTestRecord *pRec = NULL;
+	CFont fontLogo,*oldFont;
+
+	GetClientRect(&rect);
+	if(rect.bottom<100 || rect.right<100){
+		return;
+	}
+	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
+	m_pntClientAreaRef.x = rect.left + 50;
+	m_pntClientAreaRef.y = rect.bottom - 50;
+	m_nClientAreaWidth = rect.right - rect.left - 100;
+	m_nClientAreaHeight = rect.bottom - rect.top - 100;
+
+	CDC *pDC=GetDC();
+
+	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
+	pDC->SelectObject(&pen);
+	//»­ºáÖá
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
+	//»­×ÝÖá
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
+
+	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
+	double xspan = m_nClientAreaWidth / 11.0;
+	double yspan= m_nClientAreaHeight / 5.5;
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
+
+		sprintf_s(buf, "%d", (i-5)*10);
+		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
+		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
+		rect.top = m_pntClientAreaRef.y;
+		rect.bottom = m_pntClientAreaRef.y + 25;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+
+		sprintf_s(buf, "%d", (4-i)*250);
+		rect.left = m_pntClientAreaRef.x - 5 - 40;
+		rect.right = m_pntClientAreaRef.x - 5;
+		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
+		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
+	}
+	//Ô­µãÎ»ÖÃ
+	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
+	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
+
+	pen.DeleteObject();
+
+	//»­×ÝºáÐéÏß
+	LOGBRUSH logbrush;
+	logbrush.lbColor = RGB(192,192,192); 
+	logbrush.lbStyle = PS_SOLID;
+	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
+	pDC->SelectObject(&pen);
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+	}
+	pen.DeleteObject();
+
+	//±êÊ¶Ô­µã
+	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
+
+	//»­±êÊ¶
+	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
+	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
+
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
+	rect.top = m_pntClientAreaRef.y + 20;
+	rect.bottom = m_pntClientAreaRef.y + 40;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN,_T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	rect.left = m_pntClientAreaRef.x - 48;
+	rect.right = m_pntClientAreaRef.x - 28;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
+						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+						DEFAULT_PITCH, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	if(g_pTree==NULL){
+		return;
+	}
+
+	int iNumDrawed = 0;
+	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.m_pProductTreeRoot;
+	ProductNodePtr pProductNode = g_TestDataTreeMgt.m_pProductTreeRoot->pProductNodeListHead->pNext;
+	while(pProductNode!=NULL){
+		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
+		while(pFileNode!=NULL){
+			int flag_selected = 0;
+			for(int iIndex=0;iIndex<pFileNode->test_record_header.iNumOfSpeed;iIndex++){
+				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
+				if(tp->bSelected){
+					flag_selected = 1;
+					if(tp->pNode->bProcessed==FALSE){
+						char sFileName[256];
+						TCHAR2char(sFileName, tp->pNode->sFileName, _tcslen(tp->pNode->sFileName));
+						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
+					}
+
+					pen.DeleteObject();
+					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
+					pDC->SelectObject(&pen);
+
+					//Á¦-Ê±¼äÇúÏß
+					if(m_iDrawMode & DM_NORMAL_ONLY){
+						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
+							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
+							double tmp;
+							tmp = j-tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];
+							tmp /= tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+							tmp *= xspan * 5;
+							tmp += m_pntClientAreaOrig.x;
+							x = (int)tmp;
+							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
+							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fForce[tp->iIndex][j] * (yspan/250));
+							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
+								pDC->MoveTo(x, y);
+								pDC->SetPixel(x, y, color[tp->iIndex]);
+							}
+							else{
+								pDC->LineTo(x, y);
+							}
+						}
+					}
+
+					if(m_iDrawMode & DM_FILTER_ONLY){
+						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
+							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
+							double tmp;
+							tmp = j-tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];
+							tmp /= tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
+							tmp *= xspan * 5;
+							tmp += m_pntClientAreaOrig.x;
+							x = (int)tmp;
+							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
+							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][j] * (yspan/250));
+							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
+								pDC->MoveTo(x, y);
+								pDC->SetPixel(x, y, color[tp->iIndex]);
+							}
+							else{
+								pDC->LineTo(x, y);
+							}
+						}
+					}
+
+					iNumDrawed ++;
+					if(iNumDrawed>=20){
+						break;
+					}
+				}//END OF IF
+			}//END OF FOR
+			if(flag_selected==0 && pFileNode->bProcessed){
+				delete pFileNode->pMachineInfo;
+				pFileNode->pMachineInfo = NULL;
+				delete pFileNode->pProductInfo;
+				pFileNode->pProductInfo = NULL;
+				delete pFileNode->pTestRecord;
+				pFileNode->pTestRecord = NULL;
+				delete pFileNode->pAdditionInfo;
+				pFileNode->pAdditionInfo = NULL;
+				pFileNode->bProcessed = FALSE;
+			}
+			pFileNode = pFileNode->pNext;
+		}//END OF WHILE
+		pProductNode = pProductNode->pNext;
+	}
+
+	pDC->SelectObject(oldFont);
+}
+
+void CRightDrawAreaView::Draw_Friction_Force_Vs_Position()
+{
+}
 
 // CRightDrawAreaView ÏûÏ¢´¦Àí³ÌÐò
 
@@ -345,10 +1440,12 @@ void CRightDrawAreaView::OnInitialUpdate()
 {
 	CView::OnInitialUpdate();
 
-	m_pTab->InsertItem(0, _T("TAB1"));
-	m_pTab->InsertItem(1, _T("TAB2"));
-	m_pTab->InsertItem(2, _T("TAB3"));
-	m_pTab->InsertItem(3, _T("TAB4"));
+	m_pTab->InsertItem(0, _T("F vs P"));
+	m_pTab->InsertItem(1, _T("F vs S"));
+	m_pTab->InsertItem(2, _T("F vs PS"));
+	m_pTab->InsertItem(3, _T("MaxF vs S"));
+	m_pTab->InsertItem(4, _T("F vs T"));
+	m_pTab->InsertItem(5, _T("FF vs P"));
 }
 
 int CRightDrawAreaView::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -365,7 +1462,7 @@ int CRightDrawAreaView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	CRect rect(0,0,100,100);
 
-	VERIFY(m_pTab->Create(dwStyle, rect, this, IDC_TREE));
+	VERIFY(m_pTab->Create(dwStyle, rect, this, IDC_DRAW_TAB));
 
 
 	return 0;
@@ -380,4 +1477,9 @@ void CRightDrawAreaView::OnSize(UINT nType, int cx, int cy)
 		// stretch tree to fill window
 		m_pTab->MoveWindow(0, 0, cx, 22);
 	}
+}
+
+void CRightDrawAreaView::OnTcnSelchangeTab(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	this->RedrawWindow();
 }
