@@ -66,7 +66,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\AbsTestDataMan.ico"
-IDR_AbsTestDataManTYPE  ICON                    "res\\AbsTestDataManDoc.ico"
+IDR_ABSTESTDATAMANTYPE  ICON                    "res\\AbsTestDataManDoc.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -187,18 +187,22 @@ STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_BORDER
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     LTEXT           "时间范围:",IDC_STATIC,7,19,34,8
-    EDITTEXT        IDC_STARTTIME,44,17,71,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_ENDTIME,126,17,72,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_PRODUCTNO,237,17,65,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_OPERATORNO,333,17,65,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "应用",IDC_BTN_APPLY,401,18,26,12
-    LTEXT           "~",IDC_STATIC,117,22,8,8
-    LTEXT           "试件型号:",IDC_STATIC,202,19,34,8
-    LTEXT           "试验员:",IDC_STATIC,306,19,34,8
+    EDITTEXT        IDC_STARTTIME,498,24,71,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_ENDTIME,571,24,72,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PRODUCTNO,283,17,65,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_OPERATORNO,380,17,65,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "应用",IDC_BTN_APPLY,448,18,26,12
+    LTEXT           "~",IDC_STATIC,142,22,8,8
+    LTEXT           "试件型号:",IDC_STATIC,248,19,34,8
+    LTEXT           "试验员:",IDC_STATIC,352,19,27,8
     GROUPBOX        "过滤器",IDC_FILTER_GROUP,0,2,856,37
-    PUSHBUTTON      "进度条",IDC_BTN_TEST1,434,8,27,14
-    PUSHBUTTON      "单文件",IDC_BTN_TEST2,463,8,27,14
-    PUSHBUTTON      "曲线模式",IDC_BTN_TEST3,492,8,34,14
+    PUSHBUTTON      "进度条",IDC_BTN_TEST1,501,8,27,14
+    PUSHBUTTON      "单文件",IDC_BTN_TEST2,531,8,27,14
+    PUSHBUTTON      "曲线模式",IDC_BTN_TEST3,559,8,34,14
+    CONTROL         "",IDC_DTP_START_TIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | DTS_SHOWNONE | WS_TABSTOP | 0x8,95,16,46,15
+    CONTROL         "",IDC_DTP_START_DATE,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,40,16,54,15
+    CONTROL         "",IDC_DTP_END_TIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | DTS_SHOWNONE | WS_TABSTOP | 0x8,201,16,46,15
+    CONTROL         "",IDC_DTP_END_DATE,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,148,16,52,15
 END
 
 IDD_DIR_SETUP DIALOGEX 0, 0, 247, 148
