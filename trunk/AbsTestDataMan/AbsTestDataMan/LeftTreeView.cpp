@@ -132,12 +132,12 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 		while(pFileNode!=NULL){
 			TV_INSERTSTRUCT tvChild;//Ê÷Ò¶
 			tvChild.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-			tvChild.item.pszText = pFileNode->addition_info.sTestDate;//pFileNode->addition_info.sFile;//
+			tvChild.item.pszText = pFileNode->sTestDate;//pFileNode->pAdditionInfo.sFile;//
 			tvChild.item.iImage= 10;
 			tvChild.item.iSelectedImage = 10;
 			tvChild.hParent = item_root;
 			HTREEITEM item_child = g_pTree->InsertItem(&tvChild);
-			for(int k=0;k<pFileNode->test_record.iNumOfSpeed;k++){
+			for(int k=0;k<pFileNode->test_record_header.iNumOfSpeed;k++){
 				TV_INSERTSTRUCT tvChild;//Ê÷Ò¶
 				tvChild.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
 				_stprintf(tcBuf, _T("%s%d"), _T("Speed"), k+1);
@@ -333,7 +333,7 @@ LRESULT CLeftTreeView::OnCheckbox(WPARAM wParam, LPARAM lParam)
 						ASSERT(p);
 						tp = (struct TreeItemData *)p;
 						ASSERT(tp);
-						iNumOfSpeed = tp->pNode->test_record.iNumOfSpeed;
+						iNumOfSpeed = tp->pNode->test_record_header.iNumOfSpeed;
 						for(int i=0;i<iNumOfSpeed;i++){
 							tp->pNode->tree_item_data[i].bSelected = TRUE;
 						}
