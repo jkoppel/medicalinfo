@@ -5,6 +5,10 @@
 #define MAX_SPEED_NUM		15
 #define MAX_FORCE_NUM		1600
 
+#define MAX_REFDOT_NUM		7
+#define SKIP_FIRSTDOT_NUM	125
+
+
 #define M_PI	3.1415926
 #pragma pack(8)
 
@@ -429,8 +433,6 @@ struct TreeItemData
 
 struct AdditionInfo
 {
-	TCHAR sFile[128];
-	TCHAR sTestDate[33];
 	double fDisplacementLength[MAX_SPEED_NUM];
 	double fForceOfFilter[MAX_SPEED_NUM][MAX_FORCE_NUM];
 	int iDataBandStart[MAX_SPEED_NUM];
@@ -442,6 +444,29 @@ struct AdditionInfo
 	int iFrictionDataBandLen[MAX_SPEED_NUM];
 };
 
+//
+struct CCTestRecordHeader
+{
+	BOOL bDataProcessed;					// =TRUE : 其中数据已经处理过，FALSE：没有处理过
+	BOOL bDataValid;						// =TRUE : 含有效示功图数据,FALSE: 不含有效数据
+
+	char sWorkDay[MAX_DATE_LENGTH+1];		// 测试工作日
+	char sTestDate[MAX_DATE_LENGTH+1];		// 测试日期
+	char sScheduledDate[MAX_DATE_LENGTH+1];	// 计划日期
+
+	double  fTestTemp;						// 检测到的试验温度℃
+	double  fSideForce;						// 检测到的的侧向力N
+
+	BOOL bNormalSpeed;						// 是否包含常规速度测量结果
+
+	DWORD  dwResultStatus;					// 测试结论
+
+	int    iNumOfSpeed;						// 包含的已测量的速度的个数，最多MAX_SPEED_NUM
+
+	int    iSpdIndex[MAX_SPEED_NUM];		// 此速度在测试规范中的速度序号
+};
+
+/*
 typedef struct TestRecordFileNode
 {
 	struct CCMachineInfo machine_info;
@@ -453,6 +478,24 @@ typedef struct TestRecordFileNode
 	struct TestRecordFileNode *pNext;
 	struct TestRecordFileNode *pPrev;
 } FileNode, *FileNodePtr, *FileNodeList;
+*/
+typedef struct TestRecordFileNode
+{
+	BOOL bProcessed;
+	TCHAR sProductNo[33];
+	TCHAR sFileName[256];
+	TCHAR sTestDate[33];
+
+	struct CCTestRecordHeader test_record_header;
+	struct CCMachineInfo *pMachineInfo;
+	struct CCProductInfo *pProductInfo;
+	struct CCTestRecord *pTestRecord;
+	struct AdditionInfo *pAdditionInfo;
+	struct TreeItemData tree_item_data[MAX_SPEED_NUM];
+	struct TestRecordFileNode *pNext;
+	struct TestRecordFileNode *pPrev;
+} FileNode, *FileNodePtr, *FileNodeList;
+
 
 typedef struct ProductNode
 {
@@ -477,16 +520,17 @@ public:
 	void InitTree(void);
 	void ReloadTree(void);
 	void FreeTree(void);
+	void FreeFileNode(FileNodePtr pFileNode);
 
-	BOOL LoadFile(const char *sFileNmae, BOOL bNeedProcessData=FALSE);
-	BOOL ReadFile(const char *sFileName, BOOL bNeedProcessData, FileNodePtr pFileNode);
+	BOOL LoadFile(const char *sFileNmae);
+	BOOL LoadAndProcessFile(const char *sFileName, FileNodePtr pFileNode);
+	BOOL GetFileHeader(const char *sFileName, FileNodePtr pFileNode);
 	//对二级节点双循环链表的操作
 	BOOL InsertFileNode(ProductNodePtr pProductNode, FileNodePtr pFileNodeToInsert);
 	BOOL DeleteFileNode(ProductNodePtr pProductNode_Ahead, ProductNodePtr pProductNodet, FileNodePtr pFileNodeToDelete);
 	void DeleteFileNode(FileNodePtr pFileNodeToDelete);
 	void DeleteFileNode(const char *sFileName);
 	BOOL SearchFileNode(const char *sFileName, FileNodePtr &pFileNodeFound);
-	void ProcessData(FileNodePtr pFileNode);
 	//对一级节点双循环链表的操作
 	BOOL InsertProductNode(ProductNodePtr pProductNodeToInsert);
 	void InsertProductNode(const char *sProductNo, ProductNodePtr &pProductNodeInserted);
@@ -498,4 +542,5 @@ public:
 
 	ProductTreeRootPtr m_pProductTreeRoot;
 protected:
+	void ProcessData(FileNodePtr pFileNode);
 };

@@ -45,7 +45,7 @@ void CTestDataTreeMgt::InitTree(void)
 			}
 			name = str + ff.GetFileName();
 			CString2char(buf, name);
-			LoadFile(buf, FALSE);
+			LoadFile(buf);
 		}
 		ff.Close();
 	}
@@ -94,7 +94,7 @@ void CTestDataTreeMgt::ReloadTree(void)
 		FileNodePtr pFileNode_Ahead = pProductNode->pFileListHead;
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
 		while(pFileNode!=NULL){
-			if(!(IsFileInConfigDirList(pFileNode->addition_info.sFile) && ff.FindFile(pFileNode->addition_info.sFile))){
+			if(!(IsFileInConfigDirList(pFileNode->sFileName) && ff.FindFile(pFileNode->sFileName))){
 				//并非目录列表有该文件，并且该文件实际存在
 				FileNodePtr pFileNode_Next = pFileNode->pNext;
 				pFileNode_Ahead->pNext = pFileNode_Next;
@@ -104,7 +104,7 @@ void CTestDataTreeMgt::ReloadTree(void)
 				else{
 					pProductNode->pFileListTail = pFileNode_Ahead;
 				}
-				delete pFileNode;
+				FreeFileNode(pFileNode);
 				pFileNode = pFileNode_Next;
 			}
 			else{
@@ -145,7 +145,7 @@ void CTestDataTreeMgt::FreeTree(void)
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
 		while(pFileNode!=NULL){
 			FileNodePtr pFileNode_Next = pFileNode->pNext;
-			delete pFileNode;
+			FreeFileNode(pFileNode);
 			pProductNode->pFileListHead->pNext = pFileNode_Next;
 			if(pFileNode_Next){
 				pFileNode_Next->pPrev = NULL;
@@ -174,37 +174,46 @@ void CTestDataTreeMgt::FreeTree(void)
 	m_pProductTreeRoot = NULL;
 }
 
-BOOL CTestDataTreeMgt::LoadFile(const char *sFileName, BOOL bNeedProcessData)
+void CTestDataTreeMgt::FreeFileNode(FileNodePtr pFileNode)
+{
+	delete pFileNode->pMachineInfo;
+	delete pFileNode->pProductInfo;
+	delete pFileNode->pTestRecord;
+	delete pFileNode->pAdditionInfo;
+	delete pFileNode;
+}
+
+BOOL CTestDataTreeMgt::LoadFile(const char *sFileName)
 {
 	FileNodePtr pFileNode = NULL;
 	ProductNodePtr pProductNode = NULL;
 
 	if(SearchFileNode(sFileName, pFileNode)){
-		if(pFileNode->bDataProcessed){
+		if(pFileNode->bProcessed){
 			return TRUE;
 		}
-		if(bNeedProcessData){
-			ProcessData(pFileNode);
-		}
+		ProcessData(pFileNode);
 		return TRUE;
 	}
 	pFileNode = new FileNode;
 	memset(pFileNode, 0, sizeof(FileNode));
-	if(!ReadFile(sFileName, bNeedProcessData, pFileNode)){
-		delete pFileNode;
+	if(!GetFileHeader(sFileName, pFileNode)){
+		FreeFileNode(pFileNode);
 		return FALSE;
 	}
-	if(!SearchProductNode(pFileNode->product_info.sProductNo, pProductNode)){
-		InsertProductNode(pFileNode->product_info.sProductNo, pProductNode);
+	char sProductNo[33];
+	TCHAR2char(sProductNo, pFileNode->sProductNo, _tcslen(pFileNode->sProductNo));
+	if(!SearchProductNode(sProductNo, pProductNode)){
+		InsertProductNode(sProductNo, pProductNode);
 	}
 	if(!InsertFileNode(pProductNode, pFileNode)){
-		delete pFileNode;
+		FreeFileNode(pFileNode);
 		return FALSE;
 	}
 	return TRUE;
 }
 
-BOOL CTestDataTreeMgt::ReadFile(const char *sFileName, BOOL bNeedProcessData, FileNodePtr pFileNode)
+BOOL CTestDataTreeMgt::GetFileHeader(const char *sFileName, FileNodePtr pFileNode)
 {
 	int ret, i;
 	FILE *pFile = NULL;
@@ -225,10 +234,11 @@ BOOL CTestDataTreeMgt::ReadFile(const char *sFileName, BOOL bNeedProcessData, Fi
 		return FALSE;
 	}
 
+	memset(&node, 0, sizeof(FileNode));
 	//查看文件头
 	memset(sBuf, 0, sizeof(sBuf));
 	fread(sBuf, 23, 1, pFile);
-	sprintf_s(sBuf1, "%s", "MyTester Data File ");
+	sprintf_s(sBuf1, "%s", "MyTester Data File ");//TODO, "Absorber Data File 6.0"
 	if(strncmp(sBuf, sBuf1, strlen("MyTester Data File "))!=0){
 		fclose(pFile);
 		return FALSE;
@@ -249,42 +259,119 @@ BOOL CTestDataTreeMgt::ReadFile(const char *sFileName, BOOL bNeedProcessData, Fi
 		return FALSE;
 	}
 
-	ret = (int)fread(&node.machine_info, sizeof(struct CCMachineInfo), 1, pFile);
+	//略过前面MachineInfo,读取ProductInfo的ProductNo
+	fseek(pFile, sizeof(struct CCMachineInfo)+30, SEEK_SET);
+	ret = (int)fread(sBuf, 33, 1, pFile);
 	if(ret!=1){
 		fclose(pFile);
 		return FALSE;
 	}
-
-	ret = (int)fread(&node.product_info, sizeof(struct CCProductInfo), 1, pFile);
-	if(ret!=1){
-		fclose(pFile);
-		return FALSE;
-	}
+	char2TCHAR(node.sProductNo, sBuf, 33);
 
 	//直接读取数据
-	ret = (int)fread(&node.test_record, sizeof(struct CCTestRecord), 1, pFile);
+	fseek(pFile, sizeof(struct CCMachineInfo)+sizeof(struct CCProductInfo)+30, SEEK_SET);
+
+	ret = (int)fread(&node.test_record_header, sizeof(struct CCTestRecordHeader), 1, pFile);
 	fclose(pFile);
 	if(ret!=1){
 		return FALSE;
 	}
 
-	char2TCHAR(node.addition_info.sFile, sFileName, (int)strlen(sFileName));
-	char2TCHAR(node.addition_info.sTestDate, node.test_record.sTestDate, (int)strlen(node.test_record.sTestDate));
+	char2TCHAR(node.sFileName, sFileName, (int)strlen(sFileName));
+	char2TCHAR(node.sTestDate, node.test_record_header.sTestDate, (int)strlen(node.test_record_header.sTestDate));
 
-	memset(node.tree_item_data, 0, sizeof(node.tree_item_data));
-	node.bDataProcessed = FALSE;
-	for(i=0;i<node.test_record.iNumOfSpeed;i++){
+	node.bProcessed = FALSE;
+	for(i=0;i<node.test_record_header.iNumOfSpeed;i++){
 		node.tree_item_data[i].iIndex = i;
 		node.tree_item_data[i].pNode = &node;
 	}
 
-	if(!bNeedProcessData){
-		return TRUE;
+	return TRUE;
+}
+
+BOOL CTestDataTreeMgt::LoadAndProcessFile(const char *sFileName, FileNodePtr pFileNode)
+{
+	int ret, i;
+	FILE *pFile = NULL;
+	char sBuf[256], sBuf1[256];
+	FileNode &node = *pFileNode;
+
+	if(sFileName==NULL || strlen(sFileName)==0){
+		return FALSE;
+	}
+	if(pFileNode==NULL){
+		return FALSE;
+	}
+
+	if(fopen_s(&pFile, sFileName, "rb")!=0){
+		return FALSE;
+	}
+	if(pFile==NULL){
+		return FALSE;
+	}
+
+	if(!node.bProcessed){
+		node.pMachineInfo = new CCMachineInfo;
+		node.pProductInfo = new CCProductInfo;
+		node.pTestRecord = new CCTestRecord;
+		node.pAdditionInfo = new AdditionInfo;
+	}
+
+	//查看文件头
+	memset(sBuf, 0, sizeof(sBuf));
+	fread(sBuf, 23, 1, pFile);
+	sprintf_s(sBuf1, "%s", "MyTester Data File ");//TODO, "Absorber Data File 6.0"
+	if(strncmp(sBuf, sBuf1, strlen("MyTester Data File "))!=0){
+		fclose(pFile);
+		return FALSE;
+	}
+	//获取版本号
+	double fDataVer = 0.0;
+	if(isdigit(sBuf[19]) && sBuf[20]=='.' && isdigit(sBuf[21])){
+		fDataVer = atof(sBuf+19);
+	}
+	else{
+		fclose(pFile);
+		return FALSE;
+	}
+
+	//略过30字节
+	if(fseek(pFile, 30, SEEK_SET)!=0){
+		fclose(pFile);
+		return FALSE;
+	}
+
+	ret = (int)fread(node.pMachineInfo, sizeof(struct CCMachineInfo), 1, pFile);
+	if(ret!=1){
+		fclose(pFile);
+		return FALSE;
+	}
+
+	ret = (int)fread(node.pProductInfo, sizeof(struct CCProductInfo), 1, pFile);
+	if(ret!=1){
+		fclose(pFile);
+		return FALSE;
+	}
+
+	ret = (int)fread(node.pTestRecord, sizeof(struct CCTestRecord), 1, pFile);
+	if(ret!=1){
+		fclose(pFile);
+		return FALSE;
+	}
+
+	memcpy(&node.test_record_header, node.pTestRecord, sizeof(struct CCTestRecordHeader));
+
+	char2TCHAR(node.sProductNo, node.pProductInfo->sProductNo, (int)strlen(node.pProductInfo->sProductNo));
+	char2TCHAR(node.sFileName, sFileName, (int)strlen(sFileName));
+	char2TCHAR(node.sTestDate, node.test_record_header.sTestDate, (int)strlen(node.test_record_header.sTestDate));
+
+	for(i=0;i<node.test_record_header.iNumOfSpeed;i++){
+		node.tree_item_data[i].iIndex = i;
+		node.tree_item_data[i].pNode = &node;
 	}
 
 	ProcessData(&node);
 
-	node.bDataProcessed = TRUE;
 	return TRUE;
 }
 
@@ -299,7 +386,7 @@ BOOL CTestDataTreeMgt::InsertFileNode(ProductNodePtr pProductNode, FileNodePtr p
 	FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
 
 	while(pFileNode!=NULL){
-		if(strcmp(pFileNodeToInsert->test_record.sTestDate, pFileNode->test_record.sTestDate)>=0){
+		if(strcmp(pFileNodeToInsert->test_record_header.sTestDate, pFileNode->test_record_header.sTestDate)>=0){
 			pFileNode_Ahead = pFileNode;
 			pFileNode = pFileNode->pNext;
 		}
@@ -346,7 +433,7 @@ BOOL CTestDataTreeMgt::DeleteFileNode(ProductNodePtr pProductNode_Ahead, Product
 	else{
 		pProductNode->pFileListTail = pFileNode_Ahead;
 	}
-	delete pFileNode;
+	FreeFileNode(pFileNode);
 
 	if(pProductNode->pFileListHead->pNext==NULL){//文件结点都不存在，必须删除该型号结点
 		delete pProductNode->pFileListHead;
@@ -395,7 +482,7 @@ void CTestDataTreeMgt::DeleteFileNode(const char *sFileName)
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
 		while(pFileNode){
 			char sBuf[256];
-			TCHAR2char(sBuf, pFileNode->addition_info.sFile, _tcslen(pFileNode->addition_info.sFile));
+			TCHAR2char(sBuf, pFileNode->sFileName, _tcslen(pFileNode->sFileName));
 			if(strcmp(sFileName, sBuf)!=0){
 				pFileNode_Ahead = pFileNode;
 				pFileNode = pFileNode->pNext;
@@ -413,7 +500,7 @@ void CTestDataTreeMgt::DeleteFileNode(const char *sFileName)
 			else{
 				pProductNode->pFileListTail = pFileNode_Ahead;
 			}
-			delete pFileNode;
+			FreeFileNode(pFileNode);
 			
 			if(pProductNode->pFileListHead->pNext==NULL){//文件链表为空，删除型号结点
 				ProductNodePtr pProductNode_Next = pProductNode->pNext;
@@ -511,7 +598,7 @@ BOOL CTestDataTreeMgt::DeleteProductNode(ProductNodePtr pProductNodeToDelete)
 	while(pProductNode->pFileListHead->pNext){
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
 		pProductNode->pFileListHead->pNext = pProductNode->pFileListHead->pNext->pNext;
-		delete pFileNode;
+		FreeFileNode(pFileNode);
 	}
 	delete pProductNodeToDelete->pFileListHead;
 	pProductNodeToDelete->pFileListHead = NULL;
@@ -553,7 +640,7 @@ void CTestDataTreeMgt::DeleteProductNode(const char *sProductNo)
 	while(pProductNode->pFileListHead->pNext){
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
 		pProductNode->pFileListHead->pNext = pProductNode->pFileListHead->pNext->pNext;
-		delete pFileNode;
+		FreeFileNode(pFileNode);
 	}
 	delete pProductNode->pFileListHead;
 	pProductNode->pFileListHead = NULL;
@@ -573,7 +660,7 @@ BOOL CTestDataTreeMgt::SearchFileNode(const char *sFileName, FileNodePtr &pFileN
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
 		while(pFileNode!=NULL){
 			char sBuf[256];
-			TCHAR2char(sBuf, pFileNode->addition_info.sFile, _tcslen(pFileNode->addition_info.sFile));
+			TCHAR2char(sBuf, pFileNode->sFileName, _tcslen(pFileNode->sFileName));
 			if(strcmp(sBuf, sFileName)==0){
 				pFileNodeFound = pFileNode;
 				return TRUE;
@@ -593,89 +680,98 @@ void CTestDataTreeMgt::ProcessData(FileNodePtr pFileNode)
 	FileNode &node = *pFileNode;
 
 	//对文件做处理
-	memset(&node.addition_info, 0, sizeof(node.addition_info));
-	if(node.test_record.bDataValid==FALSE){
+	memset(node.pAdditionInfo, 0, sizeof(node.pAdditionInfo));
+	if(node.pTestRecord->bDataValid==FALSE){
+		node.bProcessed = TRUE;
 		return;
 	}
-	if(node.test_record.bNormalSpeed){
-		for(i=0;i<node.test_record.iNumOfSpeed;i++){
-			j = node.test_record.iSpdIndex[i];
-			node.test_record.fSetSpeed[i] = node.product_info.fSpeed0[j];
-			if(node.product_info.bDifferentOffset){
-				node.test_record.fSetOffset[i] = node.product_info.fSpeedOffset[j];
+	if(node.pTestRecord->bNormalSpeed){
+		for(i=0;i<node.pTestRecord->iNumOfSpeed;i++){
+			j = node.pTestRecord->iSpdIndex[i];
+			node.pTestRecord->fSetSpeed[i] = node.pProductInfo->fSpeed0[j];
+			if(node.pProductInfo->bDifferentOffset){
+				node.pTestRecord->fSetOffset[i] = node.pProductInfo->fSpeedOffset[j];
 			}
 			else{
-				node.test_record.fSetOffset[i] = node.product_info.fOffset;
+				node.pTestRecord->fSetOffset[i] = node.pProductInfo->fOffset;
 			}
 
-			min = node.test_record.fDisplacement[i][0];
+			min = node.pTestRecord->fDisplacement[i][0];
 			max = min;
-			for(j=0;j<node.test_record.iNumOfForce[i];j++){
-				if(node.test_record.fDisplacement[i][j] < min){
-					min = node.test_record.fDisplacement[i][j];
+			for(j=0;j<node.pTestRecord->iNumOfForce[i];j++){
+				if(node.pTestRecord->fDisplacement[i][j] < min){
+					min = node.pTestRecord->fDisplacement[i][j];
 				}
-				if(node.test_record.fDisplacement[i][j] > max){
-					max = node.test_record.fDisplacement[i][j];
+				if(node.pTestRecord->fDisplacement[i][j] > max){
+					max = node.pTestRecord->fDisplacement[i][j];
 				}
 			}
 			avg = (max+min)/2;
-			for(j=0;j<node.test_record.iNumOfForce[i];j++){
-				node.test_record.fDisplacement[i][j] -= avg;
+			for(j=0;j<node.pTestRecord->iNumOfForce[i];j++){
+				node.pTestRecord->fDisplacement[i][j] -= avg;
 			}
-			node.addition_info.fDisplacementLength[i] = (max-min)/2;
+			node.pAdditionInfo->fDisplacementLength[i] = (max-min)/2;
 
-			int P[7];
-			int flag[7];
-			int num = 0;
-			//TODO 100
-			for(j=100;j<node.test_record.iNumOfForce[i]-1;j++){
-				if(node.test_record.fDisplacement[i][j]<0 && node.test_record.fDisplacement[i][j+1]>=0){
-					P[num] = j+1;
-					flag[num] = 0;
-					num++;
+			int P[MAX_REFDOT_NUM];
+			int PP[MAX_REFDOT_NUM] = {90, 270, 450, 630, 810, 990, 1260};
+			int iNumOfRefDot;
+
+			iNumOfRefDot = 1;
+			for(j=SKIP_FIRSTDOT_NUM;j<node.pTestRecord->iNumOfForce[i]-1;j++){
+				if(node.pTestRecord->fDisplacement[i][j]<0 && node.pTestRecord->fDisplacement[i][j+1]>=0){
+					P[iNumOfRefDot] = j+1;
+					iNumOfRefDot++;
 				}
-				else if(node.test_record.fDisplacement[i][j]>0 && node.test_record.fDisplacement[i][j+1]<=0){
-					P[num] = j+1;
-					flag[num] = 1;
-					num++;
+				else if(node.pTestRecord->fDisplacement[i][j]>0 && node.pTestRecord->fDisplacement[i][j+1]<=0){
+					P[iNumOfRefDot] = j+1;
+					iNumOfRefDot++;
 				}
-				if(num>=7){
+				if(iNumOfRefDot>=MAX_REFDOT_NUM-1){
 					break;
 				}
 			}
-			//TODO 360,450
-			int T = (P[2] - P[1])/2;
-			for(j=0;j<num;j++){
-				if(flag[j]==1 &&
-					P[j]+T>=node.product_info.iDataBandStart &&
-					P[j]+T<=node.product_info.iDataBandStart+node.product_info.iDataBandLen){
-						node.addition_info.iDataBandStart[i] = P[j] + T;
-						node.addition_info.iDataBandLen[i] = (P[2] - P[1])*2;
-						break;
+			int T = P[2]-P[1];
+			P[0] = P[1] - T;
+			for(;iNumOfRefDot<MAX_REFDOT_NUM;iNumOfRefDot++){
+				P[iNumOfRefDot] = P[iNumOfRefDot-1] + T;
+			}
+
+			//等比例获取iDataBandStart和iDataBandLen
+			for(j=0;j<MAX_REFDOT_NUM;j++){
+				if(node.pProductInfo->iDataBandStart>=PP[j] && node.pProductInfo->iDataBandStart<=PP[j+1]){
+					node.pAdditionInfo->iDataBandStart[i] = P[j] + T * (node.pProductInfo->iDataBandStart-PP[j]) / (PP[2]-PP[1]);
+					break;
 				}
 			}
-			node.test_record.fRealSpeed[i] = 2 * M_PI * node.test_record.fDataFreq[i] / node.addition_info.iDataBandLen[i] * node.test_record.fRealSpeed[i];
+			node.pAdditionInfo->iDataBandLen[i] = T * node.pProductInfo->iDataBandLen / (PP[2]-PP[1]);
 
-			memcpy(node.addition_info.fForceOfFilter[i]+node.addition_info.iDataBandStart[i],
-					node.test_record.fForce[i]+node.addition_info.iDataBandStart[i],
-					node.addition_info.iDataBandLen[i] * sizeof(double));
-			filter_new(node.addition_info.fForceOfFilter[i] + node.addition_info.iDataBandStart[i],
-						node.test_record.fDataFreq[i],
-						10*node.test_record.fSetSpeed[i]/node.test_record.fSetOffset[i]/(2*M_PI), 
-						node.addition_info.iDataBandLen[i]);
+			node.pTestRecord->fRealSpeed[i] = 2 * M_PI * node.pTestRecord->fDataFreq[i] / node.pAdditionInfo->iDataBandLen[i] * node.pTestRecord->fRealSpeed[i];
 
-			min = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]];
-			max = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]];
-			for(j=0;j<node.addition_info.iDataBandLen[i];j++){
-				if(node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j]<min){
-					min = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j];
+			memcpy(node.pAdditionInfo->fForceOfFilter[i]+node.pAdditionInfo->iDataBandStart[i],
+					node.pTestRecord->fForce[i]+node.pAdditionInfo->iDataBandStart[i],
+					node.pAdditionInfo->iDataBandLen[i] * sizeof(double));
+			filter_new(node.pAdditionInfo->fForceOfFilter[i] + node.pAdditionInfo->iDataBandStart[i],
+						node.pTestRecord->fDataFreq[i],
+						10*node.pTestRecord->fSetSpeed[i]/node.pTestRecord->fSetOffset[i]/(2*M_PI), 
+						node.pAdditionInfo->iDataBandLen[i]);
+
+			min = node.pAdditionInfo->fForceOfFilter[i][node.pAdditionInfo->iDataBandStart[i]];
+			max = node.pAdditionInfo->fForceOfFilter[i][node.pAdditionInfo->iDataBandStart[i]];
+			for(j=0;j<node.pAdditionInfo->iDataBandLen[i];j++){
+				if(node.pAdditionInfo->fForceOfFilter[i][node.pAdditionInfo->iDataBandStart[i]+j]<min){
+					min = node.pAdditionInfo->fForceOfFilter[i][node.pAdditionInfo->iDataBandStart[i]+j];
 				}
-				if(node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j]>max){
-					max = node.addition_info.fForceOfFilter[i][node.addition_info.iDataBandStart[i]+j];
+				if(node.pAdditionInfo->fForceOfFilter[i][node.pAdditionInfo->iDataBandStart[i]+j]>max){
+					max = node.pAdditionInfo->fForceOfFilter[i][node.pAdditionInfo->iDataBandStart[i]+j];
 				}
 			}
-			node.test_record.fPfm[i] = max;
-			node.test_record.fPym[i] = min;
+			node.pTestRecord->fPfm[i] = max;
+			if(min<0){
+				min = min * -1;
+			}
+			node.pTestRecord->fPym[i] = min;
+
+			//TODO 处理摩擦力
 
 			//处理微分 (-3Dj + 4Dj+1 - Dj+2) / 2dt
 			//单文件模式的两种模式
@@ -683,6 +779,7 @@ void CTestDataTreeMgt::ProcessData(FileNodePtr pFileNode)
 			//
 		}
 	}
+	node.bProcessed = TRUE;
 }
 
 BOOL CTestDataTreeMgt::SearchProductNode(const char *sProductNo, ProductNodePtr &pProductNodeFound)
@@ -712,7 +809,7 @@ void CTestDataTreeMgt::ResetNodeStatus()
 	while(pProductNode!=NULL){
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
 		while(pFileNode!=NULL){
-			for(i=0;i<pFileNode->test_record.iNumOfSpeed;i++){
+			for(i=0;i<pFileNode->test_record_header.iNumOfSpeed;i++){
 				pFileNode->tree_item_data[i].bSelected = FALSE;
 			}
 			pFileNode = pFileNode->pNext;
