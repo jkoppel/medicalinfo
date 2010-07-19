@@ -36,6 +36,10 @@ void CFilterFormView::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_PRODUCTNO, m_strProductNo);
 	DDX_Text(pDX, IDC_OPERATORNO, m_strOperatorNo);
 	DDX_Control(pDX, IDC_FILTER_GROUP, m_ctrlGroupFilter);
+	DDX_Control(pDX, IDC_DTP_START_TIME, m_ctrlDT_Start_Time);
+	DDX_Control(pDX, IDC_DTP_START_DATE, m_ctrlDT_Start_Date);
+	DDX_Control(pDX, IDC_DTP_END_DATE, m_ctrlDT_End_Date);
+	DDX_Control(pDX, IDC_DTP_END_TIME, m_ctrlDT_End_Time);
 }
 
 BEGIN_MESSAGE_MAP(CFilterFormView, CFormView)
@@ -70,6 +74,9 @@ void CFilterFormView::Dump(CDumpContext& dc) const
 void CFilterFormView::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
+
+	this->m_ctrlDT_Start_Time.SetFormat(_T("HH:mm"));
+	this->m_ctrlDT_End_Time.SetFormat(_T("HH:mm"));
 }
 
 void CFilterFormView::OnPaint()
@@ -158,7 +165,9 @@ UINT MyThreadProc(LPVOID lpParam)
 
 void CFilterFormView::OnBnClickedBtnTest1()
 {
-	CDlgProgress::StartThread(MyThreadProc, _T("正在测试..."));
+	//CDlgProgress::StartThread(MyThreadProc, _T("正在测试..."));
+	extern int TestStringMatch();
+	TestStringMatch();
 }
 
 void CFilterFormView::OnBnClickedBtnTest2()
@@ -177,6 +186,9 @@ void CFilterFormView::OnBnClickedBtnTest2()
 void CFilterFormView::OnBnClickedBtnTest3()
 {
 	CRightDrawAreaView::DRAW_MODE iMode = (CRightDrawAreaView::DRAW_MODE)((g_pRightDrawAreaView->GetDrawMode()+1) % 4);
+	if(iMode==0){
+		iMode = (CRightDrawAreaView::DRAW_MODE)((int)iMode + 1);
+	}
 	g_pRightDrawAreaView->SetDrawMode(iMode);
 	g_pRightDrawAreaView->RedrawWindow();
 }
