@@ -197,7 +197,8 @@ BOOL CTextParse::MoveWhileChar(LPCTSTR strTok,BOOL bForward)
 
 LPCTSTR CTextParse::CopyWhileChar(int c)
 {
-	for(int i=0;i < MAX_BUF && *m_pLine != '\0' && *m_pLine == c;i++)
+	int i;
+	for(i=0;i < MAX_BUF && *m_pLine != '\0' && *m_pLine == c;i++)
 	{
 		m_szCopyBuf[i] = *m_pLine;
 		m_pLine = _tcsinc(m_pLine);
@@ -208,8 +209,9 @@ LPCTSTR CTextParse::CopyWhileChar(int c)
 
 LPCTSTR CTextParse::CopyUntilString(LPCTSTR pszText)
 {
+	int i;
 	int nLen = _tcslen(pszText);
-	for(int i=0;i < MAX_BUF && *m_pLine != '\0' && _tcsncmp(m_pLine,pszText,nLen) != 0;i++)
+	for(i=0;i < MAX_BUF && *m_pLine != '\0' && _tcsncmp(m_pLine,pszText,nLen) != 0;i++)
 	{
 		m_szCopyBuf[i] = *m_pLine;
 		m_pLine = _tcsinc(m_pLine);
@@ -231,7 +233,8 @@ LPCTSTR CTextParse::CopyUntilChar(int c)
 
 LPCTSTR CTextParse::CopyWhileChar(LPCTSTR strTok)
 {
-	for(int i=0;i < MAX_BUF && *m_pLine != '\0' && IsToken(strTok,m_pLine);i++)
+	int i;
+	for(i=0;i < MAX_BUF && *m_pLine != '\0' && IsToken(strTok,m_pLine);i++)
 	{
 		m_szCopyBuf[i] = *m_pLine;
 		m_pLine = _tcsinc(m_pLine);

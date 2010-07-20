@@ -68,7 +68,8 @@ void CHtmlCtrl::OnDestroy()
 	// This is probably unecessary since ~CHtmlView does it, but
 	// safer to mimic CHtmlView::OnDestroy.
 	if (m_pBrowserApp) {
-		m_pBrowserApp->Release();
+		//m_pBrowserApp->Release();
+		m_pBrowserApp->Quit();//modified by hwy
 		m_pBrowserApp = NULL;
 	}
 	CWnd::OnDestroy(); // bypass CView doc/frame stuff

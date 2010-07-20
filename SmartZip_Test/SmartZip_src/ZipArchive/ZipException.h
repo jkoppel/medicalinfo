@@ -216,9 +216,12 @@ protected:
 
 #endif //_ZIP_ENABLE_ERROR_DESCRIPTION
 
+DECLARE_DYNAMIC(CZipException)
+/*
 #if defined _MFC_VER && defined _ZIP_IMPL_MFC
 	DECLARE_DYNAMIC(CZipException)
 #endif
+*///modified by hwy
 };
 
 #if _MSC_VER > 1000

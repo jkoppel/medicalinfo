@@ -116,7 +116,8 @@ void CIEShellListCtrl::DestroyThreads()
 {
     if (m_nThreadCount == 0) 
 		return;
-    for (UINT i=0; i<m_nThreadCount; i++)
+	UINT i;
+    for (i=0; i<m_nThreadCount; i++)
 	    m_event[i].SetEvent();
     ::WaitForMultipleObjects (m_nThreadCount, m_hThreads, TRUE, INFINITE);
     for (i=0; i<m_nThreadCount; i++)
@@ -223,7 +224,8 @@ LPCTSTR CIEShellListCtrl::GetFilterMask(LPCTSTR pszFilter,CString &sMask)
 		return NULL;
 	TCHAR szMask[MAX_PATH];
 	szMask[0] = 0;
-	for(int i=0;*pszFilter != '\0';i++)
+	int i;
+	for(i=0;*pszFilter != '\0';i++)
 	{
 		if (*pszFilter == _T(';') || *pszFilter == _T(','))
 		{
@@ -1117,7 +1119,8 @@ DROPEFFECT CIEShellListCtrl::DoDragDrop(int *pnRows,COleDataSource *pOleDataSour
 		sl.AddPidl(GetShellPidl().GetEmptyPidl());
 	else
 		sl.AddPidl(m_tvid.lpifq);
-	for(int i=0;*pnRows != -1;i++)
+	int i;
+	for(i=0;*pnRows != -1;i++)
 	{
 		plvid = (LPLVITEMDATA)GetItemData(*pnRows);
 		ASSERT(plvid);

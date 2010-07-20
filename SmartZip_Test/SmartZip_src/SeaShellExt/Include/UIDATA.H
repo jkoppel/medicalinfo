@@ -210,7 +210,7 @@ class CTRL_EXT_CLASS CUIDBListCtrlData : public CUIListCtrlData
 public:
 	CUIDBListCtrlData(int nCols) : CUIListCtrlData(nCols) { }
     DECLARE_DYNAMIC(CUIDBListCtrlData)
-	const GetRecNum() { return m_nRecNum; }
+	const int GetRecNum() { return m_nRecNum; }
 	void SetRecNum(long nRecNum) { m_nRecNum = nRecNum; }
 private:
 	long m_nRecNum;			// for ODBC connection to record sets

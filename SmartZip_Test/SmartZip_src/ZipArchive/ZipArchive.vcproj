@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="ZipArchive"
 	ProjectGUID="{A51CF340-B0EA-4C9B-A2FA-4D7487692EF5}"
 	RootNamespace="ZipArchive"

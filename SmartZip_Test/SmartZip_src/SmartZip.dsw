@@ -15,7 +15,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "ZipArchive"=".\ZipArchive\ZipArchive.dsp" - Package Owner=<4>
+Project: "ZipArchive"=".\ZipArchive\ZipArchive.vcproj" - Package Owner=<4>
 
 Package=<5>
 {{{

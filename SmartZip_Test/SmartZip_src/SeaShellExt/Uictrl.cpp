@@ -1276,7 +1276,8 @@ int CUIODListCtrl::FindItem(DWORD dwExtData)
 {
 	int count = GetItemCount();
 	CUIListCtrlData *pData;
-	for(int i=0;i <	count;i++) 
+	int i;
+	for(i=0;i <	count;i++) 
 	{
 		pData = GetListCtrlData(i);
 		if (pData->GetExtData() == dwExtData)
@@ -2548,7 +2549,7 @@ int CUIODListCtrl::OnToolHitTest(CPoint point, TOOLINFO * pTI) const
 	if (GetStringWidth(GetItemText(row,col))-10 < cellrect.Width())
 		return -1;
 
-	CToolTipCtrl* pToolTip = AfxGetThreadState()->m_pToolTip;
+	CToolTipCtrl* pToolTip = AfxGetModuleThreadState()->m_pToolTip;//modified by hwy
 	pToolTip->SendMessage(TTM_SETDELAYTIME,TTDT_AUTOPOP,10000);
 	pToolTip->SendMessage(TTM_SETMAXTIPWIDTH,0,30);
 

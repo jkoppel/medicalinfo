@@ -118,7 +118,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	
 	// THE IMAGE LIST
 	int iSize = GetWindowsDirectory(NULL, 0);
-	CString sz;
+	//CString sz;
+	CZipString sz;//modified by hwy
 	if (iSize && GetWindowsDirectory(sz.GetBuffer(iSize), iSize))
 	{
 		sz.ReleaseBuffer();
@@ -638,7 +639,7 @@ void CMainFrame::OnActionExportHtml()
 		"<hr>"
 		"<center>"
 		"<font face=\"Arial Black\" size=5><i>SmartZip</font><font face=\"Arial Black\" size=3> 1.0</i></font><br>"
-		"<font face=\"Tahoma\" size=2><b>Copyright ©2001, 2002 <a href=\"mailto:ahmed_ismaiel@hotmail.com\">A.I.Z Software</a></b></font>"
+		"<font face=\"Tahoma\" size=2><b>Copyright ?001, 2002 <a href=\"mailto:ahmed_ismaiel@hotmail.com\">A.I.Z Software</a></b></font>"
 		"</body></html>";
 	file1.Write (htmlfile.GetBuffer (htmlfile.GetLength ()),htmlfile.GetLength ());
 	htmlfile.ReleaseBuffer ();
@@ -719,10 +720,10 @@ HINSTANCE insApp = AfxGetInstanceHandle();
 	//Now Get the size of the EXE resource type witch will be
 	//the size of exe file.
 	DWORD dFileLength = SizeofResource( insApp, hResInfo ); 
-	sfx.WriteHuge((LPSTR)hRes,dFileLength);
+	sfx.Write((LPSTR)hRes,dFileLength);
 	char* b=new char[file.GetLength ()];
-	file.ReadHuge (b,file.GetLength ());
-	sfx.WriteHuge (b,file.GetLength ());
+	file.Read (b,file.GetLength ());
+	sfx.Write (b,file.GetLength ());//modified by hwy, WriteHuge to Write, ReadHuge to Read
 	delete b;
 	pDoc->OpenCurrentFile (pDoc->m_strfilename );
 }

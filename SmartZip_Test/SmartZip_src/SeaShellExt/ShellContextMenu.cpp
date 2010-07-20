@@ -110,7 +110,7 @@ CShCMInitializer::~CShCMInitializer()
     m_sfDesktop->Release();
 }
 
-
+extern CCoolMenuManager g_CoolMenuManager;
 
 CShellContextMenu::CShellContextMenu(HWND hWnd,const CString &sAbsPath, LPITEMIDLIST *ppidl, UINT cidl, LPSHELLFOLDER psfParent) 
 :   m_hWnd(hWnd), 
