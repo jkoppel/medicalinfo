@@ -633,7 +633,8 @@ STDMETHODIMP CShellPidl::ResolveInternetShortcut(LPCTSTR lpszLinkFile, LPTSTR* l
 	if (SUCCEEDED(hr))
 	{
 		 // Ensure that the string is Unicode. 
-		 WORD wsz[MAX_PATH];  
+		//WORD wsz[MAX_PATH];//deleted by hwy
+		WCHAR wsz[MAX_PATH];//added by hwy
 		#ifdef UNICODE
 		 _tcscpy(wsz,lpszLinkFile);
 		#else
@@ -671,7 +672,8 @@ STDMETHODIMP CShellPidl::ResolveLink(HWND hWnd,LPCTSTR lpszLinkFile, LPTSTR* lps
       if (SUCCEEDED(hr))
       {
          // Ensure that the string is Unicode. 
-         WORD wsz[MAX_PATH];  
+         //WORD wsz[MAX_PATH];//deleted by hwy
+		 TCHAR wsz[MAX_PATH];//added by hwy
 #ifdef UNICODE
 		 _tcscpy(wsz,lpszLinkFile);
 #else

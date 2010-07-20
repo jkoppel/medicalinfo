@@ -70,7 +70,8 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnGetdispinfo(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDestroy();
-	afx_msg void OnDblclk(NMITEMACTIVATE* pNMHDR, LRESULT* pResult);
+	//afx_msg void OnDblclk(NMITEMACTIVATE* pNMHDR, LRESULT* pResult);
+	afx_msg void OnDblclk(NMHDR * pNMHDR, LRESULT* pResult);//modified by hwy
 	afx_msg void OnHeaderEnddrag(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnHeaderItemclick(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnItemRclick(NMHDR* pNMHDR, LRESULT* pResult);

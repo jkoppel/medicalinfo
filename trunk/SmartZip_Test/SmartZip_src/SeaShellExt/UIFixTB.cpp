@@ -416,7 +416,8 @@ CSize CFixMFCToolBar::CalcLayout(DWORD dwMode, int nLength)
 			BOOL bIsDelayed = m_bDelayedButtonLayout;
 			m_bDelayedButtonLayout = FALSE;
 
-			for(int i = 0; i < nCount; i++)
+			int i;
+			for(i = 0; i < nCount; i++)
 				if ((pData[i].fsStyle & TBSTYLE_SEP) && (pData[i].idCommand != 0))
 					nControlCount++;
 

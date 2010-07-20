@@ -138,8 +138,10 @@ BOOL CSmartZipDoc::OpenZipFile(CZipArchive &zip, LPCTSTR lpszZipFileName, long i
 			zip.SetAdvanced(1500000);
 			zip.Open(lpszZipFileName, iMode, iVolumeSize);
 			CZipPathComponent zpc(lpszZipFileName);
-			if (!zpc.GetFileExt().CompareNoCase(_T("jar")))
-				zip.SetIgnoreCRC();
+			if (!zpc.GetFileExt().CompareNoCase(_T("jar"))){
+				//zip.SetIgnoreCRC();
+				zip.SetIgnoredConsistencyChecks();//modified by hwy
+			}
 			
 		}
 		CATCH(CException, pEx)
@@ -214,7 +216,8 @@ BOOL CSmartZipDoc::OnSaveDocument(LPCTSTR lpszPathName)
 {
 	if (!m_zip.IsClosed())
 	{
-	m_zip.Flush();
+	//m_zip.Flush();
+	m_zip.FlushBuffers();//modified by hwy
 //	SetModifiedFlag (FALSE);
 	}
 	return TRUE;

@@ -175,7 +175,8 @@ int CSmartZipView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		TEXTMETRIC tm;
 		cdc->GetTextMetrics(&tm);
 		int nItems = GetListCtrl().GetItemCount();
-		for (int iColumn = 0; iColumn < NCOLS; iColumn++)
+		int iColumn;
+		for (iColumn = 0; iColumn < NCOLS; iColumn++)
 		{
 			HDITEM hdi;
 			TCHAR  lpBuffer[512];
@@ -247,7 +248,8 @@ void CSmartZipView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 		CTreeNode * current=pDoc->currentnode;
 		if(current==NULL) return;
 		int m=current->Childrens .GetSize ();
-		for (int i=0;i<m;i++)
+		int i;
+		for (i=0;i<m;i++)
 		{
 			LV_ITEM lvi;
 			lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM; 
@@ -458,10 +460,11 @@ void CSmartZipView::OnDestroy()
 	
 }
 
-void CSmartZipView::OnDblclk(NMITEMACTIVATE* pNMHDR, LRESULT* pResult) 
+void CSmartZipView::OnDblclk(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	// TODO: Add your control notification handler code here
-	int selitem=pNMHDR->iItem;
+	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	int selitem=pNMListView->iItem;//modified by hwy
 	if(selitem==-1) return;
 	CListCtrl& pCtrl=GetListCtrl ();
 	LISTDATA* data=(LISTDATA*)pCtrl.GetItemData (selitem);
@@ -766,7 +769,8 @@ void CSmartZipView::OnTcProperties()
 					CTreeNode *c=pDoc->currentnode;
 					CTreeNode *hold;
 					int m=c->Childrens.GetSize ();
-					for(int i=0;i<m;i++)
+					int i;
+					for(i=0;i<m;i++)
 					{
 						
 						hold=(CTreeNode*)c->Childrens[i];
@@ -800,7 +804,8 @@ void CSmartZipView::OnTcProperties()
 				CTreeNode *c=pDoc->currentnode;
 				CTreeNode *hold;
 				int m=c->Childrens.GetSize ();
-				for(int i=0;i<m;i++)
+				int i;
+				for(i=0;i<m;i++)
 				{
 					
 					hold=(CTreeNode*)c->Childrens[i];
@@ -887,7 +892,8 @@ void CSmartZipView::OnTcProperties()
 			dlg.fh =&fh;
 			if(dlg.DoModal ()==IDOK)
 			{
-				pDoc->m_zip .SetFileComment (tempindex,dlg.comment );
+				//pDoc->m_zip.SetFileComment (tempindex,dlg.comment );
+				pDoc->m_zip.SetGlobalComment (dlg.comment );//modified by hwy
 				pDoc->SaveModified();
 			}
 		}

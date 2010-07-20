@@ -311,7 +311,8 @@ BOOL CUIStatusBar::SetPanes(BOOL bSave)
 {
 	int nSize = 0;
 	CStatusBarPane *pPane = NULL;
-	for(POSITION pos = m_PaneList.GetTailPosition();pos != NULL;) 
+	POSITION pos;
+	for(pos = m_PaneList.GetTailPosition();pos != NULL;) 
 	{
 		pPane = m_PaneList.GetPrev(pos);
 		nSize += pPane->IsPaneActive();

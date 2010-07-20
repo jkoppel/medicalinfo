@@ -71,7 +71,7 @@ private:
 	static LPCTSTR szPaneHeightMinimum;
 };
 
-inline CTabSplitterWnd::IsEmpty()
+inline int CTabSplitterWnd::IsEmpty()
 {
 	return m_nCols == 0 && m_nRows == 0;
 }

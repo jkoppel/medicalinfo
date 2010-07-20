@@ -57,7 +57,8 @@ CWDClipboardData::~CWDClipboardData()
 
 bool CWDClipboardData::IsValidFormat(CLIPFORMAT cfFormat)
 {
-	for(int i=0;i < e_cfMax;i++)
+	int i;
+	for(i=0;i < e_cfMax;i++)
 	{
 		if (m_aFormatIDs[i] == cfFormat)
 			break;
@@ -624,6 +625,7 @@ template <> void AFXAPI SerializeElements <CCF_FolderType>(CArchive& ar, CCF_Fol
 	}
 }
 
+/*
 template<> void AFXAPI DestructElements<CCF_FolderType> (CCF_FolderType *pElements, int nCount)
 {
 	for ( int n = 0; n < nCount; n++, pElements++ )
@@ -639,6 +641,7 @@ template<> void AFXAPI ConstructElements<CCF_FolderType> (CCF_FolderType *pEleme
 		pElements->CCF_FolderType::CCF_FolderType();
 	}
 }
+*///deleted by hwy
 
 ///////////////////////////////////////////////////	
 template <> void AFXAPI SerializeElements <CCF_WebSite>(CArchive& ar, CCF_WebSite *pWebSite, int nCount )
@@ -649,6 +652,7 @@ template <> void AFXAPI SerializeElements <CCF_WebSite>(CArchive& ar, CCF_WebSit
 	}
 }
 
+/*
 template<> void AFXAPI DestructElements<CCF_WebSite> (CCF_WebSite *pElements, int nCount)
 {
 	for ( int n = 0; n < nCount; n++, pElements++ )
@@ -664,4 +668,5 @@ template<> void AFXAPI ConstructElements<CCF_WebSite> (CCF_WebSite *pElements, i
 		pElements->CCF_WebSite::CCF_WebSite();
 	}
 }
+*///deleted by hwy
 

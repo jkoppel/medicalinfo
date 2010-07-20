@@ -89,7 +89,7 @@ LRESULT CDProgress::OnThreadUpdate (WPARAM wParam, LPARAM lParam)
 
 LRESULT CDProgress::OnThreadFinished (WPARAM wParam, LPARAM lParam)
 {
-		m_pDoc->m_zip.SetCallback(NULL, CZipArchive::cbAll);
+	m_pDoc->m_zip.SetCallback(NULL, CZipActionCallback::cbAll);//modified by hwy
 		m_cancel.SetWindowText("Close");
 	m_dir.SetWindowText("");
 		m_filename.SetWindowText("");
@@ -159,7 +159,7 @@ BOOL CDProgress::OnInitDialog()
 	ptp->bEnc =bEnc;
 //	m_progressdata.pWnd=ptp->pWnd;
 	m_progressdata=new CProgressData(this);
-	m_pDoc->m_zip.SetCallback(m_progressdata, CZipArchive::cbAll);
+	m_pDoc->m_zip.SetCallback(m_progressdata, CZipActionCallback::cbAll);//modified by hwy
 	////
 	if(m_operation=="t")
 	{
@@ -345,7 +345,8 @@ UINT Extract (LPVOID pParam)
 				BOOL success=zip.ExtractFile(pArray->GetAt (i),pWnd->m_extractpath,useFullpath);
 				if(!success)
 				{
-					CString gg;gg.Format (fh.GetFileName()+" %d",pArray->GetAt (i));
+					CString gg;
+					gg.Format ((CString)(fh.GetFileName())+CString(_T(" %d")),pArray->GetAt (i));//modified by hwy
 					AfxMessageBox (gg);
 				}
 				zip.SetPassword ();
@@ -380,7 +381,8 @@ UINT Delete (LPVOID pParam)
 		}
 		  TRY
 			{
-					zip.DeleteFiles (*pArray);
+					//zip.DeleteFiles (*pArray);
+				zip.RemoveFiles (*pArray);//modified by hwy
 			}
 			CATCH(CException, pEx)
 			{			
@@ -445,7 +447,8 @@ BOOL bEnc=ptp->bEnc ;
 	CObArray files;
 	bool bContinue = true;
 	int iSize =pArray->GetSize ();
-	for (int i = 1; i < iSize; i++) // at 0 is the root path
+	int i;
+	for (i = 1; i < iSize; i++) // at 0 is the root path
 	{
 		CString sz = (*pArray)[i];
 		CFileStatus fs;
@@ -480,8 +483,10 @@ BOOL bEnc=ptp->bEnc ;
 	}
 	iSize = array.GetSize();
 	DWORD iMax = 0;
-	for (i = 0; i < iSize; i++)
-		iMax += ((CAddInfo*)array[i])->m_iSize;
+	for (i = 0; i < iSize; i++){
+		CAddInfo *p = ((CAddInfo*)array[i]);
+		iMax += p->m_iSize;//modified by hwy
+	}
 	pWnd->m_progressdata->begin(iMax);
 
 	for (i = 0; i < iSize; i++)

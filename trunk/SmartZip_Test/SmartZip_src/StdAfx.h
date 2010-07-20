@@ -28,6 +28,8 @@
 #define ID_COMMENTS 0x333
 //void _AfxAdjustRectangle(CRect& rect, CPoint pt);
 
+#include "GuiLib.h" //added by hwy
+
 //mine
 #include <afxmt.h>
 #include "ZipArchive.h"

@@ -170,15 +170,19 @@ inline CString CCF_DBFolderList::GetDatabase() const
 // template CCF_DBFolderList
 /////////////////////////////////////
 template<> void CTRL_EXT_CLASS AFXAPI SerializeElements <CCF_FolderType>(CArchive& ar, CCF_FolderType *pWebSiteCategory, int nCount );
+/*
 template<> void CTRL_EXT_CLASS AFXAPI DestructElements<CCF_FolderType>(CCF_FolderType *pElements, int nCount);
 template<> void CTRL_EXT_CLASS AFXAPI ConstructElements<CCF_FolderType>(CCF_FolderType *pElements, int nCount);
+*///deleted by hwy
 
 // template CList
 /////////////////////////////////////
 typedef CList<CCF_WebSite,CCF_WebSite&> CListWebSites;
 template<> void CTRL_EXT_CLASS AFXAPI SerializeElements <CCF_WebSite>(CArchive& ar, CCF_WebSite *pWebSite, int nCount );
+/*
 template<> void CTRL_EXT_CLASS AFXAPI DestructElements<CCF_WebSite>(CCF_WebSite *pElements, int nCount);
 template<> void CTRL_EXT_CLASS AFXAPI ConstructElements<CCF_WebSite>(CCF_WebSite *pElements, int nCount);
+*///deleted by hwy
 
 /////////////////////////////////////
 class CTRL_EXT_CLASS CCF_WebSites : public CObject

@@ -49,7 +49,7 @@ public:
 		//	if (IsSubAction())
 		//		m_bInit = true;
 		}
-		bool Callback(int iProgress)
+		virtual bool Callback(ZIP_SIZE_TYPE iProgress)//modified by hwy
 		{
 		//	if (IsStopOnly() && IsStopping())
 		//		return false; // can break safely
