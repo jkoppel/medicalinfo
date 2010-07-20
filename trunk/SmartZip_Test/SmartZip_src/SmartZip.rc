@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -18,7 +18,7 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
 #ifdef _WIN32
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-#pragma code_page(1252)
+#pragma code_page(936)
 #endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
@@ -28,9 +28,9 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ZIP1                ICON    DISCARDABLE     "res\\Winzip1.ico"
-IDR_SMARTZTYPE          ICON    DISCARDABLE     "res\\Winzip2.ico"
-IDI_CANCEL3             ICON    DISCARDABLE     "res\\Cancel3_32x32x256.ico"
+IDI_ZIP1                ICON                    "res\\Winzip1.ico"
+IDR_SMARTZTYPE          ICON                    "res\\Winzip2.ico"
+IDI_CANCEL3             ICON                    "res\\Cancel3_32x32x256.ico"
 #endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +41,7 @@ IDI_CANCEL3             ICON    DISCARDABLE     "res\\Cancel3_32x32x256.ico"
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
 #ifdef _WIN32
 LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
-#pragma code_page(1252)
+#pragma code_page(936)
 #endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
@@ -49,20 +49,15 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
 // Dialog
 //
 
-IDD_EXTRACT DIALOG DISCARDABLE  20, 20, 250, 84
-STYLE DS_MODALFRAME | DS_NOIDLEMSG | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+IDD_EXTRACT DIALOG  20, 20, 250, 84
+STYLE DS_SETFONT | DS_MODALFRAME | DS_NOIDLEMSG | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 FONT 8, "MS Shell Dlg"
 BEGIN
-    CONTROL         "",IDC_VEDIO,"SysAnimate32",ACS_TRANSPARENT | 
-                    ACS_AUTOPLAY | ACS_TIMER,7,1,236,25
-    CONTROL         "",IDC_FOLDER,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX,7,
-                    48,236,10
-    CONTROL         "",IDC_FILE,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX,7,
-                    38,236,10
+    CONTROL         "",IDC_VEDIO,"SysAnimate32",ACS_TRANSPARENT | ACS_AUTOPLAY | ACS_TIMER,7,1,236,25
+    CONTROL         "",IDC_FOLDER,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX,7,48,236,10
+    CONTROL         "",IDC_FILE,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX,7,38,236,10
     CONTROL         "",IDC_PROGRESS,"msctls_progress32",0x0,7,63,190,8
-    LTEXT           "Elapsed time:",IDC_STATIC,7,72,44,10,SS_NOPREFIX | NOT 
-                    WS_GROUP
+    LTEXT           "Elapsed time:",IDC_STATIC,7,72,44,10,SS_NOPREFIX | NOT WS_GROUP
     DEFPUSHBUTTON   "Cancel",IDC_CANCEL,202,63,40,14,NOT WS_TABSTOP
     LTEXT           "",IDC_ELAPSED,53,72,46,12
     LTEXT           "",IDC_REMAINING,144,72,49,12
@@ -89,61 +84,52 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\Zip Document.ico"
-IDI_ARROWDOWN           ICON    DISCARDABLE     "icon1.ico"
-IDI_ARROWRIGHT          ICON    DISCARDABLE     "ico00001.ico"
+IDR_MAINFRAME           ICON                    "res\\Zip Document.ico"
+IDI_ARROWDOWN           ICON                    "icon1.ico"
+IDI_ARROWRIGHT          ICON                    "ico00001.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 237, 167
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_ABOUTBOX DIALOG  0, 0, 237, 167
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About SmartZip"
 FONT 8, "MS Sans Serif"
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,17,21,20
-    LTEXT           "SmartZip Version 1.0",IDC_STATIC,45,15,119,8,
-                    SS_NOPREFIX
+    LTEXT           "SmartZip Version 1.0",IDC_STATIC,45,15,119,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2001-2002",IDC_STATIC,55,126,119,8
     DEFPUSHBUTTON   "OK",IDOK,84,143,84,17,WS_GROUP
-    LTEXT           "Feel free to copy or redistribute this program to your friends ",
-                    IDC_STATIC,19,110,186,8
-    LTEXT           "This software made by Ahmed Ismaiel Zakaria",IDC_STATIC,
-                    47,37,145,8
-    LTEXT           "Any  suggestions or bug fix please send me at",
-                    IDC_STATIC,48,71,144,8
+    LTEXT           "Feel free to copy or redistribute this program to your friends ",IDC_STATIC,19,110,186,8
+    LTEXT           "This software made by Ahmed Ismaiel Zakaria",IDC_STATIC,47,37,145,8
+    LTEXT           "Any  suggestions or bug fix please send me at",IDC_STATIC,48,71,144,8
     LTEXT           "ahmed_ismaiel@hotmail.com",IDC_EMAIL,73,87,92,8
-    LTEXT           "I'm an egyptian programmer in Visual C++(MFC) ,VB and recenlty COM and ATL",
-                    IDC_STATIC,13,50,211,18
+    LTEXT           "I'm an egyptian programmer in Visual C++(MFC) ,VB and recenlty COM and ATL",IDC_STATIC,13,50,211,18
 END
 
-IDD_FORMEXTRACT DIALOG DISCARDABLE  0, 0, 300, 200
-STYLE WS_CHILD | WS_DISABLED
+IDD_FORMEXTRACT DIALOG  0, 0, 300, 200
+STYLE DS_SETFONT | WS_CHILD | WS_DISABLED
 FONT 8, "MS Sans Serif"
 BEGIN
     EDITTEXT        IDC_DESTINATION,67,96,141,13,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse",IDC_BROWSE,219,92,63,28
     LTEXT           "Destination",IDC_STATIC,26,97,36,17
-    LTEXT           "Click extract to complete extraction",IDC_STATIC,13,169,
-                    186,11
-    CONTROL         "Exctract with full path",IDC_CHECK1,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,25,44,114,10
+    LTEXT           "Click extract to complete extraction",IDC_STATIC,13,169,186,11
+    CONTROL         "Exctract with full path",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,44,114,10
     GROUPBOX        "Settings",IDC_STATIC,7,26,282,162
     LTEXT           "Ready to extract ",IDC_STATIC,7,8,215,14
-    CONTROL         "Override Existing files",IDC_CHECK2,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,27,67,80,10
+    CONTROL         "Override Existing files",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,67,80,10
 END
 
-IDD_ADDFILES DIALOG DISCARDABLE  0, 0, 300, 200
-STYLE WS_CHILD | WS_DISABLED
+IDD_ADDFILES DIALOG  0, 0, 300, 200
+STYLE DS_SETFONT | WS_CHILD | WS_DISABLED
 FONT 8, "MS Sans Serif"
 BEGIN
     PUSHBUTTON      "Add Files",IDC_ADDFILES,214,57,68,21
     PUSHBUTTON      "Remove from list",IDC_REMOVEFLIST,214,89,67,21
-    CONTROL         "List2",IDC_LIST2,"SysListView32",LVS_REPORT | WS_BORDER | 
-                    WS_TABSTOP,23,54,186,58
+    CONTROL         "List2",IDC_LIST2,"SysListView32",LVS_REPORT | WS_BORDER | WS_TABSTOP,23,54,186,58
     LTEXT           "Click ""Next"" to continue ...",IDC_STATIC,23,31,85,8
     LTEXT           "Click ""Next"" to proceed...",IDC_STATIC,25,154,82,8
     LTEXT           "Files :",IDC_STATIC,24,123,19,8
@@ -151,60 +137,48 @@ BEGIN
     GROUPBOX        "Select files to add",IDC_STATIC,21,19,263,174
 END
 
-IDD_ADDCHOOSE DIALOG DISCARDABLE  0, 0, 300, 200
-STYLE WS_CHILD | WS_DISABLED
+IDD_ADDCHOOSE DIALOG  0, 0, 300, 200
+STYLE DS_SETFONT | WS_CHILD | WS_DISABLED
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Files",IDC_CFILE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
-                    33,68,137,14
-    CONTROL         "One folder",IDC_CFOLDER,"Button",BS_AUTORADIOBUTTON,31,
-                    123,142,16
+    CONTROL         "Files",IDC_CFILE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,33,68,137,14
+    CONTROL         "One folder",IDC_CFOLDER,"Button",BS_AUTORADIOBUTTON,31,123,142,16
     GROUPBOX        "Add File(s)/Folder",IDC_STATIC,7,7,286,186
-    LTEXT           "Do you want to add file(s) or an entire folder?",
-                    IDC_STATIC,28,20,142,8
-    LTEXT           "Choose if you want to add one or more files, or if you want to add the content of a folder; if you decide to add a folder the other subfolders will be added automatically",
-                    IDC_STATIC,54,37,229,26
-    LTEXT           "Choose this option if you want to add only one or more files to the archive",
-                    IDC_STATIC,52,94,230,8
-    LTEXT           "Choose this option if you want to add the content of a folder and it's sub folders too.",
-                    IDC_STATIC,51,153,234,20
+    LTEXT           "Do you want to add file(s) or an entire folder?",IDC_STATIC,28,20,142,8
+    LTEXT           "Choose if you want to add one or more files, or if you want to add the content of a folder; if you decide to add a folder the other subfolders will be added automatically",IDC_STATIC,54,37,229,26
+    LTEXT           "Choose this option if you want to add only one or more files to the archive",IDC_STATIC,52,94,230,8
+    LTEXT           "Choose this option if you want to add the content of a folder and it's sub folders too.",IDC_STATIC,51,153,234,20
     LTEXT           "Click ""Next"" to proceed...",IDC_STATIC,29,177,82,8
 END
 
-IDD_ADDFOLDER DIALOG DISCARDABLE  0, 0, 300, 200
-STYLE WS_CHILD | WS_DISABLED
+IDD_ADDFOLDER DIALOG  0, 0, 300, 200
+STYLE DS_SETFONT | WS_CHILD | WS_DISABLED
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Tree1",IDC_SHELLTREE,"SysTreeView32",WS_BORDER | 
-                    WS_TABSTOP,14,20,273,114
+    CONTROL         "Tree1",IDC_SHELLTREE,"SysTreeView32",WS_BORDER | WS_TABSTOP,14,20,273,114
     LTEXT           "Path : ",IDC_STATIC,14,141,19,11
-    CONTROL         "",IDC_COMBOBOXEX1,"ComboBoxEx32",CBS_DROPDOWN | 
-                    CBS_SORT | WS_VSCROLL | WS_TABSTOP,38,140,254,145
+    CONTROL         "",IDC_COMBOBOXEX1,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,38,140,254,145
     GROUPBOX        "Select a folder to add",IDC_STATIC,7,7,286,170
     LTEXT           "Click ""Next"" to proceed...",IDC_STATIC,14,162,82,8
 END
 
-IDD_ADDOPTIONS DIALOG DISCARDABLE  0, 0, 300, 200
-STYLE WS_CHILD | WS_DISABLED
+IDD_ADDOPTIONS DIALOG  0, 0, 300, 200
+STYLE DS_SETFONT | WS_CHILD | WS_DISABLED
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Slider1",IDC_COMPRESSIONLEVEL,"msctls_trackbar32",
-                    TBS_AUTOTICKS | TBS_BOTH | WS_TABSTOP,13,45,274,23
-    CONTROL         "Add full path",IDC_FULLPATH,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,17,134,55,10
-    LTEXT           "Click ""Finish to start the Adding operation",
-                    IDC_STATIC,7,170,130,8
+    CONTROL         "Slider1",IDC_COMPRESSIONLEVEL,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | WS_TABSTOP,13,45,274,23
+    CONTROL         "Add full path",IDC_FULLPATH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,134,55,10
+    LTEXT           "Click ""Finish to start the Adding operation",IDC_STATIC,7,170,130,8
     LTEXT           "No Compression",IDC_STATIC,15,76,52,8
     LTEXT           "Medium",IDC_STATIC,140,76,26,8
     LTEXT           "Brutal",IDC_STATIC,267,76,19,8
     GROUPBOX        "Select compression level",IDC_STATIC,7,7,286,101
     GROUPBOX        "Other Options",IDC_STATIC,7,114,286,50
-    CONTROL         "Use Password for your files",IDC_CHECK1,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,16,148,101,10
+    CONTROL         "Use Password for your files",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,148,101,10
 END
 
-IDD_FILERENAME DIALOG DISCARDABLE  0, 0, 117, 71
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_FILERENAME DIALOG  0, 0, 117, 71
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Choose a new file name"
 FONT 8, "MS Sans Serif"
 BEGIN
@@ -216,32 +190,28 @@ BEGIN
     LTEXT           "",IDC_FROM,41,7,69,10
 END
 
-IDD_FILEVIEW DIALOG DISCARDABLE  0, 0, 329, 209
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_FILEVIEW DIALOG  0, 0, 329, 209
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,127,182,56,20
-    CONTROL         "List1",IDC_LIST1,"SysListView32",LVS_REPORT | 
-                    LVS_OWNERDRAWFIXED | LVS_OWNERDATA | LVS_NOCOLUMNHEADER | 
-                    WS_BORDER | WS_TABSTOP,7,7,315,170
+    CONTROL         "List1",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_OWNERDRAWFIXED | LVS_OWNERDATA | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,315,170
 END
 
-IDD_MYFAVORITES DIALOG DISCARDABLE  0, 0, 314, 111
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_MYFAVORITES DIALOG  0, 0, 314, 111
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "My Favourites"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "Open",IDOK,222,7,85,23
     PUSHBUTTON      "Cancel",IDCANCEL,222,38,85,23
-    CONTROL         "List1",IDC_LIST1,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | 
-                    WS_TABSTOP,7,7,210,97
+    CONTROL         "List1",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,7,7,210,97
     PUSHBUTTON      "Delete",IDCANCEL2,222,73,85,23
 END
 
-IDD_FILEPROP DIALOG DISCARDABLE  0, 0, 238, 242
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_FILEPROP DIALOG  0, 0, 238, 242
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "File Properties"
 FONT 8, "MS Sans Serif"
 BEGIN
@@ -256,14 +226,10 @@ BEGIN
     LTEXT           "CRC32:",IDC_S2,7,115,26,8
     LTEXT           "Modification Date:",IDC_S4,7,137,58,8
     LTEXT           "External Attributes:",IDC_S5,7,154,60,8
-    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,33,
-                    224,1
-    CONTROL         "",IDC_SEP1,"Static",SS_BLACKFRAME | SS_SUNKEN,7,99,224,
-                    1
-    CONTROL         "",IDC_SEP2,"Static",SS_BLACKFRAME | SS_SUNKEN,7,132,224,
-                    1
-    EDITTEXT        IDC_COMMENTS,49,167,182,44,ES_AUTOHSCROLL | NOT 
-                    WS_BORDER
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,33,224,1
+    CONTROL         "",IDC_SEP1,"Static",SS_BLACKFRAME | SS_SUNKEN,7,99,224,1
+    CONTROL         "",IDC_SEP2,"Static",SS_BLACKFRAME | SS_SUNKEN,7,132,224,1
+    EDITTEXT        IDC_COMMENTS,49,167,182,44,ES_AUTOHSCROLL | NOT WS_BORDER
     LTEXT           "Comments :",IDC_S6,7,188,38,8
     LTEXT           "Static",IDC_TYPE,39,44,136,8
     LTEXT           "Static",IDC_COMSIZE,78,57,136,8
@@ -277,8 +243,7 @@ BEGIN
 END
 
 IDD_SPLITTER_DIALOG DIALOGEX 0, 0, 270, 262
-STYLE DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "Time To Get!!!"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
@@ -289,13 +254,11 @@ BEGIN
     LTEXT           "Calculations for diffrent speed",IDC_STATIC,7,62,118,17
     PUSHBUTTON      "Export to HTML",IDC_EXPORT,190,127,68,35
     EDITTEXT        IDC_BPS,15,212,92,15,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Enter specified speed  in BPS(example:28800)",
-                    IDC_STATIC,13,194,156,12
+    LTEXT           "Enter specified speed  in BPS(example:28800)",IDC_STATIC,13,194,156,12
     PUSHBUTTON      "Calculate",IDC_CALC,113,210,70,18
     EDITTEXT        IDC_OUTPUT,189,211,74,14,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_MSFLEXGRID1,
-                    "{6262D3A0-531B-11CF-91F6-C2863C385E30}",WS_TABSTOP,16,
-                    81,159,100
+                    "{6262D3A0-531B-11CF-91F6-C2863C385E30}",WS_TABSTOP,16,81,159,100
     PUSHBUTTON      "",IDC_CHOOSE,224,24,31,23,BS_ICON | BS_FLAT
     EDITTEXT        IDC_FILESIZE,189,89,70,22,ES_AUTOHSCROLL
 END
@@ -307,18 +270,18 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"
@@ -344,20 +307,20 @@ END
 // Bitmap
 //
 
-IDB_DBPROJECTS          BITMAP  MOVEABLE PURE   "res\\dbprojec.bmp"
-IDB_DOCKBAR             BITMAP  MOVEABLE PURE   "res\\bitmap1.bmp"
-IDB_DOCKBAROFFICE       BITMAP  MOVEABLE PURE   "res\\DockOffice.bmp"
-IDB_FOLDER              BITMAP  DISCARDABLE     "res\\folders.bmp"
-IDB_MDIICONS            BITMAP  MOVEABLE PURE   "res\\bmp00001.bmp"
-IDR_MAINFRAME           BITMAP  MOVEABLE PURE   "res\\mainfram.bmp"
-IDB_BITMAP2             BITMAP  DISCARDABLE     "res\\baroper.bmp"
+IDB_DBPROJECTS          BITMAP                  "res\\dbprojec.bmp"
+IDB_DOCKBAR             BITMAP                  "res\\bitmap1.bmp"
+IDB_DOCKBAROFFICE       BITMAP                  "res\\DockOffice.bmp"
+IDB_FOLDER              BITMAP                  "res\\folders.bmp"
+IDB_MDIICONS            BITMAP                  "res\\bmp00001.bmp"
+IDR_MAINFRAME           BITMAP                  "res\\mainfram.bmp"
+IDB_BITMAP2             BITMAP                  "res\\baroper.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Toolbar
 //
 
-IDR_MAINFRAME TOOLBAR DISCARDABLE  16, 15
+IDR_MAINFRAME TOOLBAR  16, 15
 BEGIN
     BUTTON      ID_FILE_NEW
     BUTTON      ID_FILE_OPEN
@@ -376,7 +339,7 @@ END
 // Menu
 //
 
-IDR_MENUSYS MENU DISCARDABLE 
+IDR_MENUSYS MENU 
 BEGIN
     POPUP "System"
     BEGIN
@@ -392,7 +355,7 @@ BEGIN
     END
 END
 
-IDR_MAINFRAME MENU PRELOAD DISCARDABLE 
+IDR_MAINFRAME MENU 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -421,12 +384,9 @@ BEGIN
         POPUP "Selection"
         BEGIN
             MENUITEM "Select all",                  ID_VIEW_SELECTION_SELECTALL
-
             MENUITEM "Unselect all",                ID_VIEW_SELECTION_UNSELECTALL
-
             MENUITEM SEPARATOR
             MENUITEM "Select inverse",              ID_VIEW_SELECTION_SELECTINVERSE
-
         END
         MENUITEM SEPARATOR
         POPUP "Layout"
@@ -465,7 +425,7 @@ BEGIN
     END
 END
 
-IDR_NEWZIP MENU DISCARDABLE 
+IDR_NEWZIP MENU 
 BEGIN
     POPUP "cool"
     BEGIN
@@ -479,7 +439,7 @@ END
 // Accelerator
 //
 
-IDR_MAINFRAME ACCELERATORS PRELOAD MOVEABLE PURE 
+IDR_MAINFRAME ACCELERATORS 
 BEGIN
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
@@ -497,7 +457,6 @@ BEGIN
 END
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -520,18 +479,15 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "the fastest way to get a maximum compression\0"
-            VALUE "CompanyName", "A.I.Z Software\0"
-            VALUE "FileDescription", "SmartZip Compression Application\0"
-            VALUE "FileVersion", "1, 0, 0, 0\0"
-            VALUE "InternalName", "SmartZip\0"
-            VALUE "LegalCopyright", "Copyright (C) 2002\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "SmartZip.exe\0"
-            VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "SmartZip Application\0"
-            VALUE "ProductVersion", "1, 0, 0, 0\0"
-            VALUE "SpecialBuild", "\0"
+            VALUE "Comments", "the fastest way to get a maximum compression"
+            VALUE "CompanyName", "A.I.Z Software"
+            VALUE "FileDescription", "SmartZip Compression Application"
+            VALUE "FileVersion", "1, 0, 0, 0"
+            VALUE "InternalName", "SmartZip"
+            VALUE "LegalCopyright", "Copyright (C) 2002"
+            VALUE "OriginalFilename", "SmartZip.exe"
+            VALUE "ProductName", "SmartZip Application"
+            VALUE "ProductVersion", "1, 0, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -540,8 +496,6 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -549,7 +503,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -904,34 +858,27 @@ END
 // AVI
 //
 
-IDR_AVIEXTRACT          AVI     DISCARDABLE     "res\\Data_5.avi"
-IDR_AVIDELETE           AVI     DISCARDABLE     "res\\Data_8.avi"
-IDR_AVITEST             AVI     DISCARDABLE     "res\\Data_9.avi"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// 24
-//
-
-1                       24      DISCARDABLE     "res\\default1.bin"
+IDR_AVIEXTRACT          AVI                     "res\\Data_5.avi"
+IDR_AVIDELETE           AVI                     "res\\Data_8.avi"
+IDR_AVITEST             AVI                     "res\\Data_9.avi"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE PRELOAD DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDR_MAINFRAME           "SmartZip\n\nSmartZip\nSmartZip Files (*.zip)\n.zip\nSmartZip.Document\nSmartZip Document"
 END
 
-STRINGTABLE PRELOAD DISCARDABLE 
+STRINGTABLE 
 BEGIN
     AFX_IDS_APP_TITLE       "SmartZip"
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_INDICATOR_EXT        "EXT"
     ID_INDICATOR_CAPS       "CAP"
@@ -941,7 +888,7 @@ BEGIN
     ID_INDICATOR_REC        "REC"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_FILE_NEW             "Create a new document\nNew"
     ID_FILE_OPEN            "Open an existing document\nOpen"
@@ -950,13 +897,13 @@ BEGIN
     ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
     ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_FILE_MRU_FILE1       "Open this document"
     ID_FILE_MRU_FILE2       "Open this document"
@@ -976,18 +923,18 @@ BEGIN
     ID_FILE_MRU_FILE16      "Open this document"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
     ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_EDIT_CLEAR           "Erase the selection\nErase"
     ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
@@ -1002,13 +949,13 @@ BEGIN
     ID_EDIT_REDO            "Redo the previously undone action\nRedo"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
     ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     AFX_IDS_SCSIZE          "Change the window size"
     AFX_IDS_SCMOVE          "Change the window position"
@@ -1019,13 +966,13 @@ BEGIN
     AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     AFX_IDS_SCRESTORE       "Restore the window to normal size"
     AFX_IDS_SCTASKLIST      "Activate Task List"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_COL1                "FILE NAME"
     IDS_COL2                "TYPE"
@@ -1038,7 +985,7 @@ BEGIN
     IDS_COL9                "COMMENTS"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     ID_VIEW_SMALLICON       "Display items by using small icons.\nSmall Icons"
     ID_VIEW_LARGEICON       "Display items by using large icons.\nLarge Icons"
@@ -1051,11 +998,11 @@ END
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Unknown language: 0x1, 0x3 resources
+// Arabic (Egypt) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ARE)
 #ifdef _WIN32
-LANGUAGE 0x1, 0x3
+LANGUAGE LANG_ARABIC, SUBLANG_ARABIC_EGYPT
 #pragma code_page(1256)
 #endif //_WIN32
 
@@ -1066,24 +1013,24 @@ LANGUAGE 0x1, 0x3
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_BROWSE              ICON    DISCARDABLE     "res\\Open.ico"
-IDI_DELETE              ICON    DISCARDABLE     "res\\Icon_237.ico"
-IDI_CLOSE               ICON    DISCARDABLE     "res\\icon1.ico"
-IDI_CLOSEHOT            ICON    DISCARDABLE     "res\\ico00001.ico"
-IDI_NEXTHOT             ICON    DISCARDABLE     "res\\nexthot.ico"
-IDI_NEXT                ICON    DISCARDABLE     "res\\ico00002.ico"
-IDI_BACKHOT             ICON    DISCARDABLE     "res\\backhot.ico"
-IDI_BACK                ICON    DISCARDABLE     "res\\back.ico"
-IDI_FINISH              ICON    DISCARDABLE     "res\\finish.ico"
-IDI_FINISHHOT           ICON    DISCARDABLE     "res\\finishho.ico"
+IDI_BROWSE              ICON                    "res\\Open.ico"
+IDI_DELETE              ICON                    "res\\Icon_237.ico"
+IDI_CLOSE               ICON                    "res\\icon1.ico"
+IDI_CLOSEHOT            ICON                    "res\\ico00001.ico"
+IDI_NEXTHOT             ICON                    "res\\nexthot.ico"
+IDI_NEXT                ICON                    "res\\ico00002.ico"
+IDI_BACKHOT             ICON                    "res\\backhot.ico"
+IDI_BACK                ICON                    "res\\back.ico"
+IDI_FINISH              ICON                    "res\\finish.ico"
+IDI_FINISHHOT           ICON                    "res\\finishho.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_VERIPASS DIALOG DISCARDABLE  0, 0, 216, 81
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_VERIPASS DIALOG  0, 0, 216, 81
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Sans Serif"
 BEGIN
@@ -1100,15 +1047,15 @@ END
 // Bitmap
 //
 
-IDB_BITBAR              BITMAP  DISCARDABLE     "res\\Bar.bmp"
-IDB_SPLASH              BITMAP  DISCARDABLE     "res\\Splash.bmp"
+IDB_BITBAR              BITMAP                  "res\\Bar.bmp"
+IDB_SPLASH              BITMAP                  "res\\Splash.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDR_LCONTEXT MENU DISCARDABLE 
+IDR_LCONTEXT MENU 
 BEGIN
     POPUP "lc", GRAYED
     BEGIN
@@ -1122,7 +1069,7 @@ BEGIN
     END
 END
 
-IDR_TCONTEXT MENU DISCARDABLE 
+IDR_TCONTEXT MENU 
 BEGIN
     POPUP "lc", GRAYED
     BEGIN
@@ -1140,7 +1087,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_VERIPASS, DIALOG
     BEGIN
@@ -1158,8 +1105,8 @@ END
 // SFX
 //
 
-IDR_SFX1                SFX     DISCARDABLE     "res\\SFX.exe"
-#endif    // Unknown language: 0x1, 0x3 resources
+IDR_SFX1                SFX                     "res\\SFX.exe"
+#endif    // Arabic (Egypt) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
