@@ -438,10 +438,10 @@ struct AdditionInfo
 	int iDataBandStart[MAX_SPEED_NUM];
 	int iDataBandLen[MAX_SPEED_NUM];
 
-	double fFrictionDisplacementLength[MAX_SPEED_NUM];
-	double fFrictionForceOfFilter[MAX_SPEED_NUM][MAX_FORCE_NUM];
-	int iFrictionDataBandStart[MAX_SPEED_NUM];
-	int iFrictionDataBandLen[MAX_SPEED_NUM];
+	double fFrictionDisplacementLength;
+	double fFrictionForceOfFilter[MAX_FORCE_NUM];
+	int iFrictionDataBandStart;
+	int iFrictionDataBandLen;
 };
 
 //
