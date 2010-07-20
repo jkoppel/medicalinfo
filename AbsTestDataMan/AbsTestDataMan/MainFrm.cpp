@@ -160,6 +160,8 @@ void CreateDataFileIcons()
 
 CMainFrame::CMainFrame()
 {
+	extern void TestStringMatch();
+	TestStringMatch();
 }
 
 CMainFrame::~CMainFrame()

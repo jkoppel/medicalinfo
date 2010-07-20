@@ -602,309 +602,271 @@ int fir_dsgn(int Len, double FreqS, double FreqB , double **Coef1)
 #include <stdio.h>
 #include <string.h>
 
-//在lpszSour中查找lpszFind,从nStart开始
+///在lpszSour中查找lpszFind,从nStart开始
 int FindString(const char * lpszSour,const char * lpszFind,int nStart=0);
-//带通配符'?','*'的字符串匹配,bMatchCase=TRUE区分大小写
+///带通配符'?','*'的字符串匹配,bMatchCase=TRUE区分大小写
 BOOL MatchString(const char * lpszSour,const char * lpszMatch,BOOL bMatchCase=TRUE);
-//多重匹配
-BOOL MultiMatch(const char * lpszSour,const char * lpszMatch,int nMatchLogic=0,BOOL bRetReversed=FALSE,BOOL bMatchCase=TRUE);
 
-//功 能: 在lpszSour中查找字符串lpszFind,lpszFind中可以包含通配符'?'
-//参 数: nStart未在lpszSour中的起始查找位置
-//返回值: 成功返回匹配位置,否则返回-1
-
-int FindString(const char * lpszSour,const char * lpszFind,int nStart/*=0*/)
+///在lpszSour中查找字符串lpszFind，lpszFind中可以包含通配字符‘?’
+/**
+  * nStart : 在lpszSour中的起始查找位置 \n
+  * 返回值 : 成功返回匹配位置，否则返回-1 \n
+  * 注  意 : Called by “BOOL MatchString()”
+  */
+int FindingString(const char* lpszSour, const char* lpszFind, int nStart /* = 0 */)
 {
-	if(lpszSour==NULL || lpszFind==NULL || nStart<0)
+	//	ASSERT(lpszSour && lpszFind && nStart >= 0);
+	if(lpszSour == NULL || lpszFind == NULL || nStart < 0){
 		return -1;
-	int m=strlen(lpszSour);
-	int n=strlen(lpszFind);
-	if(nStart+n>m)
+	}
+
+	int m = strlen(lpszSour);
+	int n = strlen(lpszFind);
+
+	if( nStart+n > m ){
 		return -1;
-	if(n==0)
+	}
+
+	if(n == 0){
 		return nStart;
-	//KMP begin
-	int * next=new int[n]; //查找字符串的next数组
-	--n;
-	int j,k;
-	j=0,k=-1;
-	next[0]=-1;
-	while(j<n)
+	}
+
+	//KMP算法
+	int* next = new int[n];
+
+	//得到查找字符串的next数组
 	{
-		if(k==-1 || lpszFind[k]=='?' || lpszFind[j]==lpszFind[k])
-		{
-			++j,++k;
-			next[j]=k;
+	n--;
+
+	int j, k;
+	j = 0;
+	k = -1;
+	next[0] = -1;
+
+	while(j < n){
+		if(k == -1 || lpszFind[k] == '?' || lpszFind[j] == lpszFind[k]){
+			j++;
+			k++;
+			next[j] = k;
+		}
+		else{
+			k = next[k];
+		}
+	}
+
+	n++;
+	}
+
+	int i = nStart,	j = 0;
+	while(i < m && j < n)
+	{
+		if(j == -1 || lpszFind[j] == '?' || lpszSour[i] == lpszFind[j])
+		{	i++;
+		j++;
 		}
 		else
-			k=next[k];
+			j = next[j];
 	}
-	++n;
-	int i=nStart;
-	j=0;
-	while(i<m && j<n)
-	{
-		if(j==-1 || lpszFind[j]=='?' || lpszSour[i]==lpszFind[j])
-		{
-			++i;
-			++j;
-		}
-		else
-			j=next[j];
-	}
-	delete [] next;
-	if(j>=n)
+
+	delete []next;
+
+	if(j >= n)
 		return i-n;
 	else
 		return -1;
 }
 
-//功 能: 带通配符的字符串匹配
-//参 数: lpszSour是一个普通字符串
-//    lpszMatch是一个可以包含通配符的字符串
-//    bMatchCase=TRUE:区分大小写,=FALSE不区分大小写
-//返回值: 匹配返回TRUE,否则返回FALSE
-//说 明: '*' 匹配任意长度字符串,包括空串;'?'匹配任意一个字符,非空
-BOOL MatchString(const char * lpszSour,const char * lpszMatch,BOOL bMatchCase/*=TRUE*/)
+//功	  能：带通配符的字符串匹配
+//参	  数：lpszSour是一个普通字符串；
+//			  lpszMatch是一可以包含通配符的字符串；
+//			  bMatchCase为0，不区分大小写，否则区分大小写。
+//返  回  值：匹配，返回1；否则返回0。
+//通配符意义：
+//		‘*’	代表任意字符串，包括空字符串；
+//		‘?’	代表任意一个字符，不能为空；
+//时	  间：	2001.11.02	13:00
+BOOL MatchString(const char* lpszSour, const char* lpszMatch, BOOL bMatchCase /*  = TRUE */)
 {
-	if(lpszSour==NULL || lpszMatch==NULL)
+	//	ASSERT(AfxIsValidString(lpszSour) && AfxIsValidString(lpszMatch));
+	if(lpszSour == NULL || lpszMatch == NULL)
 		return FALSE;
-	if(lpszMatch[0]==0) //模式串空
+
+	if(lpszMatch[0] == 0)//Is a empty string
 	{
-		if(lpszSour[0]==0)
+		if(lpszSour[0] == 0)
 			return TRUE;
 		else
 			return FALSE;
 	}
-	int i=0,j=0;
-	char * szSource=new char[(j=strlen(lpszSour)+1)]; //比较用临时源字符串
-	if(bMatchCase)
-	{
-		while(* (szSource+i)=*(lpszSour+i++));
+
+	int i = 0, j = 0;
+
+	//生成比较用临时源字符串'szSource'
+	char* szSource =
+		new char[ (j = strlen(lpszSour)+1) ];
+
+	if( bMatchCase )
+	{	//memcpy(szSource, lpszSour, j);
+		while( *(szSource+i) = *(lpszSour+i++) );
 	}
 	else
-	{
-		i=0;
+	{	//Lowercase 'lpszSour' to 'szSource'
+		i = 0;
 		while(lpszSour[i])
-		{
-			if(lpszSour[i]>='A' && lpszSour[i]<='Z')
-				szSource[i]=lpszSour[i]-'A'+'a';
-			else
-				szSource[i]=lpszSour[i];
-			++i;
+		{	if(lpszSour[i] >= 'A' && lpszSour[i] <= 'Z')
+		szSource[i] = lpszSour[i] - 'A' + 'a';
+		else
+			szSource[i] = lpszSour[i];
+
+		i++;
 		}
-		szSource[i]=0; //end of source
+		szSource[i] = 0;
 	}
-	char * szMatcher=new char[strlen(lpszMatch)+1]; //比较用临时匹配字符串
-	//把lpszMatch里面连续的'*'合并成一个'*'后复制到szMatcher中
-	i=j=0;
+
+	//生成比较用临时匹配字符串'szMatcher'
+	char* szMatcher = new char[strlen(lpszMatch)+1];
+
+	//把lpszMatch里面连续的“*”并成一个“*”后复制到szMatcher中
+	i = j = 0;
 	while(lpszMatch[i])
 	{
-		szMatcher[j++]=(! bMatchCase) ? ((lpszMatch[i]>='A' && lpszMatch[i]<='Z') ? lpszMatch[i]-'A'+'a' : lpszMatch[i]) : lpszMatch[i];
-		if(lpszMatch[i]=='*')
-		{
-			while(lpszMatch[++i]=='*');
-		}
+		szMatcher[j++] = (!bMatchCase) ?
+			( (lpszMatch[i] >= 'A' && lpszMatch[i] <= 'Z') ?//Lowercase lpszMatch[i] to szMatcher[j]
+			lpszMatch[i] - 'A' + 'a' :
+		lpszMatch[i]
+		) :
+		lpszMatch[i];		 //Copy lpszMatch[i] to szMatcher[j]
+		//Merge '*'
+		if(lpszMatch[i] == '*')
+			while(lpszMatch[++i] == '*');
 		else
-			++i;
+			i++;
 	}
-	szMatcher[j]=0;
-	//开始匹配
-	int nMatchOffset,nSourOffset;
-	BOOL bIsMatched=TRUE;
-	nMatchOffset=nSourOffset=0;
+	szMatcher[j] = 0;
+
+	//开始进行匹配检查
+
+	int nMatchOffset, nSourOffset;
+
+	BOOL bIsMatched = TRUE;
+	nMatchOffset = nSourOffset = 0;
 	while(szMatcher[nMatchOffset])
 	{
-		if(szMatcher[nMatchOffset]=='*')
+		if(szMatcher[nMatchOffset] == '*')
 		{
-			if(szMatcher[nMatchOffset+1]==0) //szMatcher[nMatchOffset]是最后一个字符
-			{
-				bIsMatched=TRUE;
+			if(szMatcher[nMatchOffset+1] == 0)
+			{	//szMatcher[nMatchOffset]是最后一个字符
+
+				bIsMatched = TRUE;
 				break;
 			}
-			else //szMatcher[nMatchOffset+1]只能是'?'或普通字符
-			{
-				int nSubOffset=nMatchOffset+1;
+			else
+			{	//szMatcher[nMatchOffset+1]只能是'?'或普通字符
+
+				int nSubOffset = nMatchOffset+1;
+
 				while(szMatcher[nSubOffset])
-				{
-					if(szMatcher[nSubOffset]=='*')
-						break;
-					++nSubOffset;
+				{	if(szMatcher[nSubOffset] == '*')
+				break;
+				nSubOffset++;
 				}
-				if(strlen(szSource+nSourOffset)<size_t(nSubOffset-nMatchOffset-1)) //源字符串剩下的长度小于匹配串剩下的长度
-				{
-					bIsMatched=FALSE;
-					break;
+
+				if( strlen(szSource+nSourOffset) <
+					size_t(nSubOffset-nMatchOffset-1) )
+				{	//源字符串剩下的长度小于匹配串剩下要求长度
+					bIsMatched = FALSE; //判定不匹配
+					break;			//退出
 				}
-				if(! szMatcher[nSubOffset]) //nSubOffset 达到szMatcher 末尾 ; 检查剩下部分字符是否一一匹配
-				{
-					--nSubOffset;
-					int nTempSourOffset=strlen(szSource)-1;
+
+				if(!szMatcher[nSubOffset])//nSubOffset is point to ender of 'szMatcher'
+				{	//检查剩下部分字符是否一一匹配
+
+					nSubOffset--;
+					int nTempSourOffset = strlen(szSource)-1;
 					//从后向前进行匹配
-					while(szMatcher[nSubOffset]!='*')
+					while(szMatcher[nSubOffset] != '*')
 					{
-						if(szMatcher[nSubOffset]=='?')
+						if(szMatcher[nSubOffset] == '?')
 							;
 						else
-						{
-							if(szMatcher[nSubOffset]!=szSource[nTempSourOffset])
-							{
-								bIsMatched=FALSE;
-								break;
-							}
+						{	if(szMatcher[nSubOffset] != szSource[nTempSourOffset])
+						{	bIsMatched = FALSE;
+						break;
 						}
-						--nSubOffset;
-						--nTempSourOffset;
+						}
+						nSubOffset--;
+						nTempSourOffset--;
 					}
 					break;
 				}
-				else //szMatcher[nSubOffset]=='*'
-				{
-					nSubOffset-=nMatchOffset;
-					char * szTempFinder=new char[nSubOffset];
-					--nSubOffset;
-					memcpy(szTempFinder,szMatcher+nMatchOffset+1,nSubOffset);
-					szTempFinder[nSubOffset]=0;
-					int nPos=FindString(szSource+nSourOffset,szTempFinder,0);
-					delete [] szTempFinder;
-					if(nPos!=-1) //在szSource+nSourOffset中找到szTempFinder
-					{
-						nMatchOffset+=nSubOffset;
-						nSourOffset+=(nPos+nSubOffset-1);
-					}
-					else
-					{
-						bIsMatched=FALSE;
-						break;
-					}
+				else//szMatcher[nSubOffset] == '*'
+				{	nSubOffset -= nMatchOffset;
+
+				char* szTempFinder = new char[nSubOffset];
+				nSubOffset--;
+				memcpy(szTempFinder, szMatcher+nMatchOffset+1, nSubOffset);
+				szTempFinder[nSubOffset] = 0;
+
+				int nPos = ::FindingString(szSource+nSourOffset, szTempFinder, 0);
+				delete []szTempFinder;
+
+				if(nPos != -1)//在'szSource+nSourOffset'中找到szTempFinder
+				{	nMatchOffset += nSubOffset;
+				nSourOffset += (nPos+nSubOffset-1);
+				}
+				else
+				{	bIsMatched = FALSE;
+				break;
+				}
 				}
 			}
-		}
-		else if(szMatcher[nMatchOffset]=='?')
+		}		//end of "if(szMatcher[nMatchOffset] == '*')"
+		else if(szMatcher[nMatchOffset] == '?')
 		{
-			if(! szSource[nSourOffset])
-			{
-				bIsMatched=FALSE;
+			if(!szSource[nSourOffset])
+			{	bIsMatched = FALSE;
+			break;
+			}
+			if(!szMatcher[nMatchOffset+1] && szSource[nSourOffset+1])
+			{	//如果szMatcher[nMatchOffset]是最后一个字符，
+				//且szSource[nSourOffset]不是最后一个字符
+				bIsMatched = FALSE;
 				break;
 			}
-			if(! szMatcher[nMatchOffset+1] && szSource[nSourOffset+1]) //szMatcher最后一个字符 szSource非最后一个字符
-			{
-				bIsMatched=FALSE;
-				break;
-			}
-			++nMatchOffset;
-			++nSourOffset;
+			nMatchOffset++;
+			nSourOffset++;
 		}
-		else //szMatcher[nMatchOffset] 为常规字符
+		else//szMatcher[nMatchOffset]为常规字符
 		{
-			if(szSource[nSourOffset]!=szMatcher[nMatchOffset])
-			{
-				bIsMatched=FALSE;
-				break;
+			if(szSource[nSourOffset] != szMatcher[nMatchOffset])
+			{	bIsMatched = FALSE;
+			break;
 			}
-			if(! szMatcher[nMatchOffset+1] && szSource[nSourOffset+1])
-			{
-				bIsMatched=FALSE;
-				break;
+			if(!szMatcher[nMatchOffset+1] && szSource[nSourOffset+1])
+			{	bIsMatched = FALSE;
+			break;
 			}
-			++nMatchOffset;
-			++nSourOffset;
+			nMatchOffset++;
+			nSourOffset++;
 		}
 	}
-	delete [] szSource;
-	delete [] szMatcher;
+
+	delete []szSource;
+	delete []szMatcher;
 	return bIsMatched;
 }
 
-//功 能: 多重匹配,不同匹配字符串之间用','隔开;"*.h,*.cpp",可以匹配"*.h","*.cpp";
-//参 数: nMatchLogic=0,不同匹配求或,else求与; bMatchCase: 是否大小敏感
-//返回值: 如果bRetReversed=0,匹配返回TRUE; 否则不匹配返回TRUE
-BOOL MultiMatching(const char * lpszSour,const char * lpszMatch,int nMatchLogic/*=0*/,BOOL bRetReversed/*=0*/,BOOL bMatchCase/*=TRUE*/)   
+void TestStringMatch()
 {
-	if(lpszSour==NULL || lpszMatch==NULL)
-		return FALSE;
-	char * szSubMatch=new char[strlen(lpszMatch)+1];
-	BOOL bIsMatch;
-	if(nMatchLogic==0) //或
-	{
-		bIsMatch=0;
-		int i=0,j=0;
-		while(TRUE)
-		{
-			if(lpszMatch[i]!=0 && lpszMatch[i]!=',')
-				szSubMatch[j++]=lpszMatch[i];
-			else
-			{
-				szSubMatch[j]=0;
-				if(j!=0)
-				{
-					bIsMatch=MatchString(lpszSour,szSubMatch,bMatchCase);
-					if(bIsMatch)
-						break;
-				}
-				j=0;
-			}
-			if(lpszMatch[i]==0)
-				break;
-			++i;
-		}
-	}
-	else //与
-	{
-		bIsMatch=1;
-		int i=0,j=0;
-		while(TRUE)
-		{
-			if(lpszMatch[i]!=0 && lpszMatch[i]!=',')
-				szSubMatch[j++]=lpszMatch[i];
-			else
-			{
-				szSubMatch[j]=0;
-				bIsMatch=MatchString(lpszSour,szSubMatch,bMatchCase);
-				if(! bIsMatch)
-					break;
-				j=0;
-			}
-			if(lpszMatch[i]==0)
-				break;
-			++i;
-		}
-	}
-	delete [] szSubMatch;
-	if(bRetReversed)
-		return ! bIsMatch;
-	else
-		return bIsMatch;
-}
+	char* str = "String match";
+	BOOL bMatch;
+	char* sMatch;
 
-int n = 10,q;
-char dic[2000][1000];
+	sMatch = "*ing??*c*";
+	bMatch = MatchString(str, sMatch);//单匹配
+	printf("\"%s\" %s match with \"%s\"\n\n", str, bMatch ? "is" : "is not", sMatch);
 
-int TestStringMatch()
-{
-	char s[] = "123AABBCC11";
-	char s1[] = "123DF";
-
-	BOOL ret;
-	ret = MatchString(s, s1);
-	/*
-	int i;
-	scanf("%d",&n);
-	for(i=0;i<n;++i)
-		scanf("%s",dic[i]);
-	scanf("%d",&q);
-	for(i=0;i<q;++i)
-	{
-		char tmp[10000];
-		scanf("%s",tmp);
-		int ans=0;
-		for(int j=0;j<n;++j)
-		{
-			if(MatchString(dic[j],tmp))
-				++ans;
-		}
-		printf("%d\n",ans);
-	}
-	*/
-	return 0;
+	sMatch = "*ing??*c*??";
+	bMatch = MatchString(str, sMatch);//单匹配
+	printf("\"%s\" %s match with \"%s\"\n\n", str, bMatch ? "is" : "is not", sMatch);
 }

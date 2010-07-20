@@ -165,9 +165,7 @@ UINT MyThreadProc(LPVOID lpParam)
 
 void CFilterFormView::OnBnClickedBtnTest1()
 {
-	//CDlgProgress::StartThread(MyThreadProc, _T("正在测试..."));
-	extern int TestStringMatch();
-	TestStringMatch();
+	CDlgProgress::StartThread(MyThreadProc, _T("正在测试..."));
 }
 
 void CFilterFormView::OnBnClickedBtnTest2()
