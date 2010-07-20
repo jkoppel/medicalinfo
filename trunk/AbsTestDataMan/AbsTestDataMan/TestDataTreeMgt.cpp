@@ -777,8 +777,94 @@ void CTestDataTreeMgt::ProcessData(FileNodePtr pFileNode)
 			//单文件模式的两种模式
 			//文件最多加载一些，没有的就release
 			//
+		}//END OF FOR EACH SPEED
+	}//END OF IF NORMAL SPEED
+
+	if(node.pTestRecord->bFrictionSpeed){
+		node.pTestRecord->fFrictionSetSpeed = node.pProductInfo->fFrictionSpeed0;
+		if(node.pProductInfo->bDifferentOffset){
+			node.pTestRecord->fFrictionSetOffset = node.pProductInfo->fFrictionSpeedOffset;
 		}
+		else{
+			node.pTestRecord->fFrictionSetOffset = node.pProductInfo->fOffset;
+		}
+
+		min = node.pTestRecord->fFrictionDisplacement[0];
+		max = min;
+		for(j=0;j<node.pTestRecord->iFrictionNumOfForce;j++){
+			if(node.pTestRecord->fFrictionDisplacement[j] < min){
+				min = node.pTestRecord->fFrictionDisplacement[j];
+			}
+			if(node.pTestRecord->fFrictionDisplacement[j] > max){
+				max = node.pTestRecord->fFrictionDisplacement[j];
+			}
+		}
+		avg = (max+min)/2;
+		for(j=0;j<node.pTestRecord->iFrictionNumOfForce;j++){
+			node.pTestRecord->fFrictionDisplacement[j] -= avg;
+		}
+		node.pAdditionInfo->fFrictionDisplacementLength = (max-min)/2;
+
+		int P[MAX_REFDOT_NUM];
+		int PP[MAX_REFDOT_NUM] = {90, 270, 450, 630, 810, 990, 1260};
+		int iNumOfRefDot;
+
+		iNumOfRefDot = 1;
+		for(j=SKIP_FIRSTDOT_NUM;j<node.pTestRecord->iFrictionNumOfForce-1;j++){
+			if(node.pTestRecord->fFrictionDisplacement[j]<0 && node.pTestRecord->fFrictionDisplacement[j+1]>=0){
+				P[iNumOfRefDot] = j+1;
+				iNumOfRefDot++;
+			}
+			else if(node.pTestRecord->fFrictionDisplacement[j]>0 && node.pTestRecord->fFrictionDisplacement[j+1]<=0){
+				P[iNumOfRefDot] = j+1;
+				iNumOfRefDot++;
+			}
+			if(iNumOfRefDot>=MAX_REFDOT_NUM-1){
+				break;
+			}
+		}
+		int T = P[2]-P[1];
+		P[0] = P[1] - T;
+		for(;iNumOfRefDot<MAX_REFDOT_NUM;iNumOfRefDot++){
+			P[iNumOfRefDot] = P[iNumOfRefDot-1] + T;
+		}
+
+		//等比例获取iDataBandStart和iDataBandLen
+		for(j=0;j<MAX_REFDOT_NUM;j++){
+			if(node.pProductInfo->iDataBandStart>=PP[j] && node.pProductInfo->iDataBandStart<=PP[j+1]){
+				node.pAdditionInfo->iFrictionDataBandStart = P[j] + T * (node.pProductInfo->iDataBandStart-PP[j]) / (PP[2]-PP[1]);
+				break;
+			}
+		}
+		node.pAdditionInfo->iFrictionDataBandLen = T * node.pProductInfo->iDataBandLen / (PP[2]-PP[1]);
+
+		node.pTestRecord->fFrictionRealSpeed = 2 * M_PI * node.pTestRecord->fFrictionDataFreq / node.pAdditionInfo->iFrictionDataBandLen * node.pTestRecord->fFrictionRealSpeed;
+
+		memcpy(node.pAdditionInfo->fFrictionForceOfFilter+node.pAdditionInfo->iFrictionDataBandStart,
+				node.pTestRecord->fFrictionForce+node.pAdditionInfo->iFrictionDataBandStart,
+				node.pAdditionInfo->iFrictionDataBandLen * sizeof(double));
+		filter_new(node.pAdditionInfo->fFrictionForceOfFilter + node.pAdditionInfo->iFrictionDataBandStart,
+					node.pTestRecord->fFrictionDataFreq,
+					10*node.pTestRecord->fFrictionSetSpeed/node.pTestRecord->fFrictionSetOffset/(2*M_PI), 
+					node.pAdditionInfo->iFrictionDataBandLen);
+
+		min = node.pAdditionInfo->fFrictionForceOfFilter[node.pAdditionInfo->iFrictionDataBandStart];
+		max = node.pAdditionInfo->fFrictionForceOfFilter[node.pAdditionInfo->iFrictionDataBandStart];
+		for(j=0;j<node.pAdditionInfo->iFrictionDataBandLen;j++){
+			if(node.pAdditionInfo->fFrictionForceOfFilter[node.pAdditionInfo->iFrictionDataBandStart+j]<min){
+				min = node.pAdditionInfo->fFrictionForceOfFilter[node.pAdditionInfo->iFrictionDataBandStart+j];
+			}
+			if(node.pAdditionInfo->fFrictionForceOfFilter[node.pAdditionInfo->iFrictionDataBandStart+j]>max){
+				max = node.pAdditionInfo->fFrictionForceOfFilter[node.pAdditionInfo->iFrictionDataBandStart+j];
+			}
+		}
+		node.pTestRecord->fFrictionPfm = max;
+		if(min<0){
+			min = min * -1;
+		}
+		node.pTestRecord->fFrictionPym = min;
 	}
+
 	node.bProcessed = TRUE;
 }
 
