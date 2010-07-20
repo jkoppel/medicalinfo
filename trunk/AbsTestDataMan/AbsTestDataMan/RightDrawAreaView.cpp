@@ -1432,6 +1432,217 @@ void CRightDrawAreaView::Draw_Force_Vs_Time()
 
 void CRightDrawAreaView::Draw_Friction_Force_Vs_Position()
 {
+	RECT rect;
+	CPen pen;
+	CBrush brush;
+	int i, j, x, y;
+	char buf[100];
+	struct CCTestRecord *pRec = NULL;
+	CFont fontLogo,*oldFont;
+
+	GetClientRect(&rect);
+	if(rect.bottom<100 || rect.right<100){
+		return;
+	}
+	//获取待画图区域大小位置
+	m_pntClientAreaRef.x = rect.left + 50;
+	m_pntClientAreaRef.y = rect.bottom - 50;
+	m_nClientAreaWidth = rect.right - rect.left - 100;
+	m_nClientAreaHeight = rect.bottom - rect.top - 100;
+
+	CDC *pDC=GetDC();
+
+	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
+	pDC->SelectObject(&pen);
+	//画横轴
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
+	//画纵轴
+	pDC->MoveTo(m_pntClientAreaRef);
+	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
+
+	//画轴坐标及文字标识
+	double xspan = m_nClientAreaWidth / 11.0;
+	double yspan= m_nClientAreaHeight / 5.5;
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
+
+		sprintf_s(buf, "%d", (i-5)*10);
+		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
+		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
+		rect.top = m_pntClientAreaRef.y;
+		rect.bottom = m_pntClientAreaRef.y + 25;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+
+		sprintf_s(buf, "%d", (4-i)*250);
+		rect.left = m_pntClientAreaRef.x - 5 - 40;
+		rect.right = m_pntClientAreaRef.x - 5;
+		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
+		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
+	}
+	//原点位置
+	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
+	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
+
+	pen.DeleteObject();
+
+	//画纵横虚线
+	LOGBRUSH logbrush;
+	logbrush.lbColor = RGB(192,192,192); 
+	logbrush.lbStyle = PS_SOLID;
+	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
+	pDC->SelectObject(&pen);
+	for(i=0;i<11;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
+		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
+	}
+	for(i=0;i<6;i++){
+		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
+	}
+	pen.DeleteObject();
+
+	//标识原点
+	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
+
+	//画标识
+	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
+	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
+
+	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
+	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
+	rect.top = m_pntClientAreaRef.y + 20;
+	rect.bottom = m_pntClientAreaRef.y + 40;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN,_T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	rect.left = m_pntClientAreaRef.x - 48;
+	rect.right = m_pntClientAreaRef.x - 28;
+	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
+	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
+						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+						DEFAULT_PITCH, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
+
+	if(g_pTree==NULL){
+		return;
+	}
+
+	int iNumDrawed = 0;
+	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.m_pProductTreeRoot;
+	ProductNodePtr pProductNode = g_TestDataTreeMgt.m_pProductTreeRoot->pProductNodeListHead->pNext;
+	while(pProductNode!=NULL){
+		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
+		while(pFileNode!=NULL){
+			int flag_selected = 0;
+			for(int iIndex=0;iIndex<pFileNode->test_record_header.iNumOfSpeed;iIndex++){
+				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
+				if(tp->bSelected){
+					flag_selected = 1;
+					if(tp->pNode->bProcessed==FALSE){
+						char sFileName[256];
+						TCHAR2char(sFileName, tp->pNode->sFileName, _tcslen(tp->pNode->sFileName));
+						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
+					}
+
+					if(!tp->pNode->pTestRecord->bFrictionSpeed){
+						break;
+					}
+
+					pen.DeleteObject();
+					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
+					pDC->SelectObject(&pen);
+
+					pDC->SelectObject(oldFont);
+					if(m_iDrawMode & DM_NORMAL_ONLY){
+						int x_start, y_start;
+						for(j=tp->pNode->pAdditionInfo->iFrictionDataBandStart;j<tp->pNode->pAdditionInfo->iFrictionDataBandStart+tp->pNode->pAdditionInfo->iFrictionDataBandLen;j++){
+							//X按均值和幅度缩放到对应值
+							x = (int)(tp->pNode->pTestRecord->fFrictionDisplacement[j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+							//Y直接使用原大小
+							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fFrictionForce[j] * (yspan/250));
+							if(j==tp->pNode->pAdditionInfo->iFrictionDataBandStart){
+								pDC->MoveTo(x, y);
+								x_start = x;
+								y_start = y;
+								pDC->SetPixel(x, y, color[0]);
+							}
+							else{
+								pDC->LineTo(x, y);
+							}
+						}
+						pDC->LineTo(x_start, y_start);
+					}
+
+					if(m_iDrawMode & DM_FILTER_ONLY){
+						int x_start, y_start;
+						for(j=tp->pNode->pAdditionInfo->iFrictionDataBandStart;j<tp->pNode->pAdditionInfo->iFrictionDataBandStart+tp->pNode->pAdditionInfo->iFrictionDataBandLen;j++){
+							//X按均值和幅度缩放到对应值
+							x = (int)(tp->pNode->pTestRecord->fFrictionDisplacement[j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
+							//Y直接使用原大小
+							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pAdditionInfo->fFrictionForceOfFilter[j] * (yspan/250));
+							if(j==tp->pNode->pAdditionInfo->iFrictionDataBandStart){
+								pDC->MoveTo(x, y);
+								x_start = x;
+								y_start = y;
+								pDC->SetPixel(x, y, color[0]);
+							}
+							else{
+								pDC->LineTo(x, y);
+							}
+						}
+						pDC->LineTo(x_start, y_start);
+					}
+
+					iNumDrawed ++;
+					if(iNumDrawed>=20){
+						break;
+					}
+
+					break;
+				}//END OF IF
+			}//END OF FOR
+			if(flag_selected==0 && pFileNode->bProcessed){
+				delete pFileNode->pMachineInfo;
+				pFileNode->pMachineInfo = NULL;
+				delete pFileNode->pProductInfo;
+				pFileNode->pProductInfo = NULL;
+				delete pFileNode->pTestRecord;
+				pFileNode->pTestRecord = NULL;
+				delete pFileNode->pAdditionInfo;
+				pFileNode->pAdditionInfo = NULL;
+				pFileNode->bProcessed = FALSE;
+			}
+			pFileNode = pFileNode->pNext;
+		}//END OF WHILE
+		pProductNode = pProductNode->pNext;
+	}
 }
 
 // CRightDrawAreaView 消息处理程序
