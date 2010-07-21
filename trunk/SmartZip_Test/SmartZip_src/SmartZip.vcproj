@@ -49,8 +49,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="ZipArchive\,GuiLib\,SeaShellExt\Include\"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				AdditionalIncludeDirectories="ZipArchive\;SeaShellExt\Include;GuiLib\;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ZIP_BUILD_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -1255,6 +1255,106 @@
 			</File>
 			<File
 				RelativePath="res\Zip Document.ico"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="SeaShellExt"
+			>
+			<File
+				RelativePath=".\SeaShellExt\cbformats.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\IEFolderTreeCtrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\IEShellComboBox.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\IEShellDragDrop.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\IEShellTreeCtrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\InPlaceEdit.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\LocaleInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\PIDL.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\ShellContextMenu.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\ShellPidl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\ShellSettings.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\TextParse.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\TextProgressCtrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\UICONT.CPP"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\UICoolMenu.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\Uictrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\UIDATA.CPP"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\uidragdropctrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\UIDragDropTree.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\uidragimage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\uidroptarget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\UIImageDropTarget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\UISubclass.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SeaShellExt\UITreeCtrl.cpp"
 				>
 			</File>
 		</Filter>
