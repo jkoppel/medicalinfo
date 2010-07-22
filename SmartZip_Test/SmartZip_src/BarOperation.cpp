@@ -63,10 +63,10 @@ int CBarOperation::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (!File.Create(WS_VISIBLE,
 		CRect(0,0,0,0), &cf, 1))
 		return -1;
-if (!Folder.Create(WS_VISIBLE,
+	if (!Folder.Create(WS_VISIBLE,
 		CRect(0,0,0,0), &cf, 1))
 		return -1;
-if (!Archive.Create(WS_VISIBLE,
+	if (!Archive.Create(WS_VISIBLE,
 		CRect(0,0,0,0), &cf, 1))
 		return -1;
 

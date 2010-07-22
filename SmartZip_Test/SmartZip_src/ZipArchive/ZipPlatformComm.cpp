@@ -23,7 +23,7 @@ bool ZipPlatform::ForceDirectory(LPCTSTR lpDirectory)
 {
 	ASSERT(lpDirectory);
 	CZipString szDirectory = lpDirectory;
-	szDirectory.TrimRight(CZipPathComponent::m_cSeparator);
+	szDirectory.TrimRight("\\");//CZipPathComponent::m_cSeparator);//modified by hwy
 	CZipPathComponent zpc(szDirectory);
 	if ((zpc.GetFilePath().Compare((LPCTSTR)szDirectory)) == 0 ||
 		(FileExists(szDirectory) == -1))

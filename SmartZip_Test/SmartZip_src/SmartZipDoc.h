@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "ZipArchive.h"		//the archive lib
+#include "ZipCollections.h"
 #include "TreeNode.h"
 
 class CSmartZipDoc : public CDocument
