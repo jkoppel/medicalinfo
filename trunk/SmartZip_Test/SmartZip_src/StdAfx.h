@@ -29,6 +29,8 @@
 
 //void _AfxAdjustRectangle(CRect& rect, CPoint pt);
 
+#define _GUILIB_NOAUTOLIB
+
 #define 	GUISTYLE_XP   0x08001 	
 #define		GUISTYLE_2003 0x08002
 #define		GUISTYLE_2003MENUBTN 0x08021

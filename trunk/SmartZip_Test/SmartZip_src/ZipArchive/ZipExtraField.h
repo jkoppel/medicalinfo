@@ -262,7 +262,8 @@ public:
 		\see
 			<a href="kb">0610242300|read</a>
 	*/
-	static CZipArray<WORD> m_aNoSizeExtraHeadersID;
+	//static CZipArray<WORD> m_aNoSizeExtraHeadersID;
+	//CZipArray<WORD> m_aNoSizeExtraHeadersID;//modified by hwy
 
 	/**
 		Returns the value indicating whether the extra data record with the given ID writes its size.
@@ -278,10 +279,11 @@ public:
 	*/
 	static bool HasSize(WORD headerID)
 	{
-		ZIP_ARRAY_SIZE_TYPE size = m_aNoSizeExtraHeadersID.GetSize();
+		CZipArray<WORD> g_aNoSizeExtraHeadersID;
+		ZIP_ARRAY_SIZE_TYPE size = g_aNoSizeExtraHeadersID.GetSize();//m_aNoSizeExtraHeadersID.GetSize();//modified by hwy
 		for (ZIP_ARRAY_SIZE_TYPE i = 0; i < size; i++)
 		{
-			if (m_aNoSizeExtraHeadersID.GetAt(i) == headerID)
+			if (g_aNoSizeExtraHeadersID.GetAt(i) == headerID)//modified by hwy
 				return false;
 		}
 		return true;

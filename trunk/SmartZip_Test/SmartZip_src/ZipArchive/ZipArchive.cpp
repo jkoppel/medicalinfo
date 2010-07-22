@@ -496,7 +496,7 @@ bool CZipArchive::OpenNewFile(CZipFileHeader & header, int iLevel, LPCTSTR lpszF
 		int iNameLen = szFileName.GetLength();		
 		if (!iNameLen || !CZipPathComponent::IsSeparator(szFileName[iNameLen-1]))
 		{
-			szFileName += CZipPathComponent::m_cSeparator;
+			szFileName += "\\";//CZipPathComponent::m_cSeparator;//modified by hwy
 			header.SetFileName(szFileName);
 		}
 	}

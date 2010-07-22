@@ -155,7 +155,7 @@ BOOL CSmartZipDoc::OpenZipFile(CZipArchive &zip, LPCTSTR lpszZipFileName, long i
 					iMode = CZipArchive::zipOpenReadOnly;
 					continue;
 				}
-				else if (pEx->IsKindOf(RUNTIME_CLASS(CZipException)) && 
+				else if (//pEx->IsKindOf(RUNTIME_CLASS(CZipException)) && 
 				((CZipException*)pEx)->m_iCause == CZipException::cdirNotFound &&
 				ZipPlatform::IsDriveRemovable(lpszZipFileName))
 				{

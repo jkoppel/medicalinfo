@@ -78,7 +78,8 @@ public:
 
 	virtual ~CZipPathComponent();
 
-	static const TCHAR m_cSeparator; ///< A system specific default path separator.
+	//static const TCHAR m_cSeparator; ///< A system specific default path separator.
+	TCHAR m_cSeparator; ///< A system specific default path separator.//modified by hwy
 
 	/**
 		Appends a path separator to \a szPath, if it is not already appended.
@@ -89,7 +90,7 @@ public:
 	static void AppendSeparator(CZipString& szPath)
 	{
 		RemoveSeparators(szPath);
-		szPath += m_cSeparator;
+		szPath += '\\';//m_cSeparator;//modified by hwy
 	}
 
 	/**
