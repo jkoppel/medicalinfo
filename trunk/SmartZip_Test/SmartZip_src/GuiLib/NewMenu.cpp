@@ -4234,7 +4234,7 @@ CNewMenuHook::CNewMenuHook()
   AddTheme(new CMenuTheme(CNewMenu::STYLE_ORIGINAL,
                           &CNewMenu::MeasureItem_OldStyle,
                           &CNewMenu::DrawItem_OldStyle,
-                          &CNewMenu::DrawMenuTitle,TRUE));//modified by hwy
+                          &CNewMenu::DrawMenuTitle,TRUE));
 
   AddTheme(new CMenuTheme(CNewMenu::STYLE_ORIGINAL_NOBORDER,
                           &CNewMenu::MeasureItem_OldStyle,

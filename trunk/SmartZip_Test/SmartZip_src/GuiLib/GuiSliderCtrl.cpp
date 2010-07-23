@@ -174,7 +174,7 @@ void CGuiSliderCtrl::DrawHThumb(CDC* pDC,CRect rcClient)
 	//se pinta la punta
 	//-------------------------------------------------------------
 	int y;
-	for (y =0; y<5;y++)
+	for (y=0; y<5;y++)
 	{
 		pDC->SetPixel(rcClient.left+nMedio+y,rcClient.top+y,m_dl.GetRGBPressBXP());
 		pDC->SetPixel(rcClient.left+nMedio+y,rcClient.bottom-y,m_dl.GetRGBPressBXP());

@@ -4,7 +4,7 @@
 
 static CFont m_fontHorzMenu, m_fontVertMenu;
 static int _cyHorzFont, _cyMenuOnBar, _cyTextMargin;
-//const int CXTEXTMARGIN = 5;//deleted by hwy
+static int CXTEXTMARGIN = 5;
 
 static BOOL InitGlobalFont()
 {

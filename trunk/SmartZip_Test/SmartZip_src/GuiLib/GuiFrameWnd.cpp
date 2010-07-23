@@ -66,6 +66,7 @@ BOOL CGuiFrameWnd::PreCreateWindow(CREATESTRUCT& cs)
 	s = pApp->GetProfileInt(szSection, "status", SW_NORMAL);
 	GuiDrawLayer::m_Style=(int)pApp->WriteProfileInt(szSection, _T("Style"),GUISTYLE_XP);
 	GuiDrawLayer::m_Theme=(int)pApp->WriteProfileInt(szSection, _T("Theme"),0);
+	GuiDrawLayer::m_Theme = 0;//added by hwy
 
 	// only restore if there is a previously saved position
 	// restore the window's status

@@ -26,8 +26,6 @@
 #include "GuiMDIFrame.h"
 #include "GuiFrameWnd.h"
 
-const int CXTEXTMARGIN = 2;
-
 /////////////////////////////////////////////////////////////////////////////
 // CDockButton
 

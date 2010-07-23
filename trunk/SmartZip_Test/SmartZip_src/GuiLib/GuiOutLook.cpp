@@ -214,7 +214,7 @@ void CGuiOutLook::RecalLayout()
 	
 	int m_iNumBotton= m_ArrayButtons.GetSize();
 	int iCont;
-	for( iCont=0; iCont< m_iNumBotton;iCont++)
+	for(iCont=0; iCont< m_iNumBotton;iCont++)
 	{
 		CItems* cit=(CItems*)m_ArrayButtons[iCont];
 		CSize sz=cit->m_bt.GetSizeButton();
