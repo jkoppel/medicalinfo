@@ -54,16 +54,12 @@ END_MESSAGE_MAP()
 
 int CBarOperation::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
-/*	if (CWnd::OnCreate(lpCreateStruct) == -1)
-		return -1;
-*/	
-	// TODO: Add your specialized creation code here
 	if (CGuiOutLookView::OnCreate(lpCreateStruct) == -1)
 		return -1;
-	if (!File.Create(WS_VISIBLE,
+	if (!Folder.Create(WS_VISIBLE,
 		CRect(0,0,0,0), &cf, 1))
 		return -1;
-	if (!Folder.Create(WS_VISIBLE,
+	if (!File.Create(WS_VISIBLE,
 		CRect(0,0,0,0), &cf, 1))
 		return -1;
 	if (!Archive.Create(WS_VISIBLE,
@@ -72,9 +68,9 @@ int CBarOperation::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	Folder.SetImageList(IDB_BITMAP2, 32, 0, RGB(206,0,206));
 	Folder.AddItem(IDO_FAVOURITES,"Favorites",0);
-	Folder.AddItem(IDO_FAVOURITES,"Favorites",0);
 	Folder.AddItem(IDO_FAVOURITESADD,"Add to Favorites",1);
 	Folder.AddItem(ID_TC_ADD,"Add file/folder",2);
+	Folder.StyleDispl(GUISTYLE_2003);
 	
 	File.SetImageList(IDB_BITMAP2, 32, 0, RGB(206,0,206));
 	File.AddItem(ID_TC_VIEW,"Create",3);//no need
@@ -95,6 +91,7 @@ int CBarOperation::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	cf.AddFolder(&Folder,"Folders");
 	cf.AddFolder(&File,"Files");
 	cf.AddFolder(&Archive,"Archive");
+
 	return 0;
 }
 void CBarOperation::OnFavourites()
