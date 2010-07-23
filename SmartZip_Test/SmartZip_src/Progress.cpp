@@ -342,7 +342,7 @@ UINT Extract (LPVOID pParam)
 					continue;
 				}
 			}
-				BOOL success=zip.ExtractFile(pArray->GetAt (i),pWnd->m_extractpath,useFullpath);
+				bool success=zip.ExtractFile(pArray->GetAt (i),pWnd->m_extractpath,useFullpath);
 				if(!success)
 				{
 					CString gg;
@@ -438,7 +438,7 @@ UINT Add (LPVOID pParam)
 	CStringArray * pArray=(CStringArray *)ptp->pReserved;
 	BOOL bFullPath=ptp->pFull;
 	int iLevel=ptp->bOverwrite;
-BOOL bEnc=ptp->bEnc ;
+	BOOL bEnc=ptp->bEnc ;
 	CZipArchive& zip=*(ptp->zip);
 	delete ptp;
 	/////////////////////////////////////////
@@ -454,7 +454,7 @@ BOOL bEnc=ptp->bEnc ;
 		CFileStatus fs;
 		if (!CFile::GetStatus(sz, fs))
 			continue;
-		CAddInfo* ai = new CAddInfo(sz, fs.m_size, (fs.m_attribute & FILE_ATTRIBUTE_DIRECTORY) != 0);
+		CAddInfo* ai = new CAddInfo(sz, (int)fs.m_size, (fs.m_attribute & FILE_ATTRIBUTE_DIRECTORY) != 0);
 		if (ai->m_bDir)
 		{
 			ai->m_iSize = 0;
@@ -469,7 +469,7 @@ BOOL bEnc=ptp->bEnc ;
 		CAddInfo* pInfo =(CAddInfo*) folders[i];
 		array.Add(pInfo); // add the folder before adding its files											// it is not needed to add the root folder
 		folders[i] = NULL;
-		bContinue = pWnd->AddFolder(pInfo->m_szName, array);
+		bContinue = (bool)pWnd->AddFolder(pInfo->m_szName, array);
 		if (!bContinue)
 			break;
 	}
@@ -521,7 +521,7 @@ BOOL bEnc=ptp->bEnc ;
 				else continue;
 			}
 			zip.AddNewFile(ai->m_szName, 
-				iLevel, bFullPath, // we have a root path set, so set it to false
+				iLevel, (bool)bFullPath, // we have a root path set, so set it to false
 				iSmart);
 			zip.SetPassword ();
 		}

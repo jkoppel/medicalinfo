@@ -52,8 +52,8 @@ BOOL CFileView::OnInitDialog()
 	::ReleaseDC(NULL, hDC);
 	m_list.SetFont(&m_Font);
 	// TODO: Add extra initialization here
-	m_list.LoadFile (&memfile,memfile.GetLength ());
-COLORREF	crBtnColor = ::GetSysColor(COLOR_BTNFACE) + RGB(30, 30, 30);
+	m_list.LoadFile (&memfile, (int)memfile.GetLength ());
+	COLORREF crBtnColor = ::GetSysColor(COLOR_BTNFACE) + RGB(30, 30, 30);
 	m_close.SetIcon(IDI_CANCEL3);
 	m_close.SetColor(CButtonST::BTNST_COLOR_BK_IN, crBtnColor);
 	m_close.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 128, 0));

@@ -50,7 +50,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="ZipArchive\;SeaShellExt\Include;GuiLib\;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ZIP_BUILD_DLL;ZIP_HAS_DLL;NO_DUMMY_DECL;_CRT_RAND_S;_AFXEXT;_AFXDLL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_AFXDLL;ZIP_HAS_DLL;_ZIP_IMPL_MFC"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -78,7 +78,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="GuiTk115d.lib ZipArchive.lib"
 				OutputFile=".\Debug/SmartZip.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -1162,11 +1161,11 @@
 				>
 			</File>
 			<File
-				RelativePath="Res\icon1.ico"
+				RelativePath="icon1.ico"
 				>
 			</File>
 			<File
-				RelativePath="icon1.ico"
+				RelativePath="Res\icon1.ico"
 				>
 			</File>
 			<File
@@ -1350,10 +1349,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SeaShellExt\UISubclass.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\SeaShellExt\UITreeCtrl.cpp"
 				>
 			</File>
@@ -1384,5 +1379,9 @@
 		</File>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="SmartZip.rc"
+		/>
 	</Globals>
 </VisualStudioProject>

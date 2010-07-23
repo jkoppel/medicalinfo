@@ -49,8 +49,7 @@
 #include "ZipPathComponent.h"
 #include "ZipCompatibility.h"
 
-//const TCHAR CZipPathComponent::m_cSeparator = _T('\\');
-//const char CZipPathComponent::m_cSeparator = '\\';
+const TCHAR CZipPathComponent::m_cSeparator = _T('\\');
 
 ULONGLONG ZipPlatform::GetDeviceFreeSpace(LPCTSTR lpszPath)
 {

@@ -121,7 +121,7 @@ bool CRegistrySerialize::Save()
 		return false;
 	}
 
-	int iSize = mf.GetLength();
+	int iSize = (int)mf.GetLength();
 	BYTE* pData = mf.Detach();
 	bool ret = RegSetValueEx(m_Key, m_szValue, 0, REG_BINARY, pData, iSize) == ERROR_SUCCESS;
 	free(pData);
