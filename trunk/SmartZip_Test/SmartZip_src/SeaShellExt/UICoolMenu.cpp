@@ -84,7 +84,7 @@ BOOL CUICoolMenuManager::bTRACE = FALSE;
 
 // constants used for drawing
 const int CXGAP = 1;        // num pixels between button and text
-const int CXTEXTMARGIN = 2;   // num pixels after hilite to start text
+//const int CXTEXTMARGIN = 2;   // num pixels after hilite to start text//modified by hwy
 const int CXBUTTONMARGIN = 2; // num pixels wider button is than bitmap
 const int CYBUTTONMARGIN = 2; // ditto for height
 

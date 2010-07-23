@@ -721,9 +721,9 @@ HINSTANCE insApp = AfxGetInstanceHandle();
 	//the size of exe file.
 	DWORD dFileLength = SizeofResource( insApp, hResInfo ); 
 	sfx.Write((LPSTR)hRes,dFileLength);
-	char* b=new char[file.GetLength ()];
-	file.Read (b,file.GetLength ());
-	sfx.Write (b,file.GetLength ());//modified by hwy, WriteHuge to Write, ReadHuge to Read
+	char* b=new char[(int)file.GetLength ()];
+	file.Read (b,(int)file.GetLength ());
+	sfx.Write (b,(int)file.GetLength ());//modified by hwy, WriteHuge to Write, ReadHuge to Read
 	delete b;
 	pDoc->OpenCurrentFile (pDoc->m_strfilename );
 }

@@ -495,7 +495,7 @@ public:
 		return m_state;
 	}
 
-	char m_gszSignature[10];		///< The central file header signature.//modified by hwy
+	static char m_gszSignature[];		///< The central file header signature.
 	static char m_gszLocalSignature[];	///< The local file header signature.
 	unsigned char m_uVersionMadeBy;		///< The version of the software that created the archive.
 	WORD m_uVersionNeeded;				///< The version needed to extract the file.
@@ -748,8 +748,7 @@ protected:
 	*/
 	static bool VerifySignature(CZipAutoBuffer& buf)
 	{
-		char gszSignature[] = {0x50, 0x4b, 0x01, 0x02};//added by hwy
-		return memcmp(buf, gszSignature, 4) == 0;//modified by hwy
+		return memcmp(buf, m_gszSignature, 4) == 0;
 	}
 
 	/**

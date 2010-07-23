@@ -79,6 +79,10 @@ void CMyFavourites::OnOK()
 	
 	POSITION pos=m_list.GetFirstSelectedItemPosition ();
 	int m=m_list.GetNextSelectedItem (pos);
+	if(m<0){
+		::AfxMessageBox(_T("Please Select an Item."));
+		return;
+	}
 	::AfxGetApp ()->OpenDocumentFile (m_list.GetItemText (m,0));
 	//	
 	CDialog::OnOK();

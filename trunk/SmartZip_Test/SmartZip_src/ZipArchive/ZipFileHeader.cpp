@@ -31,16 +31,13 @@
 #endif
 
 
-//char CZipFileHeader::m_gszSignature[] = {0x50, 0x4b, 0x01, 0x02};
+char CZipFileHeader::m_gszSignature[] = {0x50, 0x4b, 0x01, 0x02};
 char CZipFileHeader::m_gszLocalSignature[] = {0x50, 0x4b, 0x03, 0x04};
 
 using namespace ZipArchiveLib;
 
 CZipFileHeader::CZipFileHeader()
 {
-	char gszSignature[] = {0x50, 0x4b, 0x01, 0x02};
-	memcpy(m_gszSignature, gszSignature, 4);
-
 	Initialize(NULL);
 	SetSystemCompatibility(ZipPlatform::GetSystemID());
 }

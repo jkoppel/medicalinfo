@@ -27,29 +27,12 @@
 #define ID_PROPERTIES 0x332
 #define ID_COMMENTS 0x333
 
-//void _AfxAdjustRectangle(CRect& rect, CPoint pt);
-
-#define _GUILIB_NOAUTOLIB
-
-#define 	GUISTYLE_XP   0x08001 	
-#define		GUISTYLE_2003 0x08002
-#define		GUISTYLE_2003MENUBTN 0x08021
-#define		WIN_NT		  0x08003 	
-#define		WIN_2000	0x08004
-#define		WIN_XP		0x08005
-#define		WIN_95		0x08006
-#define		WIN_98		0x08007
-#define		WIN_32		0x08008
-#define		WIN_ME		0x08009
-#define		WIN_95OSR2	0x0800A
-#define		WIN_98_SE	0x0800B
- 	
 #include "GuiLib.h"
-#include "GuiLibRes.h"
 
 //mine
-#include <afxmt.h>
+//#include <afxmt.h>
 #include "ZipArchive.h"
+
 struct CDebugTimer
 	{
 		DWORD m_ticks;

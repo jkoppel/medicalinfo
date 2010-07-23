@@ -15,7 +15,7 @@
 #include "stdafx.h"
 #include "ZipExtraField.h"
 
-//CZipArray<WORD> CZipExtraField::m_aNoSizeExtraHeadersID;//deleted by hwy
+CZipArray<WORD> CZipExtraField::m_aNoSizeExtraHeadersID;
 
 bool CZipExtraField::Read(CZipStorage *pStorage, WORD uSize)
 {

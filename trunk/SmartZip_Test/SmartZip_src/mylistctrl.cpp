@@ -39,7 +39,7 @@ szLine[16]=NULL;
 	sprintf(szHex, "%02x %02x %02x %02x %02x %02x %02x %02x  %02x %02x %02x %02x %02x %02x %02x %02x", 
 		szLine[0],szLine[1],szLine[2],szLine[3],szLine[4],szLine[5],szLine[6],szLine[7],szLine[8],
 		szLine[9],szLine[10],szLine[11],szLine[12],szLine[13],szLine[14],szLine[15]);
-	strupr(szHex);
+	_strupr(szHex);
 	SetToDots(szHex);
 	strcat(szHex, "  ");
 	strcat(szHex, szLine);

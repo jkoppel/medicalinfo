@@ -59,6 +59,9 @@ public:
 	}
 };
 
+typedef CZipArray<WORD> CZipWordArray;//added by hwy
+
+
 template<class TYPE>
 class CZipPtrList : public CTypedPtrList<CPtrList, TYPE>
 {
