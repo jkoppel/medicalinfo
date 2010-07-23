@@ -46,6 +46,7 @@ static char THIS_FILE[] = __FILE__;
 #define CX_BORDER   1
 #define CY_BORDER   1
 
+//AFX_STATIC void AFXAPI _AfxAdjustRectangle(CRect& rect, CPoint pt);
 AFX_STATIC void AFXAPI _AfxAdjustRectangle(CRect& rect, CPoint pt)
 {
 	int nXOffset = (pt.x < rect.left) ? (pt.x - rect.left) :
@@ -54,6 +55,8 @@ AFX_STATIC void AFXAPI _AfxAdjustRectangle(CRect& rect, CPoint pt)
 					(pt.y > rect.bottom) ? (pt.y - rect.bottom) : 0;
 	rect.OffsetRect(nXOffset, nYOffset);
 }
+/*
+*/
 
 /////////////////////////////////////////////////////////////////////////////
 // CGuiDockContext

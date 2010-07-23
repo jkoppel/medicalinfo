@@ -226,7 +226,7 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnNcLButtonDblClk(UINT nFlags, CPoint point);
-	afx_msg LRESULT OnNcHitTest(CPoint point);//modified by hwy
+	afx_msg LRESULT OnNcHitTest(CPoint point);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	afx_msg void OnMouseMove(UINT, CPoint);
 	afx_msg void OnSize(UINT nType, int cx, int cy);

@@ -144,7 +144,7 @@ CFrameWnd* pParent = STATIC_DOWNCAST(CFrameWnd, AfxGetMainWnd());
 
 	SetTimer(1,200,NULL);
 	CWnd* pWnd=CWnd::FromHandle(::GetTopWindow(GetParentFrame()->GetSafeHwnd()));	
-	char ClassName[32];
+	TCHAR ClassName[32];
 	
 	while (pWnd != NULL)
 	{

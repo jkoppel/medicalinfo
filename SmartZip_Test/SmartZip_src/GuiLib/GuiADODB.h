@@ -23,8 +23,10 @@
 
 
 
-//modified by hwy
-#import "C:\Program Files\Common Files\System\ADO\msado15.dll" rename_namespace("ADOCG") rename("EOF", "EndOfFile")
+
+//#import "\Program Files\Common Files\System\ADO\msado15.dll" rename_namespace("ADOCG") rename("EOF", "EndOfFile")
+#import "C:\\WINDOWS\\ServicePackFiles\\i386\\msado15.dll" rename_namespace("ADOCG") rename("EOF", "EndOfFile")
+
 
 using namespace ADOCG;
 

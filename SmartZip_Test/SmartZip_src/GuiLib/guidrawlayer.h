@@ -145,11 +145,10 @@ public:
 	}
 
 
-	static int DrawIcon(CDC* pDC, CPoint m_point,CSize m_sizeImg,HICON hIcon,BOOL Enabled=TRUE)
+	static void DrawIcon(CDC* pDC, CPoint m_point,CSize m_sizeImg,HICON hIcon,BOOL Enabled=TRUE)
 	{
 		pDC->DrawState(m_point, m_sizeImg, hIcon,
 					(Enabled== FALSE ? DSS_DISABLED:DSS_NORMAL), (CBrush*)NULL);
-		return 0;
 	}
 	//**
 

@@ -90,6 +90,7 @@ END_MESSAGE_MAP()
 
 
 int _afxDropDownWidth = -1;
+//extern int _afxDropDownWidth;
 
 int AFXAPI _AfxGetDropDownWidth()
 {
@@ -1493,8 +1494,7 @@ CSize  CGuiToolBarWnd::CalcLayout(DWORD dwMode, int nLength)
 			BOOL bIsDelayed = m_bDelayedButtonLayout;
 			m_bDelayedButtonLayout = FALSE;
 
-			int i;
-			for (i = 0; i < nCount; i++)
+			for (int i = 0; i < nCount; i++)
 				if ((pData[i].fsStyle & TBSTYLE_SEP) && (pData[i].idCommand != 0))
 					nControlCount++;
 
@@ -1522,7 +1522,7 @@ CSize  CGuiToolBarWnd::CalcLayout(DWORD dwMode, int nLength)
 
 			if ((m_dwStyle & CBRS_FLOATING) && (m_dwStyle & CBRS_SIZE_DYNAMIC))
 				m_nMRUWidth = sizeResult.cx;
-			for (i = 0; i < nCount; i++)
+			for (int i = 0; i < nCount; i++)
 				_SetButton(i, &pData[i]);
 
 			if (nControlCount > 0)

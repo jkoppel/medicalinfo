@@ -89,7 +89,7 @@ BOOL CGuiMDIFrame::PreCreateWindow(CREATESTRUCT& cs)
 	// Restore main window position
 	CWinApp* pApp = AfxGetApp();
 	TCHAR szSection[256];
- 	wsprintf(szSection, "%sMain", sProfile);
+ 	wsprintf(szSection, _T("%sMain"), sProfile);
 
 	// Restore main window position
     CWinApp* app = AfxGetApp();

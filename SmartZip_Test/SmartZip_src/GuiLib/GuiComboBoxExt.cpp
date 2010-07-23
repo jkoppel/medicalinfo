@@ -226,7 +226,7 @@ void CGuiComboBoxExt::DeleteHistory(CString szHistory)
 	int nCount = GetCount();
     for (int i = 0; i < nCount; i++)
     {
-	  sKey.Format("%s%d", szHistory,i);
+	  sKey.Format(_T("%s%d"), szHistory,i);
       rk.DeleteValue(sKey);
     }
   CString nKeyHist=szHistory+"SaveCurrent";
