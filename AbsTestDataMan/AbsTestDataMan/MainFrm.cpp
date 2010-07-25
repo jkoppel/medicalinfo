@@ -433,11 +433,14 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	if(!m_wndSplitter1.CreateStatic(this,2,1)){
 		return FALSE;
 	}
-	m_wndSplitter1.CreateView(0,0,RUNTIME_CLASS(CFilterFormView),CSize(500,60),pContext);
+	m_wndSplitter1.CreateView(0,0,RUNTIME_CLASS(CFilterFormView),CSize(500,50),pContext);
 	m_wndSplitter2.CreateStatic(&m_wndSplitter1,1,2,WS_CHILD|WS_VISIBLE,m_wndSplitter1.IdFromRowCol(1, 0));
 	m_wndSplitter2.CreateView(0,0,RUNTIME_CLASS(CLeftTreeView),CSize(200,100),pContext);
 	m_wndSplitter2.CreateView(0,1,RUNTIME_CLASS(CRightDrawAreaView),CSize(100,100),pContext);
+
 	SetActiveView((CView*)m_wndSplitter1.GetPane(0,0));
+
+	m_wndSplitter1.LockBar();
 
 	return CFrameWndEx::OnCreateClient(lpcs, pContext);
 }
