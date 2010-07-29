@@ -6,6 +6,31 @@
 #include "AbsTestDataManDoc.h"
 #include "ExtLibs\\LBTabCtrl\\LBTabCtrl.h"
 
+#define MAX_AXIS_BUF_LEN	256
+struct CurveInfo
+{
+	double *pXData;
+	double *pYData;
+	int iNumOfPoint;
+
+	COLORREF crColor;
+	int iWidth;
+	BOOL bIsClosed;
+};
+
+struct CanvasInfo
+{
+	RECT rect;
+	CDC *pDC;
+	struct CurveInfo *pCurveInfo;
+	int iNumOfCurve;
+	char sCanvasInfo[MAX_AXIS_BUF_LEN];
+	char sXAxisInfo[MAX_AXIS_BUF_LEN];
+	char sYAxisInfo[MAX_AXIS_BUF_LEN];
+};
+
+extern void DrawCurve(struct CanvasInfo ci);
+
 class CRightDrawAreaView : public CView
 {
 protected: // 仅从序列化创建
@@ -17,11 +42,13 @@ protected: // 仅从序列化创建
 // 属性
 public:
 	int m_iCurrTabIndex;		//当前选中页面
-	DRAW_MODE m_iDrawMode;	//图像显示方式
+	DRAW_MODE m_iDrawMode;		//图像显示方式
 	POINT m_pntClientAreaRef;	//参考位置，即左下角起始点
 	POINT m_pntClientAreaOrig;	//真正坐标原点位置
 	int m_nClientAreaWidth;		//作图区域宽度
 	int m_nClientAreaHeight;	//作图区域高度
+	int m_nMaxNumOfCurveToDraw;	//最多作图个数
+	struct CurveInfo *m_pCurveInfo;
 
 	CLBTabCtrl *m_pTab;
 

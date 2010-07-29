@@ -444,13 +444,15 @@ struct AdditionInfo
 	double fDisplacementOfFilter[MAX_SPEED_NUM][MAX_FORCE_NUM];	//滤波后的位移值
 	double fForceOfFilter[MAX_SPEED_NUM][MAX_FORCE_NUM];		//滤波后的力值
 	double fSpeedOfFilter[MAX_SPEED_NUM][MAX_FORCE_NUM];		//滤波后的速度值(位移的微分)
+	double fTime[MAX_SPEED_NUM][MAX_FORCE_NUM];					//时间序列
 	int iDataBandStart[MAX_SPEED_NUM];							//有效数据的起始点位置
 	int iDataBandLen[MAX_SPEED_NUM];							//有效数据的宽度
 
 	//摩擦力数据
 	double fFrictionDisplacementOfFilter[MAX_FORCE_NUM];		//滤波后的摩擦力位移值
 	double fFrictionForceOfFilter[MAX_FORCE_NUM];				//滤波后的摩擦力力值
-	double fFrictionSpeedOfFilter[MAX_FORCE_NUM];				//滤波后的速度值(位移的微分)
+	double fFrictionSpeedOfFilter[MAX_FORCE_NUM];				//滤波后的摩擦力速度值(位移的微分)
+	double fFrictionTime[MAX_FORCE_NUM];						//摩擦力时间序列
 	int iFrictionDataBandStart;									//摩擦力有效数据起始点位置
 	int iFrictionDataBandLen;									//摩擦力有效数据宽度
 };
