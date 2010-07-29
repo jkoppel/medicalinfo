@@ -856,7 +856,12 @@ void CTestDataTreeMgt::ProcessData(FileNodePtr pFileNode)
 						COEF_OF_FILTER*node.pTestRecord->fSetSpeed[i]/node.pTestRecord->fSetOffset[i]/(2*M_PI), 
 						node.pAdditionInfo->iDataBandLen[i]);
 
-			//记录
+			//时间序列
+			for(j=node.pAdditionInfo->iDataBandStart[i];j<node.pAdditionInfo->iDataBandStart[i]+node.pAdditionInfo->iDataBandLen[i];j++){
+				node.pAdditionInfo->fTime[i][j] = (j-node.pAdditionInfo->iDataBandStart[i]) / node.pTestRecord->fDataFreq[i];
+			}
+
+			//记录最大力值和最小力值
 			min = node.pAdditionInfo->fForceOfFilter[i][node.pAdditionInfo->iDataBandStart[i]];
 			max = node.pAdditionInfo->fForceOfFilter[i][node.pAdditionInfo->iDataBandStart[i]];
 			for(j=0;j<node.pAdditionInfo->iDataBandLen[i];j++){
@@ -875,6 +880,7 @@ void CTestDataTreeMgt::ProcessData(FileNodePtr pFileNode)
 		}//END OF FOR EACH SPEED
 	}//END OF IF NORMAL SPEED
 
+	node.pTestRecord->bFrictionSpeed = TRUE;//just for test
 	if(node.pTestRecord->bFrictionSpeed){
 		node.pTestRecord->fFrictionSetSpeed = node.pProductInfo->fFrictionSpeed0;
 		if(node.pProductInfo->bDifferentOffset){
@@ -969,6 +975,11 @@ void CTestDataTreeMgt::ProcessData(FileNodePtr pFileNode)
 					node.pTestRecord->fFrictionDataFreq,
 					COEF_OF_FILTER*node.pTestRecord->fFrictionSetSpeed/node.pTestRecord->fFrictionSetOffset/(2*M_PI), 
 					node.pAdditionInfo->iFrictionDataBandLen);
+
+		//时间序列
+		for(j=node.pAdditionInfo->iFrictionDataBandStart;j<node.pAdditionInfo->iFrictionDataBandStart+node.pAdditionInfo->iFrictionDataBandLen;j++){
+			node.pAdditionInfo->fFrictionTime[j] = (j-node.pAdditionInfo->iFrictionDataBandStart) / node.pTestRecord->fFrictionDataFreq;
+		}
 
 		min = node.pAdditionInfo->fFrictionForceOfFilter[node.pAdditionInfo->iFrictionDataBandStart];
 		max = node.pAdditionInfo->fFrictionForceOfFilter[node.pAdditionInfo->iFrictionDataBandStart];

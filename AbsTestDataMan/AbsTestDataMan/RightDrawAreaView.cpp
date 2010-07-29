@@ -3,11 +3,12 @@
 
 #include "stdafx.h"
 #include "AbsTestDataMan.h"
-
 #include "AbsTestDataManDoc.h"
 #include "RightDrawAreaView.h"
 #include "GlobalVars.h"
 #include "GlobalFuncs.h"
+
+#include <math.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -29,6 +30,252 @@ BEGIN_MESSAGE_MAP(CRightDrawAreaView, CView)
 END_MESSAGE_MAP()
 
 
+void DrawCurve(struct CanvasInfo ci)
+{
+	int i, j;
+	double fXMax, fXMin;
+	double fYMax, fYMin;
+
+	if(ci.iNumOfCurve>0){
+		fXMax = ci.pCurveInfo[0].pXData[0];
+		fXMin = fXMax;
+		fYMax = ci.pCurveInfo[0].pYData[0];
+		fYMin = fYMax;
+
+		for(i=0;i<ci.iNumOfCurve;i++){
+			for(j=0;j<ci.pCurveInfo[i].iNumOfPoint;j++){
+				if(ci.pCurveInfo[i].pXData[j] > fXMax){
+					fXMax = ci.pCurveInfo[i].pXData[j];
+				}
+				if(ci.pCurveInfo[i].pXData[j] < fXMin){
+					fXMin = ci.pCurveInfo[i].pXData[j];
+				}
+				if(ci.pCurveInfo[i].pYData[j] > fYMax){
+					fYMax = ci.pCurveInfo[i].pYData[j];
+				}
+				if(ci.pCurveInfo[i].pYData[j] < fYMin){
+					fYMin = ci.pCurveInfo[i].pYData[j];
+				}
+			}
+		}
+	}
+	else{
+		fXMax = 900;
+		fXMin = 100;
+		fYMax = 900;
+		fYMin = 100;
+	}
+
+	double fXRange = fXMax - fXMin;
+	int iXMinUnitVal, iXMaxUnitVal;
+	double fXUnitWidth;
+	fXUnitWidth = 1;
+	if(fXRange>=2){
+		while( !(fXRange>=2 && fXRange<20) ){
+			fXRange = fXRange / 10;
+			fXUnitWidth *= 10;
+		}
+	}
+	else{
+		while( !(fXRange>=2 && fXRange<20) ){
+			fXRange = fXRange * 10;
+			fXUnitWidth /= 10;
+		}
+	}
+	iXMaxUnitVal = (int)ceil( fXMax / fXUnitWidth + 0.5 );
+	iXMinUnitVal = (int)floor( fXMin / fXUnitWidth - 0.5 );
+	if(iXMaxUnitVal-iXMinUnitVal>10){
+		fXUnitWidth *= 2;
+		iXMaxUnitVal = (int)ceil( fXMax / fXUnitWidth );
+		iXMinUnitVal = (int)floor( fXMin / fXUnitWidth );
+	}
+
+	double fYRange = fYMax - fYMin;
+	int iYMinUnitVal, iYMaxUnitVal;
+	double fYUnitWidth;
+	fYUnitWidth = 1;
+	if(fYRange>=2){
+		while( !(fYRange>=2 && fYRange<20) ){
+			fYRange = fYRange / 10;
+			fYUnitWidth *= 10;
+		}
+	}
+	else{
+		while( !(fYRange>=2 && fYRange<20) ){
+			fYRange = fYRange * 10;
+			fYUnitWidth /= 10;
+		}
+	}
+	iYMaxUnitVal = (int)ceil( fYMax / fYUnitWidth ) + 1;
+	iYMinUnitVal = (int)floor( fYMin / fYUnitWidth ) - 1;
+	if(iYMaxUnitVal-iYMinUnitVal>10){
+		fYUnitWidth *= 2;
+		iYMaxUnitVal = (int)ceil( fYMax / fYUnitWidth );
+		iYMinUnitVal = (int)floor( fYMin / fYUnitWidth );
+	}
+
+	POINT pntRefPoint;
+	int iDrawAreaWidth, iDrawAreaHeight;
+	int iXSpan;
+	int iYSpan;
+	RECT rect;
+	CPen pen;
+	CBrush brush;
+	char buf[MAX_BUF_LEN];
+	CFont fontLogo,*oldFont;
+	CDC *pDC;
+
+	if((ci.rect.bottom - ci.rect.top<100) ||
+	   (ci.rect.right - ci.rect.left<100) ){
+		return;
+	}
+
+	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
+	pntRefPoint.x = ci.rect.left + 60;
+	pntRefPoint.y = ci.rect.bottom - 50;
+	iDrawAreaWidth = ci.rect.right - ci.rect.left - 100;
+	iDrawAreaHeight = ci.rect.bottom - ci.rect.top - 100;
+	iXSpan = iDrawAreaWidth / (iXMaxUnitVal - iXMinUnitVal);
+	iYSpan = iDrawAreaHeight / (iYMaxUnitVal - iYMinUnitVal);
+	iDrawAreaWidth = iXSpan * (iXMaxUnitVal - iXMinUnitVal);
+	iDrawAreaHeight = iYSpan * (iYMaxUnitVal - iYMinUnitVal);
+
+	pDC = ci.pDC;
+
+	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
+	pDC->SelectObject(&pen);
+	//»­ºáÖá
+	pDC->MoveTo(pntRefPoint);
+	pDC->LineTo(pntRefPoint.x + iDrawAreaWidth, pntRefPoint.y);
+	//»­×ÝÖá
+	pDC->MoveTo(pntRefPoint);
+	pDC->LineTo(pntRefPoint.x, pntRefPoint.y - iDrawAreaHeight);
+
+	//»­Öá¿Ì¶È¼°ÎÄ×Ö±êÊ¶
+	for(i=0; i<=iXMaxUnitVal-iXMinUnitVal; i++){
+		if(i>0){
+			pDC->MoveTo(pntRefPoint.x + i * iXSpan, pntRefPoint.y);
+			pDC->LineTo(pntRefPoint.x + i * iXSpan, pntRefPoint.y + 5);
+		}
+
+		if(fXUnitWidth>=1){
+			sprintf_s(buf, "%d", (int)((iXMinUnitVal+i) * fXUnitWidth));
+		}
+		else{
+			sprintf_s(buf, "%.2f", (iXMinUnitVal+i) * fXUnitWidth);
+		}
+		rect.left = pntRefPoint.x  + i * iXSpan - 25;
+		rect.right = pntRefPoint.x + i * iXSpan + 25;
+		rect.top = pntRefPoint.y;
+		rect.bottom = pntRefPoint.y + 25;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
+	}
+	for(i=0; i<=iYMaxUnitVal-iYMinUnitVal; i++){
+		if(i>0){
+			pDC->MoveTo(pntRefPoint.x, pntRefPoint.y - i * iYSpan);
+			pDC->LineTo(pntRefPoint.x - 5, pntRefPoint.y - i * iYSpan);
+		}
+
+		if(fYUnitWidth>=1){
+			sprintf_s(buf, "%d", (int)((iYMinUnitVal+i) * fYUnitWidth));
+		}
+		else{
+			sprintf_s(buf, "%.2f", (iYMinUnitVal+i) * fYUnitWidth);
+		}
+		rect.left = pntRefPoint.x  - 45;
+		rect.right = pntRefPoint.x - 5;
+		rect.top = pntRefPoint.y - i * iYSpan - 10;
+		rect.bottom = pntRefPoint.y - i * iYSpan + 10;
+		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
+	}
+
+	pen.DeleteObject();
+
+	//»­×ÝºáÐéÏß
+	LOGBRUSH logbrush;
+	logbrush.lbColor = RGB(192,192,192); 
+	logbrush.lbStyle = PS_SOLID;
+	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
+	pDC->SelectObject(&pen);
+	for(i=1;i<=iXMaxUnitVal-iXMinUnitVal;i++){
+		pDC->MoveTo(pntRefPoint.x + i * iXSpan, pntRefPoint.y -2);
+		pDC->LineTo(pntRefPoint.x + i * iXSpan, pntRefPoint.y- iDrawAreaHeight + 2);
+	}
+	for(i=1;i<=iYMaxUnitVal-iYMinUnitVal;i++){
+		pDC->MoveTo(pntRefPoint.x + 2, pntRefPoint.y - iYSpan * i);
+		pDC->LineTo(pntRefPoint.x + iDrawAreaWidth - 2, pntRefPoint.y - iYSpan * i);
+	}
+	pen.DeleteObject();
+
+	//»­±êÊ¶
+
+	//´ó±êÌâ
+	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	rect.left = pntRefPoint.x + iDrawAreaWidth/2 - 120;
+	rect.right = pntRefPoint.x + iDrawAreaWidth/2 + 30;
+	rect.top = pntRefPoint.y - iDrawAreaHeight - 20;
+	rect.bottom = pntRefPoint.y - iDrawAreaHeight;
+	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(CString(ci.sCanvasInfo), &rect, DT_SINGLELINE | DT_LEFT);
+
+	//ºáÖá±êÌâ
+	rect.left = pntRefPoint.x + iDrawAreaWidth/2 - 50;
+	rect.right = pntRefPoint.x + iDrawAreaWidth/2 + 100;
+	rect.top = pntRefPoint.y + 20;
+	rect.bottom = pntRefPoint.y + 40;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
+						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+						FIXED_PITCH | FF_ROMAN,_T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(CString(ci.sXAxisInfo), &rect, DT_SINGLELINE | DT_LEFT );
+
+	//×ÝÖá±êÌâ
+	rect.left = pntRefPoint.x - 60;
+	rect.right = pntRefPoint.x - 20;
+	rect.top = pntRefPoint.y - iDrawAreaHeight/2;
+	rect.bottom = pntRefPoint.y - iDrawAreaHeight/2 - 100;
+	fontLogo.DeleteObject();
+	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
+						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+						DEFAULT_PITCH, _T("System"));
+	pDC->SetBkMode(TRANSPARENT);
+	oldFont=pDC->SelectObject(&fontLogo);
+	pDC->DrawText(CString(ci.sYAxisInfo), &rect, DT_SINGLELINE | DT_LEFT );
+
+	//»­Ã¿Ò»ÌõÇúÏß
+	for(i=0;i<ci.iNumOfCurve;i++){
+		int x_start, y_start, x, y;
+		pen.DeleteObject();
+		pen.CreatePen(PS_SOLID, 2, ci.pCurveInfo[i].crColor);
+		pDC->SelectObject(&pen);
+		for(j=0;j<ci.pCurveInfo[i].iNumOfPoint;j++){
+			x = (int)(pntRefPoint.x + (ci.pCurveInfo[i].pXData[j] - iXMinUnitVal * fXUnitWidth) * iXSpan / fXUnitWidth);
+			y = (int)(pntRefPoint.y - (ci.pCurveInfo[i].pYData[j] - iYMinUnitVal * fYUnitWidth) * iYSpan / fYUnitWidth);
+			if(j==0){
+				if(ci.pCurveInfo[i].bIsClosed){
+					x_start = x;
+					y_start = y;
+				}
+				pDC->SetPixel(x, y, ci.pCurveInfo[i].crColor);
+				pDC->MoveTo(x, y);
+			}
+			else{
+				pDC->LineTo(x, y);
+			}
+		}
+		if(ci.pCurveInfo[i].bIsClosed){
+			pDC->LineTo(x_start, y_start);
+		}
+	}
+}
+
 // CRightDrawAreaView ¹¹Ôì/Îö¹¹
 
 CRightDrawAreaView::CRightDrawAreaView()
@@ -40,6 +287,10 @@ CRightDrawAreaView::CRightDrawAreaView()
 	m_nClientAreaWidth = 0;
 	m_nClientAreaHeight = 0;
 
+	m_nMaxNumOfCurveToDraw = 20;
+	m_pCurveInfo = new struct CurveInfo[m_nMaxNumOfCurveToDraw];
+	memset(m_pCurveInfo, 0, m_nMaxNumOfCurveToDraw * sizeof(struct CurveInfo));
+
 	m_pTab = NULL;
 
 	g_pRightDrawAreaView = this;
@@ -49,6 +300,9 @@ CRightDrawAreaView::~CRightDrawAreaView()
 {
 	if(m_pTab){
 		delete m_pTab;
+	}
+	if(m_pCurveInfo){
+		delete m_pCurveInfo;
 	}
 }
 
@@ -144,407 +398,20 @@ CAbsTestDataManDoc* CRightDrawAreaView::GetDocument() const // ·Çµ÷ÊÔ°æ±¾ÊÇÄÚÁªµ
 }
 #endif //_DEBUG
 
-#if 0
-void CRightDrawAreaView::DrawData()
-{
-	RECT rect;
-	CPen pen;
-	CBrush brush;
-	int i, j, x, y;
-	char buf[100];
-	struct CCTestRecord *pRec = NULL;
-	CFont fontLogo,*oldFont;
-
-	GetClientRect(&rect);
-	if(rect.bottom<100 || rect.right<100){
-		return;
-	}
-	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
-	m_pntClientAreaRef.x = rect.left + 50;
-	m_pntClientAreaRef.y = rect.bottom - 50;
-	m_nClientAreaWidth = rect.right - rect.left - 100;
-	m_nClientAreaHeight = rect.bottom - rect.top - 100;
-
-	CDC *pDC=GetDC();
-
-	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
-	pDC->SelectObject(&pen);
-	//»­ºáÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
-	//»­×ÝÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
-
-	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
-	double xspan = m_nClientAreaWidth / 11.0;
-	double yspan= m_nClientAreaHeight / 5.5;
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
-
-		sprintf_s(buf, "%d", (i-5)*10);
-		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
-		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
-		rect.top = m_pntClientAreaRef.y;
-		rect.bottom = m_pntClientAreaRef.y + 25;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-
-		sprintf_s(buf, "%d", (4-i)*250);
-		rect.left = m_pntClientAreaRef.x - 5 - 40;
-		rect.right = m_pntClientAreaRef.x - 5;
-		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
-		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
-	}
-	//Ô­µãÎ»ÖÃ
-	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
-	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
-
-	pen.DeleteObject();
-
-	//»­×ÝºáÐéÏß
-	LOGBRUSH logbrush;
-	logbrush.lbColor = RGB(192,192,192); 
-	logbrush.lbStyle = PS_SOLID;
-	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
-	pDC->SelectObject(&pen);
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-	}
-	pen.DeleteObject();
-
-	//±êÊ¶Ô­µã
-	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
-
-	//»­±êÊ¶
-	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
-	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
-
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
-	rect.top = m_pntClientAreaRef.y + 20;
-	rect.bottom = m_pntClientAreaRef.y + 40;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN,_T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	rect.left = m_pntClientAreaRef.x - 48;
-	rect.right = m_pntClientAreaRef.x - 28;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
-						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-						DEFAULT_PITCH, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	if(g_pTree==NULL){
-		return;
-	}
-
-	int iNumDrawed = 0;
-	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
-	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.GetProductTreeRootPtr();
-	ProductNodePtr pProductNode = g_TestDataTreeMgt.GetProductTreeRootPtr()->pProductNodeListHead->pNext;
-	while(pProductNode!=NULL){
-		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
-		while(pFileNode!=NULL){
-			int flag_selected = 0;
-			for(int iIndex=0;iIndex<pFileNode->test_record_maininfo.iNumOfSpeed;iIndex++){
-				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
-				if(tp->bSelected){
-					flag_selected = 1;
-					if(tp->pNode->bProcessed==FALSE){
-						char sFileName[256];
-						TCHAR2char(sFileName, tp->pNode->sFileName, _tcslen(tp->pNode->sFileName));
-						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
-					}
-
-					pen.DeleteObject();
-					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
-					pDC->SelectObject(&pen);
-
-					if(m_iDrawMode & DM_NORMAL_ONLY){
-						int x_start, y_start;
-						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
-							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-							x = (int)(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fForce[tp->iIndex][j] * (yspan/250));
-							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
-								pDC->MoveTo(x, y);
-								x_start = x;
-								y_start = y;
-								pDC->SetPixel(x, y, color[tp->iIndex]);
-							}
-							else{
-								pDC->LineTo(x, y);
-							}
-						}
-						pDC->LineTo(x_start, y_start);
-					}
-
-					if(m_iDrawMode & DM_FILTER_ONLY){
-						int x_start, y_start; 
-						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
-							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-							x = (int)(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][j] * (yspan/250));
-							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
-								pDC->MoveTo(x, y);
-								x_start = x;
-								y_start = y;
-								pDC->SetPixel(x, y, color[tp->iIndex]);
-							}
-							else{
-								pDC->LineTo(x, y);
-							}
-						}
-						pDC->LineTo(x_start, y_start);
-					}
-
-					//Á¦-ËÙ¶ÈÇúÏß
-					double *pStart = NULL;
-					for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
-						/*
-						double tmp;
-						pStart = &(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j]);
-						if(j<=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex]-3){
-							tmp = ( -3 * (*pStart) + 4 * (*(pStart+1)) - 1 * (*(pStart+2)) ) / 2 * tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
-						}
-						else if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex]-2){
-							tmp = ( -3 * (*pStart) + 4 * (*(pStart+1)) - 1 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]]) ) / 2 / tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
-						}
-						else{
-							tmp = ( -3 * (*pStart) + 4 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]]) - 1 * (tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+1]) ) / 2 / tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
-						}
-						*///Õý³£µÄÇóÖµ
-						//²ÉÓÃ20¸öµãÇóÆ½¾ùµÄ·½·¨
-						double tmp = 0;
-						pStart = &(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j]);
-						for(int k=0;k<10;k++){
-							tmp += *(pStart+k+10) - *(pStart+k);
-						}
-						tmp = tmp / 100 * tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
-							
-						//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-						tmp = tmp * 100 * xspan / 10;
-						tmp += m_pntClientAreaOrig.x;
-						x = (int)tmp;
-						//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-						y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fForce[tp->iIndex][j] * (yspan/250));
-						if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
-							pDC->MoveTo(x, y);
-							pDC->SetPixel(x, y, color[tp->iIndex]);
-						}
-						else{
-							pDC->LineTo(x, y);
-						}
-					}
-
-					//Á¦-Ê±¼äÇúÏß
-					for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
-						//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-						double tmp;
-						tmp = j-tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];
-						tmp /= tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
-						tmp *= xspan * 5;
-						tmp += m_pntClientAreaOrig.x;
-						x = (int)tmp;
-						//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-						y = (int)(m_pntClientAreaOrig.y - tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][j] * (yspan/250));
-						if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
-							pDC->MoveTo(x, y);
-							pDC->SetPixel(x, y, color[tp->iIndex]);
-						}
-						else{
-							pDC->LineTo(x, y);
-						}
-					}
-
-					iNumDrawed ++;
-					if(iNumDrawed>=20){
-						break;
-					}
-				}//END OF IF
-			}//END OF FOR
-			if(flag_selected==0 && pFileNode->bProcessed){
-				delete pFileNode->pMachineInfo;
-				pFileNode->pMachineInfo = NULL;
-				delete pFileNode->pProductInfo;
-				pFileNode->pProductInfo = NULL;
-				delete pFileNode->pTestRecord;
-				pFileNode->pTestRecord = NULL;
-				delete pFileNode->pAdditionInfo;
-				pFileNode->pAdditionInfo = NULL;
-				pFileNode->bProcessed = FALSE;
-			}
-			pFileNode = pFileNode->pNext;
-		}//END OF WHILE
-		pProductNode = pProductNode->pNext;
-	}
-
-	pDC->SelectObject(oldFont);
-}
-#endif
-
 void CRightDrawAreaView::Draw_Force_Vs_Position()
 {
-	RECT rect;
-	CPen pen;
-	CBrush brush;
-	int i, j, x, y;
-	char buf[100];
-	struct CCTestRecord *pRec = NULL;
-	CFont fontLogo,*oldFont;
-
-	GetClientRect(&rect);
-	if(rect.bottom<100 || rect.right<100){
-		return;
-	}
-	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
-	m_pntClientAreaRef.x = rect.left + 50;
-	m_pntClientAreaRef.y = rect.bottom - 50;
-	m_nClientAreaWidth = rect.right - rect.left - 100;
-	m_nClientAreaHeight = rect.bottom - rect.top - 100;
-
-	CDC *pDC=GetDC();
-
-	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
-	pDC->SelectObject(&pen);
-	//»­ºáÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
-	//»­×ÝÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
-
-	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
-	double xspan = m_nClientAreaWidth / 11.0;
-	double yspan= m_nClientAreaHeight / 5.5;
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
-
-		sprintf_s(buf, "%d", (i-5)*10);
-		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
-		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
-		rect.top = m_pntClientAreaRef.y;
-		rect.bottom = m_pntClientAreaRef.y + 25;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-
-		sprintf_s(buf, "%d", (4-i)*250);
-		rect.left = m_pntClientAreaRef.x - 5 - 40;
-		rect.right = m_pntClientAreaRef.x - 5;
-		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
-		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
-	}
-	//Ô­µãÎ»ÖÃ
-	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
-	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
-
-	pen.DeleteObject();
-
-	//»­×ÝºáÐéÏß
-	LOGBRUSH logbrush;
-	logbrush.lbColor = RGB(192,192,192); 
-	logbrush.lbStyle = PS_SOLID;
-	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
-	pDC->SelectObject(&pen);
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-	}
-	pen.DeleteObject();
-
-	//±êÊ¶Ô­µã
-	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
-
-	//»­±êÊ¶
-	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
-	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
-
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
-	rect.top = m_pntClientAreaRef.y + 20;
-	rect.bottom = m_pntClientAreaRef.y + 40;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN,_T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	rect.left = m_pntClientAreaRef.x - 48;
-	rect.right = m_pntClientAreaRef.x - 28;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
-						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-						DEFAULT_PITCH, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	if(g_pTree==NULL){
-		return;
-	}
-
-	int iNumDrawed = 0;
 	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	struct CanvasInfo ci;
+
+	memset(&ci, 0, sizeof(struct CanvasInfo));
+	ci.pCurveInfo = m_pCurveInfo;
+
 	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.GetProductTreeRootPtr();
 	ProductNodePtr pProductNode = g_TestDataTreeMgt.GetProductTreeRootPtr()->pProductNodeListHead->pNext;
-	while(pProductNode!=NULL){
+
+	while(pProductNode!=NULL && ci.iNumOfCurve < m_nMaxNumOfCurveToDraw){
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
-		while(pFileNode!=NULL){
+		while(pFileNode!=NULL && ci.iNumOfCurve < m_nMaxNumOfCurveToDraw){
 			int flag_selected = 0;
 			for(int iIndex=0;iIndex<pFileNode->test_record_maininfo.iNumOfSpeed;iIndex++){
 				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
@@ -556,56 +423,35 @@ void CRightDrawAreaView::Draw_Force_Vs_Position()
 						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
 					}
 
-					pen.DeleteObject();
-					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
-					pDC->SelectObject(&pen);
-
 					if(m_iDrawMode & DM_NORMAL_ONLY){
-						int x_start, y_start;
-						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
-							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-							x = (int)(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fForce[tp->iIndex][j] * (yspan/250));
-							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
-								pDC->MoveTo(x, y);
-								x_start = x;
-								y_start = y;
-								pDC->SetPixel(x, y, color[tp->iIndex]);
-							}
-							else{
-								pDC->LineTo(x, y);
-							}
-						}
-						pDC->LineTo(x_start, y_start);
-					}
+						ci.pCurveInfo[ci.iNumOfCurve].bIsClosed = TRUE;
+						ci.pCurveInfo[ci.iNumOfCurve].crColor = color[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].iNumOfPoint = tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].pXData = &tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].pYData = &tp->pNode->pTestRecord->fForce[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].iWidth = 2;
 
+						ci.iNumOfCurve ++;
+						if(ci.iNumOfCurve>=m_nMaxNumOfCurveToDraw){
+							break;
+						}
+					}
+					
 					if(m_iDrawMode & DM_FILTER_ONLY){
-						int x_start, y_start; 
-						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
-							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-							x = (int)(tp->pNode->pTestRecord->fDisplacement[tp->iIndex][j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][j] * (yspan/250));
-							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
-								pDC->MoveTo(x, y);
-								x_start = x;
-								y_start = y;
-								pDC->SetPixel(x, y, color[tp->iIndex]);
-							}
-							else{
-								pDC->LineTo(x, y);
-							}
-						}
-						pDC->LineTo(x_start, y_start);
-					}
+						ci.pCurveInfo[ci.iNumOfCurve].bIsClosed = TRUE;
+						ci.pCurveInfo[ci.iNumOfCurve].crColor = color[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].iNumOfPoint = tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].pXData = &tp->pNode->pTestRecord->fDisplacement[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].pYData = &tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].iWidth = 2;
 
-					iNumDrawed ++;
-					if(iNumDrawed>=20){
-						break;
+						ci.iNumOfCurve ++;
+						if(ci.iNumOfCurve>=m_nMaxNumOfCurveToDraw){
+							break;
+						}
 					}
-				}//END OF IF
-			}//END OF FOR
+				}
+			}
 			if(flag_selected==0 && pFileNode->bProcessed){
 				delete pFileNode->pMachineInfo;
 				pFileNode->pMachineInfo = NULL;
@@ -622,310 +468,32 @@ void CRightDrawAreaView::Draw_Force_Vs_Position()
 		pProductNode = pProductNode->pNext;
 	}
 
-	pDC->SelectObject(oldFont);
+	ci.pDC = GetDC();
+	GetClientRect(&ci.rect);
+	sprintf(ci.sCanvasInfo, "%s", "Force vs.Position");
+	sprintf(ci.sXAxisInfo, "%s", "Position [mm]");
+	sprintf(ci.sYAxisInfo, "%s", "Force [N]");
+	DrawCurve(ci);
 }
 
 void CRightDrawAreaView::Draw_Force_Vs_PositionAndSpeed()
 {
-	RECT rect;
-	CPen pen;
-	CBrush brush;
-	int i;
-	char buf[100];
-	struct CCTestRecord *pRec = NULL;
-	CFont fontLogo,*oldFont;
-
-	GetClientRect(&rect);
-	if(rect.bottom<100 || rect.right<100){
-		return;
-	}
-	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
-	m_pntClientAreaRef.x = rect.left + 50;
-	m_pntClientAreaRef.y = rect.bottom - 50;
-	m_nClientAreaWidth = rect.right - rect.left - 100;
-	m_nClientAreaHeight = rect.bottom - rect.top - 100;
-
-	CDC *pDC=GetDC();
-
-	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
-	pDC->SelectObject(&pen);
-	//»­ºáÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
-	//»­×ÝÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
-
-	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
-	double xspan = m_nClientAreaWidth / 11.0;
-	double yspan= m_nClientAreaHeight / 5.5;
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
-
-		sprintf_s(buf, "%d", (i-5)*10);
-		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
-		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
-		rect.top = m_pntClientAreaRef.y;
-		rect.bottom = m_pntClientAreaRef.y + 25;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-
-		sprintf_s(buf, "%d", (4-i)*250);
-		rect.left = m_pntClientAreaRef.x - 5 - 40;
-		rect.right = m_pntClientAreaRef.x - 5;
-		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
-		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
-	}
-	//Ô­µãÎ»ÖÃ
-	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
-	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
-
-	pen.DeleteObject();
-
-	//»­×ÝºáÐéÏß
-	LOGBRUSH logbrush;
-	logbrush.lbColor = RGB(192,192,192); 
-	logbrush.lbStyle = PS_SOLID;
-	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
-	pDC->SelectObject(&pen);
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-	}
-	pen.DeleteObject();
-
-	//±êÊ¶Ô­µã
-	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
-
-	//»­±êÊ¶
-	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
-	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
-
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
-	rect.top = m_pntClientAreaRef.y + 20;
-	rect.bottom = m_pntClientAreaRef.y + 40;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN,_T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	rect.left = m_pntClientAreaRef.x - 48;
-	rect.right = m_pntClientAreaRef.x - 28;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
-						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-						DEFAULT_PITCH, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	if(g_pTree==NULL){
-		return;
-	}
-
-	int iNumDrawed = 0;
-	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
-	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.GetProductTreeRootPtr();
-	ProductNodePtr pProductNode = g_TestDataTreeMgt.GetProductTreeRootPtr()->pProductNodeListHead->pNext;
-	while(pProductNode!=NULL){
-		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
-		while(pFileNode!=NULL){
-			int flag_selected = 0;
-			for(int iIndex=0;iIndex<pFileNode->test_record_maininfo.iNumOfSpeed;iIndex++){
-				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
-				if(tp->bSelected){
-					flag_selected = 1;
-					if(tp->pNode->bProcessed==FALSE){
-						char sFileName[256];
-						TCHAR2char(sFileName, tp->pNode->sFileName, _tcslen(tp->pNode->sFileName));
-						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
-					}
-
-					pen.DeleteObject();
-					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
-					pDC->SelectObject(&pen);
-
-
-					iNumDrawed ++;
-					if(iNumDrawed>=20){
-						break;
-					}
-				}//END OF IF
-			}//END OF FOR
-			if(flag_selected==0 && pFileNode->bProcessed){
-				delete pFileNode->pMachineInfo;
-				pFileNode->pMachineInfo = NULL;
-				delete pFileNode->pProductInfo;
-				pFileNode->pProductInfo = NULL;
-				delete pFileNode->pTestRecord;
-				pFileNode->pTestRecord = NULL;
-				delete pFileNode->pAdditionInfo;
-				pFileNode->pAdditionInfo = NULL;
-				pFileNode->bProcessed = FALSE;
-			}
-			pFileNode = pFileNode->pNext;
-		}//END OF WHILE
-		pProductNode = pProductNode->pNext;
-	}
-
-	pDC->SelectObject(oldFont);
 }
 
 void CRightDrawAreaView::Draw_Force_Vs_Speed()
 {
-	RECT rect;
-	CPen pen;
-	CBrush brush;
-	int i, j, x, y;
-	char buf[100];
-	struct CCTestRecord *pRec = NULL;
-	CFont fontLogo,*oldFont;
-
-	GetClientRect(&rect);
-	if(rect.bottom<100 || rect.right<100){
-		return;
-	}
-	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
-	m_pntClientAreaRef.x = rect.left + 50;
-	m_pntClientAreaRef.y = rect.bottom - 50;
-	m_nClientAreaWidth = rect.right - rect.left - 100;
-	m_nClientAreaHeight = rect.bottom - rect.top - 100;
-
-	CDC *pDC=GetDC();
-
-	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
-	pDC->SelectObject(&pen);
-	//»­ºáÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
-	//»­×ÝÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
-
-	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
-	double xspan = m_nClientAreaWidth / 11.0;
-	double yspan= m_nClientAreaHeight / 5.5;
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
-
-		sprintf_s(buf, "%d", (i-5)*10);
-		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
-		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
-		rect.top = m_pntClientAreaRef.y;
-		rect.bottom = m_pntClientAreaRef.y + 25;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-
-		sprintf_s(buf, "%d", (4-i)*250);
-		rect.left = m_pntClientAreaRef.x - 5 - 40;
-		rect.right = m_pntClientAreaRef.x - 5;
-		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
-		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
-	}
-	//Ô­µãÎ»ÖÃ
-	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
-	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
-
-	pen.DeleteObject();
-
-	//»­×ÝºáÐéÏß
-	LOGBRUSH logbrush;
-	logbrush.lbColor = RGB(192,192,192); 
-	logbrush.lbStyle = PS_SOLID;
-	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
-	pDC->SelectObject(&pen);
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-	}
-	pen.DeleteObject();
-
-	//±êÊ¶Ô­µã
-	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
-
-	//»­±êÊ¶
-	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
-	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
-
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
-	rect.top = m_pntClientAreaRef.y + 20;
-	rect.bottom = m_pntClientAreaRef.y + 40;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN,_T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	rect.left = m_pntClientAreaRef.x - 48;
-	rect.right = m_pntClientAreaRef.x - 28;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
-						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-						DEFAULT_PITCH, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	if(g_pTree==NULL){
-		return;
-	}
-
-	int iNumDrawed = 0;
 	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	struct CanvasInfo ci;
+
+	memset(&ci, 0, sizeof(struct CanvasInfo));
+	ci.pCurveInfo = m_pCurveInfo;
+
 	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.GetProductTreeRootPtr();
 	ProductNodePtr pProductNode = g_TestDataTreeMgt.GetProductTreeRootPtr()->pProductNodeListHead->pNext;
-	while(pProductNode!=NULL){
+
+	while(pProductNode!=NULL && ci.iNumOfCurve < m_nMaxNumOfCurveToDraw){
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
-		while(pFileNode!=NULL){
+		while(pFileNode!=NULL && ci.iNumOfCurve < m_nMaxNumOfCurveToDraw){
 			int flag_selected = 0;
 			for(int iIndex=0;iIndex<pFileNode->test_record_maininfo.iNumOfSpeed;iIndex++){
 				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
@@ -937,55 +505,35 @@ void CRightDrawAreaView::Draw_Force_Vs_Speed()
 						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
 					}
 
-					pen.DeleteObject();
-					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
-					pDC->SelectObject(&pen);
-
-					//Á¦-ËÙ¶ÈÇúÏß
 					if(m_iDrawMode & DM_NORMAL_ONLY){
-						int x_start, y_start;
-						//ÎªÊ²Ã´Ç°ÃæÓÐÒ»Ð©µãÊÇ´íÎóµÄ£¿£¿
-						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+10;j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex]-9;j++){
-							x = (int)(tp->pNode->pAdditionInfo->fSpeedOfFilter[tp->iIndex][j] * xspan * 10) + m_pntClientAreaOrig.x;
-							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fForce[tp->iIndex][j] * (yspan/250));
-							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+10){
-								pDC->MoveTo(x, y);
-								pDC->SetPixel(x, y, color[tp->iIndex]);
-								x_start = x;
-								y_start = y;
-							}
-							else{
-								pDC->LineTo(x, y);
-							}
-						}
-						pDC->LineTo(x_start, y_start);
-					}
+						ci.pCurveInfo[ci.iNumOfCurve].bIsClosed = TRUE;
+						ci.pCurveInfo[ci.iNumOfCurve].crColor = color[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].iNumOfPoint = tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].pXData = &tp->pNode->pAdditionInfo->fSpeedOfFilter[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].pYData = &tp->pNode->pTestRecord->fForce[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].iWidth = 2;
 
+						ci.iNumOfCurve ++;
+						if(ci.iNumOfCurve>=m_nMaxNumOfCurveToDraw){
+							break;
+						}
+					}
+					
 					if(m_iDrawMode & DM_FILTER_ONLY){
-						int x_start, y_start;
-						//ÎªÊ²Ã´Ç°ÃæÓÐÒ»Ð©µãÊÇ´íÎóµÄ£¿£¿
-						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+10;j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex]-9;j++){
-							x = (int)(tp->pNode->pAdditionInfo->fSpeedOfFilter[tp->iIndex][j] * xspan * 10.0) + m_pntClientAreaOrig.x;
-							y = m_pntClientAreaOrig.y - (int)(tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][j] * (yspan/250));
-							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+10){
-								pDC->MoveTo(x, y);
-								pDC->SetPixel(x, y, color[tp->iIndex]);
-								x_start = x;
-								y_start = y;
-							}
-							else{
-								pDC->LineTo(x, y);
-							}
-							pDC->LineTo(x, y);
+						ci.pCurveInfo[ci.iNumOfCurve].bIsClosed = TRUE;
+						ci.pCurveInfo[ci.iNumOfCurve].crColor = color[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].iNumOfPoint = tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].pXData = &tp->pNode->pAdditionInfo->fSpeedOfFilter[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].pYData = &tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].iWidth = 2;
+
+						ci.iNumOfCurve ++;
+						if(ci.iNumOfCurve>=m_nMaxNumOfCurveToDraw){
+							break;
 						}
 					}
-
-					iNumDrawed ++;
-					if(iNumDrawed>=20){
-						break;
-					}
-				}//END OF IF
-			}//END OF FOR
+				}
+			}
 			if(flag_selected==0 && pFileNode->bProcessed){
 				delete pFileNode->pMachineInfo;
 				pFileNode->pMachineInfo = NULL;
@@ -1002,142 +550,30 @@ void CRightDrawAreaView::Draw_Force_Vs_Speed()
 		pProductNode = pProductNode->pNext;
 	}
 
-	pDC->SelectObject(oldFont);
+	ci.pDC = GetDC();
+	GetClientRect(&ci.rect);
+	sprintf(ci.sCanvasInfo, "%s", "Force vs.Speed");
+	sprintf(ci.sXAxisInfo, "%s", "Speed [mm/s]");
+	sprintf(ci.sYAxisInfo, "%s", "Force [N]");
+	DrawCurve(ci);
 }
 
 void CRightDrawAreaView::Draw_MaxForce_Vs_Speed()
 {
-	RECT rect;
-	CPen pen;
-	CBrush brush;
-	int i, x, y;
-	char buf[100];
-	struct CCTestRecord *pRec = NULL;
-	CFont fontLogo,*oldFont;
-
-	GetClientRect(&rect);
-	if(rect.bottom<100 || rect.right<100){
-		return;
-	}
-	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
-	m_pntClientAreaRef.x = rect.left + 50;
-	m_pntClientAreaRef.y = rect.bottom - 50;
-	m_nClientAreaWidth = rect.right - rect.left - 100;
-	m_nClientAreaHeight = rect.bottom - rect.top - 100;
-
-	CDC *pDC=GetDC();
-
-	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
-	pDC->SelectObject(&pen);
-	//»­ºáÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
-	//»­×ÝÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
-
-	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
-	double xspan = m_nClientAreaWidth / 11.0;
-	double yspan= m_nClientAreaHeight / 5.5;
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
-
-		sprintf_s(buf, "%d", (i-5)*10);
-		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
-		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
-		rect.top = m_pntClientAreaRef.y;
-		rect.bottom = m_pntClientAreaRef.y + 25;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-
-		sprintf_s(buf, "%d", (4-i)*250);
-		rect.left = m_pntClientAreaRef.x - 5 - 40;
-		rect.right = m_pntClientAreaRef.x - 5;
-		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
-		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
-	}
-	//Ô­µãÎ»ÖÃ
-	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
-	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
-
-	pen.DeleteObject();
-
-	//»­×ÝºáÐéÏß
-	LOGBRUSH logbrush;
-	logbrush.lbColor = RGB(192,192,192); 
-	logbrush.lbStyle = PS_SOLID;
-	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
-	pDC->SelectObject(&pen);
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-	}
-	pen.DeleteObject();
-
-	//±êÊ¶Ô­µã
-	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
-
-	//»­±êÊ¶
-	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
-	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
-
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
-	rect.top = m_pntClientAreaRef.y + 20;
-	rect.bottom = m_pntClientAreaRef.y + 40;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN,_T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	rect.left = m_pntClientAreaRef.x - 48;
-	rect.right = m_pntClientAreaRef.x - 28;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
-						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-						DEFAULT_PITCH, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	if(g_pTree==NULL){
-		return;
-	}
-
 	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	struct CanvasInfo ci;
+	double fMaxPym[MAX_SPEED_NUM];
+
+	memset(&ci, 0, sizeof(struct CanvasInfo));
+	ci.pCurveInfo = m_pCurveInfo;
+
 	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.GetProductTreeRootPtr();
 	ProductNodePtr pProductNode = g_TestDataTreeMgt.GetProductTreeRootPtr()->pProductNodeListHead->pNext;
-	while(pProductNode!=NULL){
+
+	while(pProductNode!=NULL && ci.iNumOfCurve < m_nMaxNumOfCurveToDraw){
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
-		while(pFileNode!=NULL){
+		while(pFileNode!=NULL && ci.iNumOfCurve < m_nMaxNumOfCurveToDraw){
 			int flag_selected = 0;
-			pen.DeleteObject();
-			pen.CreatePen(PS_SOLID, 2, color[0]);
-			pDC->SelectObject(&pen);
 			for(int iIndex=0;iIndex<pFileNode->test_record_maininfo.iNumOfSpeed;iIndex++){
 				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
 				if(tp->bSelected){
@@ -1148,39 +584,35 @@ void CRightDrawAreaView::Draw_MaxForce_Vs_Speed()
 						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
 					}
 
+					ci.pCurveInfo[ci.iNumOfCurve].bIsClosed = FALSE;
+					ci.pCurveInfo[ci.iNumOfCurve].crColor = RGB(0, 0, 255);
+					ci.pCurveInfo[ci.iNumOfCurve].iWidth = 2;
+					ci.pCurveInfo[ci.iNumOfCurve].iNumOfPoint = tp->pNode->pTestRecord->iNumOfSpeed;
+					ci.pCurveInfo[ci.iNumOfCurve].pXData = tp->pNode->pTestRecord->fRealSpeed;
+					ci.pCurveInfo[ci.iNumOfCurve].pYData = tp->pNode->pTestRecord->fPfm;
 
-					x = (int)(tp->pNode->pTestRecord->fRealSpeed[tp->iIndex] * 50 * (xspan/10)) + m_pntClientAreaOrig.x;
-					y = (int)(tp->pNode->pTestRecord->fPfm[tp->iIndex] * (yspan/250)) * (-1) + m_pntClientAreaOrig.y;
-					if(iIndex==0){
-						pDC->MoveTo(x, y);
-					}
-					else{
-						pDC->LineTo(x, y);
-					}
-				}//END OF IF
-			}//END OF FOR
-			for(int iIndex=0;iIndex<pFileNode->test_record_maininfo.iNumOfSpeed;iIndex++){
-				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
-				if(tp->bSelected){
-					flag_selected = 1;
-					if(tp->pNode->bProcessed==FALSE){
-						char sFileName[256];
-						TCHAR2char(sFileName, tp->pNode->sFileName, _tcslen(tp->pNode->sFileName));
-						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
+					ci.iNumOfCurve ++;
+					if(ci.iNumOfCurve>=m_nMaxNumOfCurveToDraw){
+						break;
 					}
 
-
-					x = (int)(tp->pNode->pTestRecord->fRealSpeed[tp->iIndex] * 50 * (xspan/10)) + m_pntClientAreaOrig.x;
-					y = abs((int)(tp->pNode->pTestRecord->fPym[tp->iIndex] * (yspan/250))) + m_pntClientAreaOrig.y;
-					if(iIndex==0){
-						pDC->MoveTo(x, y);
+					ci.pCurveInfo[ci.iNumOfCurve].bIsClosed = FALSE;
+					ci.pCurveInfo[ci.iNumOfCurve].crColor = RGB(0, 0, 255);
+					ci.pCurveInfo[ci.iNumOfCurve].iWidth = 2;
+					ci.pCurveInfo[ci.iNumOfCurve].iNumOfPoint = tp->pNode->pTestRecord->iNumOfSpeed;
+					ci.pCurveInfo[ci.iNumOfCurve].pXData = tp->pNode->pTestRecord->fRealSpeed;
+					for(int k=0;k<ci.pCurveInfo[ci.iNumOfCurve].iNumOfPoint;k++){
+						fMaxPym[k] = -tp->pNode->pTestRecord->fPym[k];
 					}
-					else{
-						pDC->LineTo(x, y);
-					}
+					ci.pCurveInfo[ci.iNumOfCurve].pYData = fMaxPym;
 
-				}//END OF IF
-			}//END OF FOR
+					ci.iNumOfCurve ++;
+					if(ci.iNumOfCurve>=m_nMaxNumOfCurveToDraw){
+						break;
+					}
+					break;
+				}
+			}
 			if(flag_selected==0 && pFileNode->bProcessed){
 				delete pFileNode->pMachineInfo;
 				pFileNode->pMachineInfo = NULL;
@@ -1197,139 +629,28 @@ void CRightDrawAreaView::Draw_MaxForce_Vs_Speed()
 		pProductNode = pProductNode->pNext;
 	}
 
-	pDC->SelectObject(oldFont);
+	ci.pDC = GetDC();
+	GetClientRect(&ci.rect);
+	sprintf(ci.sCanvasInfo, "%s", "MaxForce vs.Speed");
+	sprintf(ci.sXAxisInfo, "%s", "Speed [mm/s]");
+	sprintf(ci.sYAxisInfo, "%s", "MaxForce [N]");
+	DrawCurve(ci);
 }
 
 void CRightDrawAreaView::Draw_Force_Vs_Time()
 {
-	RECT rect;
-	CPen pen;
-	CBrush brush;
-	int i, j, x, y;
-	char buf[100];
-	struct CCTestRecord *pRec = NULL;
-	CFont fontLogo,*oldFont;
-
-	GetClientRect(&rect);
-	if(rect.bottom<100 || rect.right<100){
-		return;
-	}
-	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
-	m_pntClientAreaRef.x = rect.left + 50;
-	m_pntClientAreaRef.y = rect.bottom - 50;
-	m_nClientAreaWidth = rect.right - rect.left - 100;
-	m_nClientAreaHeight = rect.bottom - rect.top - 100;
-
-	CDC *pDC=GetDC();
-
-	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
-	pDC->SelectObject(&pen);
-	//»­ºáÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
-	//»­×ÝÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
-
-	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
-	double xspan = m_nClientAreaWidth / 11.0;
-	double yspan= m_nClientAreaHeight / 5.5;
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
-
-		sprintf_s(buf, "%d", (i-5)*10);
-		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
-		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
-		rect.top = m_pntClientAreaRef.y;
-		rect.bottom = m_pntClientAreaRef.y + 25;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-
-		sprintf_s(buf, "%d", (4-i)*250);
-		rect.left = m_pntClientAreaRef.x - 5 - 40;
-		rect.right = m_pntClientAreaRef.x - 5;
-		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
-		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
-	}
-	//Ô­µãÎ»ÖÃ
-	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
-	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
-
-	pen.DeleteObject();
-
-	//»­×ÝºáÐéÏß
-	LOGBRUSH logbrush;
-	logbrush.lbColor = RGB(192,192,192); 
-	logbrush.lbStyle = PS_SOLID;
-	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
-	pDC->SelectObject(&pen);
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-	}
-	pen.DeleteObject();
-
-	//±êÊ¶Ô­µã
-	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
-
-	//»­±êÊ¶
-	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
-	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
-
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
-	rect.top = m_pntClientAreaRef.y + 20;
-	rect.bottom = m_pntClientAreaRef.y + 40;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN,_T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	rect.left = m_pntClientAreaRef.x - 48;
-	rect.right = m_pntClientAreaRef.x - 28;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
-						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-						DEFAULT_PITCH, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	if(g_pTree==NULL){
-		return;
-	}
-
-	int iNumDrawed = 0;
 	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	struct CanvasInfo ci;
+
+	memset(&ci, 0, sizeof(struct CanvasInfo));
+	ci.pCurveInfo = m_pCurveInfo;
+
 	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.GetProductTreeRootPtr();
 	ProductNodePtr pProductNode = g_TestDataTreeMgt.GetProductTreeRootPtr()->pProductNodeListHead->pNext;
-	while(pProductNode!=NULL){
+
+	while(pProductNode!=NULL && ci.iNumOfCurve < m_nMaxNumOfCurveToDraw){
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
-		while(pFileNode!=NULL){
+		while(pFileNode!=NULL && ci.iNumOfCurve < m_nMaxNumOfCurveToDraw){
 			int flag_selected = 0;
 			for(int iIndex=0;iIndex<pFileNode->test_record_maininfo.iNumOfSpeed;iIndex++){
 				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
@@ -1341,59 +662,35 @@ void CRightDrawAreaView::Draw_Force_Vs_Time()
 						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
 					}
 
-					pen.DeleteObject();
-					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
-					pDC->SelectObject(&pen);
-
-					//Á¦-Ê±¼äÇúÏß
 					if(m_iDrawMode & DM_NORMAL_ONLY){
-						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
-							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-							double tmp;
-							tmp = j-tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];
-							tmp /= tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
-							tmp *= xspan * 5;
-							tmp += m_pntClientAreaOrig.x;
-							x = (int)tmp;
-							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fForce[tp->iIndex][j] * (yspan/250));
-							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
-								pDC->MoveTo(x, y);
-								pDC->SetPixel(x, y, color[tp->iIndex]);
-							}
-							else{
-								pDC->LineTo(x, y);
-							}
+						ci.pCurveInfo[ci.iNumOfCurve].bIsClosed = FALSE;
+						ci.pCurveInfo[ci.iNumOfCurve].crColor = color[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].iNumOfPoint = tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].pXData = &tp->pNode->pAdditionInfo->fTime[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].pYData = &tp->pNode->pTestRecord->fForce[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].iWidth = 2;
+
+						ci.iNumOfCurve ++;
+						if(ci.iNumOfCurve>=m_nMaxNumOfCurveToDraw){
+							break;
 						}
 					}
-
+					
 					if(m_iDrawMode & DM_FILTER_ONLY){
-						for(j=tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];j<tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]+tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];j++){
-							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-							double tmp;
-							tmp = j-tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex];
-							tmp /= tp->pNode->pTestRecord->fDataFreq[tp->iIndex];
-							tmp *= xspan * 5;
-							tmp += m_pntClientAreaOrig.x;
-							x = (int)tmp;
-							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][j] * (yspan/250));
-							if(j==tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]){
-								pDC->MoveTo(x, y);
-								pDC->SetPixel(x, y, color[tp->iIndex]);
-							}
-							else{
-								pDC->LineTo(x, y);
-							}
+						ci.pCurveInfo[ci.iNumOfCurve].bIsClosed = FALSE;
+						ci.pCurveInfo[ci.iNumOfCurve].crColor = color[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].iNumOfPoint = tp->pNode->pAdditionInfo->iDataBandLen[tp->iIndex];
+						ci.pCurveInfo[ci.iNumOfCurve].pXData = &tp->pNode->pAdditionInfo->fTime[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].pYData = &tp->pNode->pAdditionInfo->fForceOfFilter[tp->iIndex][tp->pNode->pAdditionInfo->iDataBandStart[tp->iIndex]];
+						ci.pCurveInfo[ci.iNumOfCurve].iWidth = 2;
+
+						ci.iNumOfCurve ++;
+						if(ci.iNumOfCurve>=m_nMaxNumOfCurveToDraw){
+							break;
 						}
 					}
-
-					iNumDrawed ++;
-					if(iNumDrawed>=20){
-						break;
-					}
-				}//END OF IF
-			}//END OF FOR
+				}
+			}
 			if(flag_selected==0 && pFileNode->bProcessed){
 				delete pFileNode->pMachineInfo;
 				pFileNode->pMachineInfo = NULL;
@@ -1410,139 +707,28 @@ void CRightDrawAreaView::Draw_Force_Vs_Time()
 		pProductNode = pProductNode->pNext;
 	}
 
-	pDC->SelectObject(oldFont);
+	ci.pDC = GetDC();
+	GetClientRect(&ci.rect);
+	sprintf(ci.sCanvasInfo, "%s", "Force vs.Time");
+	sprintf(ci.sXAxisInfo, "%s", "Time [s]");
+	sprintf(ci.sYAxisInfo, "%s", "Force [N]");
+	DrawCurve(ci);
 }
 
 void CRightDrawAreaView::Draw_Friction_Force_Vs_Position()
 {
-	RECT rect;
-	CPen pen;
-	CBrush brush;
-	int i, j, x, y;
-	char buf[100];
-	struct CCTestRecord *pRec = NULL;
-	CFont fontLogo,*oldFont;
-
-	GetClientRect(&rect);
-	if(rect.bottom<100 || rect.right<100){
-		return;
-	}
-	//»ñÈ¡´ý»­Í¼ÇøÓò´óÐ¡Î»ÖÃ
-	m_pntClientAreaRef.x = rect.left + 50;
-	m_pntClientAreaRef.y = rect.bottom - 50;
-	m_nClientAreaWidth = rect.right - rect.left - 100;
-	m_nClientAreaHeight = rect.bottom - rect.top - 100;
-
-	CDC *pDC=GetDC();
-
-	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
-	pDC->SelectObject(&pen);
-	//»­ºáÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth, m_pntClientAreaRef.y);
-	//»­×ÝÖá
-	pDC->MoveTo(m_pntClientAreaRef);
-	pDC->LineTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight);
-
-	//»­Öá×ø±ê¼°ÎÄ×Ö±êÊ¶
-	double xspan = m_nClientAreaWidth / 11.0;
-	double yspan= m_nClientAreaHeight / 5.5;
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y + 5);
-
-		sprintf_s(buf, "%d", (i-5)*10);
-		rect.left = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) - 25;
-		rect.right = m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i) + 25;
-		rect.top = m_pntClientAreaRef.y;
-		rect.bottom = m_pntClientAreaRef.y + 25;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_VCENTER| DT_CENTER);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x - 5, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-
-		sprintf_s(buf, "%d", (4-i)*250);
-		rect.left = m_pntClientAreaRef.x - 5 - 40;
-		rect.right = m_pntClientAreaRef.x - 5;
-		rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) - 10;
-		rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i) + 10;
-		pDC->DrawText(CString(buf), &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
-	}
-	//Ô­µãÎ»ÖÃ
-	m_pntClientAreaOrig.x = m_pntClientAreaRef.x + (int)(xspan*5.5);
-	m_pntClientAreaOrig.y = m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*4);
-
-	pen.DeleteObject();
-
-	//»­×ÝºáÐéÏß
-	LOGBRUSH logbrush;
-	logbrush.lbColor = RGB(192,192,192); 
-	logbrush.lbStyle = PS_SOLID;
-	pen.CreatePen(PS_ALTERNATE, 1, &logbrush);
-	pDC->SelectObject(&pen);
-	for(i=0;i<11;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y -2);
-		pDC->LineTo(m_pntClientAreaRef.x + (int)(xspan/2) + (int)(xspan*i), m_pntClientAreaRef.y - m_nClientAreaHeight + 2);
-	}
-	for(i=0;i<6;i++){
-		pDC->MoveTo(m_pntClientAreaRef.x + 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-		pDC->LineTo(m_pntClientAreaRef.x + m_nClientAreaWidth - 2, m_pntClientAreaRef.y - m_nClientAreaHeight + (int)(yspan*i));
-	}
-	pen.DeleteObject();
-
-	//±êÊ¶Ô­µã
-	pDC->SetPixel(m_pntClientAreaOrig, RGB(255, 0, 0));
-
-	//»­±êÊ¶
-	pen.CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 120;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 30;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight - 20;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight;
-	fontLogo.CreateFont(20,10,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force vs.Position"), &rect, DT_SINGLELINE | DT_LEFT);
-
-	rect.left = m_pntClientAreaRef.x + m_nClientAreaWidth/2 - 50;
-	rect.right = m_pntClientAreaRef.x + m_nClientAreaWidth/2 + 100;
-	rect.top = m_pntClientAreaRef.y + 20;
-	rect.bottom = m_pntClientAreaRef.y + 40;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16,8,0,0,0,FALSE,FALSE,FALSE,
-						DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-						FIXED_PITCH | FF_ROMAN,_T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Position [mm]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	rect.left = m_pntClientAreaRef.x - 48;
-	rect.right = m_pntClientAreaRef.x - 28;
-	rect.top = m_pntClientAreaRef.y - m_nClientAreaHeight/2;
-	rect.bottom = m_pntClientAreaRef.y - m_nClientAreaHeight/2 - 100;
-	fontLogo.DeleteObject();
-	fontLogo.CreateFont(16, 0, 900, 900, 0, 0, 0, 0,
-						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-						CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-						DEFAULT_PITCH, _T("System"));
-	pDC->SetBkMode(TRANSPARENT);
-	oldFont=pDC->SelectObject(&fontLogo);
-	pDC->DrawText(_T("Force [N]"), &rect, DT_SINGLELINE | DT_LEFT );
-
-	if(g_pTree==NULL){
-		return;
-	}
-
-	int iNumDrawed = 0;
 	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	struct CanvasInfo ci;
+
+	memset(&ci, 0, sizeof(struct CanvasInfo));
+	ci.pCurveInfo = m_pCurveInfo;
+
 	ProductTreeRootPtr pProductTreeRoot = g_TestDataTreeMgt.GetProductTreeRootPtr();
 	ProductNodePtr pProductNode = g_TestDataTreeMgt.GetProductTreeRootPtr()->pProductNodeListHead->pNext;
-	while(pProductNode!=NULL){
+
+	while(pProductNode!=NULL && ci.iNumOfCurve < m_nMaxNumOfCurveToDraw){
 		FileNodePtr pFileNode = pProductNode->pFileListHead->pNext;
-		while(pFileNode!=NULL){
+		while(pFileNode!=NULL && ci.iNumOfCurve < m_nMaxNumOfCurveToDraw){
 			int flag_selected = 0;
 			for(int iIndex=0;iIndex<pFileNode->test_record_maininfo.iNumOfSpeed;iIndex++){
 				struct TreeItemData *tp = pFileNode->tree_item_data + iIndex;
@@ -1554,63 +740,38 @@ void CRightDrawAreaView::Draw_Friction_Force_Vs_Position()
 						g_TestDataTreeMgt.LoadAndProcessFile(sFileName, tp->pNode);
 					}
 
-					if(!tp->pNode->pTestRecord->bFrictionSpeed){
-						break;
-					}
+					if(tp->pNode->pTestRecord->bFrictionSpeed){
+						if(m_iDrawMode & DM_NORMAL_ONLY){
+							ci.pCurveInfo[ci.iNumOfCurve].bIsClosed = TRUE;
+							ci.pCurveInfo[ci.iNumOfCurve].crColor = color[tp->iIndex];
+							ci.pCurveInfo[ci.iNumOfCurve].iNumOfPoint = tp->pNode->pAdditionInfo->iFrictionDataBandLen;
+							ci.pCurveInfo[ci.iNumOfCurve].pXData = &tp->pNode->pTestRecord->fFrictionDisplacement[tp->pNode->pAdditionInfo->iFrictionDataBandStart];
+							ci.pCurveInfo[ci.iNumOfCurve].pYData = &tp->pNode->pTestRecord->fFrictionForce[tp->pNode->pAdditionInfo->iFrictionDataBandStart];
+							ci.pCurveInfo[ci.iNumOfCurve].iWidth = 2;
 
-					pen.DeleteObject();
-					pen.CreatePen(PS_SOLID, 2, color[tp->iIndex]);
-					pDC->SelectObject(&pen);
-
-					pDC->SelectObject(oldFont);
-					if(m_iDrawMode & DM_NORMAL_ONLY){
-						int x_start, y_start;
-						for(j=tp->pNode->pAdditionInfo->iFrictionDataBandStart;j<tp->pNode->pAdditionInfo->iFrictionDataBandStart+tp->pNode->pAdditionInfo->iFrictionDataBandLen;j++){
-							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-							x = (int)(tp->pNode->pTestRecord->fFrictionDisplacement[j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pTestRecord->fFrictionForce[j] * (yspan/250));
-							if(j==tp->pNode->pAdditionInfo->iFrictionDataBandStart){
-								pDC->MoveTo(x, y);
-								x_start = x;
-								y_start = y;
-								pDC->SetPixel(x, y, color[0]);
-							}
-							else{
-								pDC->LineTo(x, y);
+							ci.iNumOfCurve ++;
+							if(ci.iNumOfCurve>=m_nMaxNumOfCurveToDraw){
+								break;
 							}
 						}
-						pDC->LineTo(x_start, y_start);
-					}
+						
+						if(m_iDrawMode & DM_FILTER_ONLY){
+							ci.pCurveInfo[ci.iNumOfCurve].bIsClosed = TRUE;
+							ci.pCurveInfo[ci.iNumOfCurve].crColor = color[tp->iIndex];
+							ci.pCurveInfo[ci.iNumOfCurve].iNumOfPoint = tp->pNode->pAdditionInfo->iFrictionDataBandLen;
+							ci.pCurveInfo[ci.iNumOfCurve].pXData = &tp->pNode->pTestRecord->fFrictionDisplacement[tp->pNode->pAdditionInfo->iFrictionDataBandStart];
+							ci.pCurveInfo[ci.iNumOfCurve].pYData = &tp->pNode->pAdditionInfo->fFrictionForceOfFilter[tp->pNode->pAdditionInfo->iFrictionDataBandStart];
+							ci.pCurveInfo[ci.iNumOfCurve].iWidth = 2;
 
-					if(m_iDrawMode & DM_FILTER_ONLY){
-						int x_start, y_start;
-						for(j=tp->pNode->pAdditionInfo->iFrictionDataBandStart;j<tp->pNode->pAdditionInfo->iFrictionDataBandStart+tp->pNode->pAdditionInfo->iFrictionDataBandLen;j++){
-							//X°´¾ùÖµºÍ·ù¶ÈËõ·Åµ½¶ÔÓ¦Öµ
-							x = (int)(tp->pNode->pTestRecord->fFrictionDisplacement[j] * 1000 * (xspan/10) + m_pntClientAreaOrig.x);
-							//YÖ±½ÓÊ¹ÓÃÔ­´óÐ¡
-							y = (int)(m_pntClientAreaOrig.y - tp->pNode->pAdditionInfo->fFrictionForceOfFilter[j] * (yspan/250));
-							if(j==tp->pNode->pAdditionInfo->iFrictionDataBandStart){
-								pDC->MoveTo(x, y);
-								x_start = x;
-								y_start = y;
-								pDC->SetPixel(x, y, color[0]);
-							}
-							else{
-								pDC->LineTo(x, y);
+							ci.iNumOfCurve ++;
+							if(ci.iNumOfCurve>=m_nMaxNumOfCurveToDraw){
+								break;
 							}
 						}
-						pDC->LineTo(x_start, y_start);
 					}
-
-					iNumDrawed ++;
-					if(iNumDrawed>=20){
-						break;
-					}
-
 					break;
-				}//END OF IF
-			}//END OF FOR
+				}
+			}
 			if(flag_selected==0 && pFileNode->bProcessed){
 				delete pFileNode->pMachineInfo;
 				pFileNode->pMachineInfo = NULL;
@@ -1626,6 +787,13 @@ void CRightDrawAreaView::Draw_Friction_Force_Vs_Position()
 		}//END OF WHILE
 		pProductNode = pProductNode->pNext;
 	}
+
+	ci.pDC = GetDC();
+	GetClientRect(&ci.rect);
+	sprintf(ci.sCanvasInfo, "%s", "Force vs.Position");
+	sprintf(ci.sXAxisInfo, "%s", "Position [mm]");
+	sprintf(ci.sYAxisInfo, "%s", "Force [N]");
+	DrawCurve(ci);
 }
 
 // CRightDrawAreaView ÏûÏ¢´¦Àí³ÌÐò
