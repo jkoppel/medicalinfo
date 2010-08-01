@@ -49,6 +49,12 @@ protected:
 	afx_msg void OnApplicationLook(UINT id);
 	afx_msg void OnUpdateApplicationLook(CCmdUI* pCmdUI);
 	afx_msg void OnDirSetup();
+	afx_msg void OnModeSingleFile();
+	afx_msg void OnModeMultiFile();
+	afx_msg void OnModeNormalCurve();
+	afx_msg void OnModeFilterCurve();
+	afx_msg void OnModeAllCurve();
+	afx_msg void OnDrawAreaSetup();
 	DECLARE_MESSAGE_MAP()
 
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
