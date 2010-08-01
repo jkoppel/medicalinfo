@@ -138,7 +138,7 @@ BEGIN
         MENUITEM "打印预览(&V)",                    ID_FILE_PRINT_PREVIEW
         MENUITEM "打印设置(&R)...",                 ID_FILE_PRINT_SETUP
         MENUITEM SEPARATOR
-        MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1
         MENUITEM SEPARATOR
         MENUITEM "退出(&X)",                      ID_APP_EXIT
     END
@@ -176,6 +176,18 @@ BEGIN
     POPUP "工具"
     BEGIN
         MENUITEM "目录设置",                        ID_DIR_SETUP
+        POPUP "文件模式"
+        BEGIN
+            MENUITEM "单文件模式",                       ID_FILEMODE_SINGLE
+            MENUITEM "多文件模式",                       ID_FILEMODE_MULTI
+        END
+        POPUP "曲线模式"
+        BEGIN
+            MENUITEM "正常曲线模式",                      ID_CURVEMODE_NORMAL
+            MENUITEM "滤波曲线模式",                      ID_CURVEMODE_FILTER
+            MENUITEM "叠加曲线模式",                      ID_CURVEMODE_ALL
+        END
+        MENUITEM "画图设置",                        ID_DRAWAREA_SETUP
     END
     POPUP "帮助(&H)"
     BEGIN
@@ -253,8 +265,6 @@ BEGIN
     EDITTEXT        IDC_OPERATORNO,359,14,65,14,ES_AUTOHSCROLL
     PUSHBUTTON      "应用",IDC_BTN_APPLY,427,14,33,14
     PUSHBUTTON      "进度条",IDC_BTN_TEST1,460,14,34,14
-    PUSHBUTTON      "单文件",IDC_BTN_TEST2,494,14,34,14
-    PUSHBUTTON      "曲线模式",IDC_BTN_TEST3,528,14,34,14
     LTEXT           "~",IDC_STATIC,137,19,8,8
     LTEXT           "试件型号:",IDC_STATIC,225,16,34,8
     LTEXT           "试验员:",IDC_STATIC,330,16,27,8
@@ -279,6 +289,34 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,251,11,50,12
     LTEXT           "",IDC_PROGRESS,7,11,237,12,0,WS_EX_STATICEDGE
     LTEXT           "正在加载数据...",IDC_PROMPT_INFO,7,1,117,8
+END
+
+IDD_DRAWAREA_SETUP DIALOGEX 0, 0, 232, 102
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "设置画图区域选项"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,115,81,50,14
+    PUSHBUTTON      "取消",IDCANCEL,175,81,50,14
+    LTEXT           "速度曲线颜色:",IDC_STATIC,11,22,52,8
+    LTEXT           "曲线粗细:",IDC_STATIC,7,66,36,8
+    GROUPBOX        "曲线设置",IDC_STATIC,7,7,218,75
+    COMBOBOX        IDC_COMBO_SPEEDCURVE_WIDTH,47,64,48,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "1",IDC_CURVECOLOR_1,87,20,15,12,WS_GROUP
+    PUSHBUTTON      "2",IDC_CURVECOLOR_2,104,20,15,12,WS_GROUP
+    PUSHBUTTON      "3",IDC_CURVECOLOR_3,120,20,15,12,WS_GROUP
+    PUSHBUTTON      "4",IDC_CURVECOLOR_4,137,20,15,12,WS_GROUP
+    PUSHBUTTON      "5",IDC_CURVECOLOR_5,154,20,15,12,WS_GROUP
+    PUSHBUTTON      "6",IDC_CURVECOLOR_6,171,20,15,12,WS_GROUP
+    PUSHBUTTON      "7",IDC_CURVECOLOR_7,187,20,15,12,WS_GROUP
+    PUSHBUTTON      "8",IDC_CURVECOLOR_8,204,20,15,12,WS_GROUP
+    PUSHBUTTON      "9",IDC_CURVECOLOR_9,87,34,15,12,WS_GROUP
+    PUSHBUTTON      "10",IDC_CURVECOLOR_10,104,34,15,12,WS_GROUP
+    PUSHBUTTON      "11",IDC_CURVECOLOR_11,120,34,15,12,WS_GROUP
+    PUSHBUTTON      "12",IDC_CURVECOLOR_12,137,34,15,12,WS_GROUP
+    PUSHBUTTON      "13",IDC_CURVECOLOR_13,154,34,15,12,WS_GROUP
+    PUSHBUTTON      "14",IDC_CURVECOLOR_14,171,34,15,12,WS_GROUP
+    PUSHBUTTON      "15",IDC_CURVECOLOR_15,187,34,15,12,WS_GROUP
 END
 
 
@@ -341,9 +379,24 @@ BEGIN
     BEGIN
         BOTTOMMARGIN, 144
     END
+
+    IDD_DRAWAREA_SETUP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 225
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 95
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// HTML
+//
+
+IDR_HTML_DLGDRAWAREASETUP HTML                    "DlgDrawAreaSetup.htm"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -480,6 +533,12 @@ END
 STRINGTABLE 
 BEGIN
     IDS_EDIT_MENU           "编辑"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILEMODE_SINGLE      "设置为列表树为单文件选择模式"
+    ID_FILEMODE_MULTI       "设置为列表树为多文件选择模式"
 END
 
 #endif    // 中文(中华人民共和国) resources
