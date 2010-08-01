@@ -33,8 +33,6 @@ public:
 	afx_msg void OnBnClickedBtnApply();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnBnClickedBtnTest1();
-	afx_msg void OnBnClickedBtnTest2();
-	afx_msg void OnBnClickedBtnTest3();
 	afx_msg void OnBnClickedCheckTime();
 
 	BOOL m_bCheckTime;
