@@ -112,6 +112,7 @@ BOOL CAbsTestDataManApp::InitInstance()
 		return FALSE;
 
 	// 唯一的一个窗口已初始化，因此显示它并对其进行更新
+	m_pMainWnd->SetWindowText(_T("减振器性能使用数据管理软件"));
 	m_pMainWnd->ShowWindow(SW_SHOW);
 	m_pMainWnd->UpdateWindow();
 	// 仅当具有后缀时才调用 DragAcceptFiles
