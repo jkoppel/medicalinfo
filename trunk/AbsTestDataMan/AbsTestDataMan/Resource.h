@@ -32,6 +32,8 @@
 #define ID_VIEW_APPLOOK_OFF_2007_SILVER 217
 #define ID_VIEW_APPLOOK_OFF_2007_AQUA   218
 #define IDS_EDIT_MENU                   306
+#define IDD_DRAWAREA_SETUP              310
+#define IDR_HTML_DLGDRAWAREASETUP       311
 #define IDC_TREE                        1000
 #define IDC_STARTTIME                   1001
 #define IDC_ENDTIME                     1002
@@ -51,9 +53,30 @@
 #define IDC_DTP_START_DATE              1013
 #define IDC_DTP_END_TIME                1015
 #define IDC_DTP_END_DATE                1016
-#define IDC_CHECK1                      1017
 #define IDC_CHECK_TIME                  1017
+#define IDC_COMBO_SPEEDCURVE_WIDTH      1022
+#define IDC_CURVECOLOR_1                1024
+#define IDC_CURVECOLOR_2                1025
+#define IDC_CURVECOLOR_3                1026
+#define IDC_CURVECOLOR_4                1027
+#define IDC_CURVECOLOR_5                1028
+#define IDC_CURVECOLOR_6                1029
+#define IDC_CURVECOLOR_7                1030
+#define IDC_CURVECOLOR_8                1031
+#define IDC_CURVECOLOR_9                1032
+#define IDC_CURVECOLOR_10               1033
+#define IDC_CURVECOLOR_11               1034
+#define IDC_CURVECOLOR_12               1035
+#define IDC_CURVECOLOR_13               1036
+#define IDC_CURVECOLOR_14               1037
+#define IDC_CURVECOLOR_15               1038
 #define ID_DIR_SETUP                    32771
+#define ID_FILEMODE_SINGLE              32772
+#define ID_FILEMODE_MULTI               32773
+#define ID_CURVEMODE_NORMAL             32774
+#define ID_CURVEMODE_FILTER             32775
+#define ID_CURVEMODE_ALL                32776
+#define ID_DRAWAREA_SETUP               32777
 #define INDICATOR_LOGO                  61446
 #define INDICATOR_EDIT                  61447
 
@@ -61,9 +84,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        310
-#define _APS_NEXT_COMMAND_VALUE         32772
-#define _APS_NEXT_CONTROL_VALUE         1018
-#define _APS_NEXT_SYMED_VALUE           310
+#define _APS_NEXT_RESOURCE_VALUE        311
+#define _APS_NEXT_COMMAND_VALUE         32778
+#define _APS_NEXT_CONTROL_VALUE         1025
+#define _APS_NEXT_SYMED_VALUE           312
 #endif
 #endif
