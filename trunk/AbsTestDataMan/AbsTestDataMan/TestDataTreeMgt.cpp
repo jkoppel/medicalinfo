@@ -1,4 +1,6 @@
 #include "TestDataTreeMgt.h"
+#include "stdafx.h"
+#include "resource.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -6,6 +8,8 @@
 #include "DirConfigMgt.h"
 #include "FilterConfigMgt.h"
 #include "GlobalFuncs.h"
+
+#include "DlgProgress.h"
 
 CTestDataTreeMgt::CTestDataTreeMgt(void)
 {
@@ -21,8 +25,71 @@ CTestDataTreeMgt::~CTestDataTreeMgt(void)
 	FreeTree();
 }
 
+static UINT InitTreeThread(LPVOID lpParam)
+{
+	CTestDataTreeMgt *pTestDataTreeMgt;
+	CFilterConfigMgt fcMgt;
+	CDirConfigMgt cMgt;
+
+	pTestDataTreeMgt = (CTestDataTreeMgt*)lpParam;
+	if(pTestDataTreeMgt==NULL){
+		return -1;
+	}
+
+	fcMgt.GetFilterConfig(pTestDataTreeMgt->m_filterConfig);
+	cMgt.LoadDirFromConfigFile();
+
+	int i;
+	CFileFind ff;
+	BOOL bDecide = FALSE;
+	CString str, name;
+	char buf[MAX_BUF_LEN];
+
+	pTestDataTreeMgt->FreeTree();
+
+	pTestDataTreeMgt->m_pProductTreeRoot = new ProductTreeRoot;
+	memset(pTestDataTreeMgt->m_pProductTreeRoot, 0, sizeof(ProductTreeRoot));
+	pTestDataTreeMgt->m_pProductTreeRoot->pProductNodeListHead = new ProductNode;
+	pTestDataTreeMgt->m_pProductTreeRoot->pProductNodeListTail = pTestDataTreeMgt->m_pProductTreeRoot->pProductNodeListHead;
+	memset(pTestDataTreeMgt->m_pProductTreeRoot->pProductNodeListHead, 0, sizeof(ProductNode));
+
+	if(!CDlgProgress::UpdateAndCheck(0)){
+		return 0;
+	}
+
+	for(i=0;i<cMgt.m_saDirectories.GetCount();i++){
+		if(!CDlgProgress::UpdateAndCheck(i * 100 / cMgt.m_saDirectories.GetCount())){
+			return 0;
+		}
+		str = cMgt.m_saDirectories.GetAt(i);
+		if(str.Right(1)!=_T('\\')){
+			str += _T("\\");
+		}
+
+		bDecide = ff.FindFile(str+_T("*.DFT"));
+		while(bDecide){
+			bDecide = ff.FindNextFile();  
+			if(ff.IsDirectory() || ff.IsDots()){//目录或.,..
+				continue;
+			}
+			name = str + ff.GetFileName();
+			CString2char(buf, name);
+			pTestDataTreeMgt->LoadFile(buf);
+			if(!CDlgProgress::UpdateAndCheck(i * 100 / cMgt.m_saDirectories.GetCount())){
+				break;
+			}
+		}
+		ff.Close();
+	}
+	return 0;
+}
+
 void CTestDataTreeMgt::InitTree(void)
 {
+#if 0
+	CDlgProgress::m_lpParam = this;
+	CDlgProgress::StartThread(InitTreeThread, _T("测试数据"));
+#else
 	CFilterConfigMgt fcMgt;
 	CDirConfigMgt cMgt;
 
@@ -43,12 +110,20 @@ void CTestDataTreeMgt::InitTree(void)
 	m_pProductTreeRoot->pProductNodeListTail = m_pProductTreeRoot->pProductNodeListHead;
 	memset(m_pProductTreeRoot->pProductNodeListHead, 0, sizeof(ProductNode));
 
+#ifdef _DEBUG
+	int count = 0;
+#endif
 	for(i=0;i<cMgt.m_saDirectories.GetCount();i++){
 		str = cMgt.m_saDirectories.GetAt(i);
 		if(str.Right(1)!=_T('\\')){
 			str += _T("\\");
 		}
 
+#ifdef _DEBUG
+		if(count>=20){
+			break;
+		}
+#endif
 		bDecide = ff.FindFile(str+_T("*.DFT"));
 		while(bDecide){
 			bDecide = ff.FindNextFile();  
@@ -58,9 +133,16 @@ void CTestDataTreeMgt::InitTree(void)
 			name = str + ff.GetFileName();
 			CString2char(buf, name);
 			LoadFile(buf);
+#ifdef _DEBUG
+			count ++;
+			if(count>=20){
+				break;
+			}
+#endif
 		}
 		ff.Close();
 	}
+#endif
 }
 
 void CTestDataTreeMgt::ReloadTree(void)
@@ -84,12 +166,20 @@ void CTestDataTreeMgt::ReloadTree(void)
 		memset(m_pProductTreeRoot->pProductNodeListHead, 0, sizeof(ProductNode));
 	}
 
+#ifdef _DEBUG
+	int count = 0;
+#endif
 	for(i=0;i<cMgt.m_saDirectories.GetCount();i++){
 		str = cMgt.m_saDirectories.GetAt(i);
 		if(str.Right(1)!=_T('\\')){
 			str += _T("\\");
 		}
 
+#ifdef _DEBUG
+		if(count>=20){
+			break;
+		}
+#endif
 		bDecide = ff.FindFile(str+_T("*.DFT"));
 		while(bDecide){
 			bDecide = ff.FindNextFile();  
@@ -99,6 +189,12 @@ void CTestDataTreeMgt::ReloadTree(void)
 			name = str + ff.GetFileName();
 			CString2char(buf, name);
 			LoadFile(buf);
+#ifdef _DEBUG
+			count ++;
+			if(count>=20){
+				break;
+			}
+#endif
 		}
 		ff.Close();
 	}
@@ -331,6 +427,7 @@ BOOL CTestDataTreeMgt::GetFileMainInfo(const char *sFileName, FileNodePtr pFileN
 
 	char2TCHAR(node.sFileName, sFileName, (int)strlen(sFileName));
 	char2TCHAR(node.sTestDate, node.test_record_maininfo.sTestDate, (int)strlen(node.test_record_maininfo.sTestDate));
+	node.sTestDate[10] = _T('\0');
 
 	node.bProcessed = FALSE;
 	for(i=0;i<node.test_record_maininfo.iNumOfSpeed;i++){
@@ -416,6 +513,7 @@ BOOL CTestDataTreeMgt::LoadAndProcessFile(const char *sFileName, FileNodePtr pFi
 	char2TCHAR(node.sProductNo, node.pProductInfo->sProductNo, (int)strlen(node.pProductInfo->sProductNo));
 	char2TCHAR(node.sFileName, sFileName, (int)strlen(sFileName));
 	char2TCHAR(node.sTestDate, node.test_record_maininfo.sTestDate, (int)strlen(node.test_record_maininfo.sTestDate));
+	node.sTestDate[10] = _T('\0');
 
 	for(i=0;i<node.test_record_maininfo.iNumOfSpeed;i++){
 		node.tree_item_data[i].iIndex = i;
@@ -940,7 +1038,7 @@ void CTestDataTreeMgt::ProcessData(FileNodePtr pFileNode)
 		}
 		node.pAdditionInfo->iFrictionDataBandLen = T * node.pProductInfo->iDataBandLen / (PP[2]-PP[1]);
 
-		node.pTestRecord->fFrictionRealSpeed = 2 * M_PI * node.pTestRecord->fFrictionDataFreq / node.pAdditionInfo->iFrictionDataBandLen * node.pTestRecord->fFrictionRealSpeed;
+		node.pTestRecord->fFrictionRealSpeed = 2 * M_PI * node.pTestRecord->fFrictionDataFreq / node.pAdditionInfo->iFrictionDataBandLen * node.pTestRecord->fFrictionRealOffset;
 
 		memcpy(node.pAdditionInfo->fFrictionDisplacementOfFilter+node.pAdditionInfo->iFrictionDataBandStart,
 				node.pTestRecord->fFrictionDisplacement+node.pAdditionInfo->iFrictionDataBandStart,
@@ -954,16 +1052,19 @@ void CTestDataTreeMgt::ProcessData(FileNodePtr pFileNode)
 		double *pStart = node.pAdditionInfo->fFrictionDisplacementOfFilter+node.pAdditionInfo->iFrictionDataBandStart;
 		double fStart_0 = *pStart;
 		double fStart_1 = *(pStart+1);
-		for(j=0;j<node.pAdditionInfo->iFrictionDataBandLen;j++){
-			if(j<=node.pAdditionInfo->iFrictionDataBandLen-3){
-				node.pAdditionInfo->fFrictionSpeedOfFilter[j] = -3 * (*pStart) + 4 * (*(pStart+1)) - (*(pStart+2));
+		for(j=node.pAdditionInfo->iFrictionDataBandStart;j<node.pAdditionInfo->iFrictionDataBandStart+node.pAdditionInfo->iFrictionDataBandLen;j++){
+			node.pAdditionInfo->fFrictionSpeedOfFilter[j] = -3 * (*pStart) + 4 * (*(pStart+1)) - (*(pStart+2));
+			/*
+			if(j<=node.pAdditionInfo->iDataBandStart[i]+node.pAdditionInfo->iDataBandLen[i]-3){
+				node.pAdditionInfo->fSpeedOfFilter[i][j] = -3 * (*pStart) + 4 * (*(pStart+1)) - (*(pStart+2));
 			}
-			else if(j==node.pAdditionInfo->iFrictionDataBandLen-2){
-				node.pAdditionInfo->fFrictionSpeedOfFilter[j] = -3 * (*pStart) + 4 * (*(pStart+1)) - (fStart_0);
+			else if(j==node.pAdditionInfo->iDataBandStart[i]+node.pAdditionInfo->iDataBandLen[i]-2){
+				node.pAdditionInfo->fSpeedOfFilter[i][j] = -3 * (*pStart) + 4 * (*(pStart+1)) - (fStart_0);
 			}
 			else{
-				node.pAdditionInfo->fFrictionSpeedOfFilter[j] = -3 * (*pStart) + 4 * (fStart_0) - (fStart_1);
+				node.pAdditionInfo->fSpeedOfFilter[i][j] = -3 * (*pStart) + 4 * (fStart_0) - (fStart_1);
 			}
+			*/
 			node.pAdditionInfo->fFrictionSpeedOfFilter[j] = node.pAdditionInfo->fFrictionSpeedOfFilter[j] / 2 * node.pTestRecord->fFrictionDataFreq;
 			pStart ++;
 		}
@@ -1005,12 +1106,12 @@ BOOL CTestDataTreeMgt::PassFilter(FileNodePtr pFileNode)
 {
 	//检查文件是否符合过滤条件
 	SYSTEMTIME st;
-	char sTestDate[MAX_BUF_LEN];
+	//char sTestDate[MAX_BUF_LEN];
 	char sOperatorNo[MAX_BUF_LEN];
 	char sProductNo[MAX_BUF_LEN];
 
-	TCHAR2char(sTestDate, pFileNode->sTestDate, _tcslen(pFileNode->sTestDate));
-	GetTimeFromStr(sTestDate, st);
+	//TCHAR2char(sTestDate, pFileNode->sTestDate, _tcslen(pFileNode->sTestDate));
+	GetTimeFromStr(pFileNode->test_record_maininfo.sTestDate, st);
 
 	if(m_filterConfig.bCheckTime){//检查时间
 		CTime tTestDate(st);
