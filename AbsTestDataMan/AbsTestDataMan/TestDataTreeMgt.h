@@ -569,6 +569,8 @@ public:
 
 	//获取根子树的指针
 	ProductTreeRootPtr GetProductTreeRootPtr();
+	ProductTreeRootPtr m_pProductTreeRoot;
+	struct FilterConfig m_filterConfig;
 protected:
 	void ProcessData(FileNodePtr pFileNode);
 	BOOL PassFilter(FileNodePtr pFileNode);
@@ -580,6 +582,4 @@ protected:
 		);
 	int fir_dsgn(int Len, double FreqS, double FreqB , double **Coef1);
 protected:
-	ProductTreeRootPtr m_pProductTreeRoot;
-	struct FilterConfig m_filterConfig;
 };
