@@ -15,6 +15,10 @@ extern BOOL GetTimeFromStr(const char *sTime, SYSTEMTIME &st);
 
 extern BOOL MatchString(const char* lpszSour, const char* lpszMatch, BOOL bMatchCase=TRUE);
 
+extern void SetMapTable();
+
+UINT GetPixelValue(DWORD uPixelValue_i);
+
 extern void TestMime();
 
 
