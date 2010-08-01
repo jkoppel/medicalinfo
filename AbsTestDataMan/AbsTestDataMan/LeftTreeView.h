@@ -49,15 +49,18 @@ protected:
 	CImageList m_ilDataFile;	//图标列表
 	BOOL m_bMultiSelectMode;	//选中模式：多文件模式或单文件模式
 	HTREEITEM m_pCurrFileItem;	//单文件模式下当前选中的文件结点
+	CMenu *m_pPopupMenu;
 
 	//{{AFX_MSG(CLeftTreeView)
-	afx_msg void OnDblclk(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg LRESULT OnCheckbox(WPARAM, LPARAM);
+	afx_msg void OnRclickTree(NMHDR* /*pNMHDR*/, LRESULT* pResult);
+	afx_msg void OnModeSingleFile();
+	afx_msg void OnModeMultiFile();
 };
 
 

@@ -10,6 +10,8 @@
 #include "GlobalVars.h"
 #include "ExtLibs\\MySplitterWndEx\\MySplitterWndEx.h"
 #include "TestDataTreeMgt.h"
+#include "DlgProgress.h"
+#include "DrawAreaConfigMgt.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -27,10 +29,18 @@ CLeftTreeView::CLeftTreeView()
 	m_ilDataFile.DeleteImageList();
 	m_bMultiSelectMode = TRUE;
 	m_pCurrFileItem = NULL;
+
+	m_pPopupMenu = new CMenu();
+	m_pPopupMenu->CreatePopupMenu();
+	m_pPopupMenu->AppendMenu(MF_STRING, ID_FILEMODE_SINGLE, _T("单文件模式"));
+	m_pPopupMenu->AppendMenu(MF_STRING, ID_FILEMODE_MULTI, _T("多文件模式"));
 }
 
 CLeftTreeView::~CLeftTreeView()
 {
+	m_pPopupMenu->DestroyMenu();
+	delete m_pPopupMenu;
+
 	if(g_pTree!=NULL){
 		delete g_pTree;
 	}
@@ -39,11 +49,13 @@ CLeftTreeView::~CLeftTreeView()
 
 BEGIN_MESSAGE_MAP(CLeftTreeView, CView)
 	//{{AFX_MSG_MAP(CLeftTreeView)
-	ON_NOTIFY_REFLECT(NM_DBLCLK, OnDblclk)
 	//}}AFX_MSG_MAP
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 	ON_REGISTERED_MESSAGE(WM_XHTMLTREE_CHECKBOX_CLICKED, OnCheckbox)
+	ON_NOTIFY(NM_RCLICK, IDC_TREE, OnRclickTree)
+	ON_COMMAND(ID_FILEMODE_SINGLE, &CLeftTreeView::OnModeSingleFile)
+	ON_COMMAND(ID_FILEMODE_MULTI, &CLeftTreeView::OnModeMultiFile)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -78,17 +90,35 @@ void CLeftTreeView::OnInitialUpdate()
 {
 	CView::OnInitialUpdate();
 
-	// create image list for level 0 items
-	m_ilDataFile.DeleteImageList();
-	m_ilDataFile.Create(IDB_BITMAP_DATAFILE, 16, 1, RGB(255,255,255));
-
 	InitTree();
 
 	g_pLeftTreeView = this;
 }
 
+int Color2Index(COLORREF color)
+{
+	DWORD dwPixelVal = color;
+
+	int nBlue = dwPixelVal >> 16;
+	int nGreen = (dwPixelVal & 0x00FF00) >> 8 ;
+	int nRed = dwPixelVal & 0x0000FF;
+	// Get Index of suitable color data in the palette table.
+
+	UINT uRedValue = GetPixelValue(nRed);
+	UINT uGreenValue = GetPixelValue(nGreen);
+	UINT uBlueValue = GetPixelValue(nBlue);
+
+	UINT uPalettePos = uBlueValue*36+uGreenValue*6+uRedValue;
+
+	return (int)uPalettePos;
+}
+
 void CLeftTreeView::InitTree(BOOL bReloadMode)
 {
+	// create image list for level 0 items
+	m_ilDataFile.DeleteImageList();
+	m_ilDataFile.Create(IDB_BITMAP_DATAFILE, 16, 1, RGB(255,255,255));
+
 	if(!bReloadMode){
 		g_TestDataTreeMgt.InitTree();
 	}
@@ -96,7 +126,9 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 		g_TestDataTreeMgt.ReloadTree();
 	}
 
-	COLORREF color[] = {RGB(255,0,0),RGB(0,255,0),RGB(0,0,255),RGB(255,255,0),RGB(255,0,255),RGB(0,255,255),RGB(0,0,0),};
+	CDrawAreaConfigMgt dacMgt;
+	struct DrawAreaConfig daConfig;
+	dacMgt.GetDrawAreaConfig(daConfig);
 
 	g_pTree->DeleteAllItems();
 	g_pTree->SetImageList(&m_ilDataFile, TVSIL_NORMAL);
@@ -113,8 +145,8 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 	if(pProductNode==NULL){
 		tvRoot.item.pszText = _T("无数据");
 		tvRoot.hParent = NULL;
-		tvRoot.item.iImage = 8;
-		tvRoot.item.iSelectedImage = 8;
+		tvRoot.item.iImage = Color2Index(RGB(0, 0, 255));
+		tvRoot.item.iSelectedImage = Color2Index(RGB(0, 0, 255));
 		g_pTree->InsertItem(&tvRoot);
 		return;
 	}
@@ -123,8 +155,8 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 		TCHAR tcBuf[1024];
 		tvRoot.hParent = NULL;
 		tvRoot.item.pszText = pProductNode->sProductNo;
-		tvRoot.item.iImage = 8;
-		tvRoot.item.iSelectedImage = 8;
+		tvRoot.item.iImage = Color2Index(RGB(0, 0, 255));
+		tvRoot.item.iSelectedImage = Color2Index(RGB(0, 0, 255));
 		HTREEITEM item_root=g_pTree->InsertItem(&tvRoot);
 
 		FileNodePtr pFileNode;
@@ -132,9 +164,9 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 		while(pFileNode!=NULL){
 			TV_INSERTSTRUCT tvChild;//树叶
 			tvChild.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-			tvChild.item.pszText = pFileNode->sTestDate;//pFileNode->pAdditionInfo.sFile;//
-			tvChild.item.iImage= 10;
-			tvChild.item.iSelectedImage = 10;
+			tvChild.item.pszText = pFileNode->sTestDate;
+			tvChild.item.iImage= Color2Index(RGB(0xFF, 0x45, 0x00));
+			tvChild.item.iSelectedImage = Color2Index(RGB(0xFF, 0x45, 0x00));
 			tvChild.hParent = item_root;
 			HTREEITEM item_child = g_pTree->InsertItem(&tvChild);
 			for(int k=0;k<pFileNode->test_record_maininfo.iNumOfSpeed;k++){
@@ -142,11 +174,11 @@ void CLeftTreeView::InitTree(BOOL bReloadMode)
 				tvChild.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
 				_stprintf(tcBuf, _T("%s%d"), _T("Speed"), k+1);
 				tvChild.item.pszText = tcBuf;
-				tvChild.item.iImage=(k % 12) + 2;
-				tvChild.item.iSelectedImage = (k % 12) + 2;
+				tvChild.item.iImage = Color2Index(daConfig.crSpeedCurve[k]);
+				tvChild.item.iSelectedImage = Color2Index(daConfig.crSpeedCurve[k]);
 				tvChild.hParent = item_child;
 				HTREEITEM item_curr = g_pTree->InsertItem(&tvChild);
-				g_pTree->SetItemTextColor(item_curr, color[k]);
+				g_pTree->SetItemTextColor(item_curr, daConfig.crSpeedCurve[k]);
 				g_pTree->SetItemData(item_curr, (DWORD_PTR)(&pFileNode->tree_item_data[k]));
 			}
 			pFileNode = pFileNode->pNext;
@@ -169,11 +201,6 @@ void CLeftTreeView::SetMultiSelectMode(BOOL bMultiSelectMode)
 BOOL CLeftTreeView::GetMultiSelectMode()
 {
 	return m_bMultiSelectMode;
-}
-
-void CLeftTreeView::OnDblclk(NMHDR* pNMHDR, LRESULT* pResult) 
-{
-	*pResult = 0;
 }
 
 int CLeftTreeView::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -361,4 +388,41 @@ LRESULT CLeftTreeView::OnCheckbox(WPARAM wParam, LPARAM lParam)
 	}
 
 	return 0;
+}
+
+void CLeftTreeView::OnRclickTree(NMHDR* /*pNMHDR*/, LRESULT* pResult)
+//=============================================================================
+{
+	// get the mouse position from this message
+	const MSG* pMessage = GetCurrentMessage();
+	ASSERT(pMessage);
+
+	if (pMessage)
+	{
+		CPoint point = pMessage->pt;// get the point from the message
+		m_pPopupMenu->CheckMenuRadioItem(ID_FILEMODE_SINGLE, ID_FILEMODE_MULTI, ID_FILEMODE_SINGLE + ((m_bMultiSelectMode)?1:0), MF_BYCOMMAND);
+		m_pPopupMenu->TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
+	}
+
+	*pResult = 0;
+}
+
+void CLeftTreeView::OnModeSingleFile()
+{
+	SetMultiSelectMode(FALSE);
+	InitTree(TRUE);
+
+	if(g_pRightDrawAreaView!=NULL){
+		g_pRightDrawAreaView->RedrawWindow();
+	}
+}
+
+void CLeftTreeView::OnModeMultiFile()
+{
+	SetMultiSelectMode(TRUE);
+	InitTree(TRUE);
+
+	if(g_pRightDrawAreaView!=NULL){
+		g_pRightDrawAreaView->RedrawWindow();
+	}
 }
