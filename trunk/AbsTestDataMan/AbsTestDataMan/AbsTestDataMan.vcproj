@@ -226,7 +226,15 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\DlgDrawAreaSetup.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DlgProgress.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DrawAreaConfigMgt.cpp"
 				>
 			</File>
 			<File
@@ -376,7 +384,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DlgDrawAreaSetup.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DlgProgress.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DrawAreaConfigMgt.h"
 				>
 			</File>
 			<File
@@ -809,7 +825,48 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="ColorComboEx"
+				>
+				<File
+					RelativePath=".\ExtLibs\ColorComboEx\ColorComboEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ExtLibs\ColorComboEx\ColorComboEx.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ButtonEx"
+				>
+				<File
+					RelativePath=".\ExtLibs\ButtonEx\ButtonEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ExtLibs\ButtonEx\ButtonEx.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="BitmapEx"
+				>
+				<File
+					RelativePath=".\ExtLibs\BitmapEx\BitmapEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ExtLibs\BitmapEx\BitmapEx.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
+		<File
+			RelativePath=".\DlgDrawAreaSetup.htm"
+			DeploymentContent="true"
+			>
+		</File>
 		<File
 			RelativePath=".\ReadMe.txt"
 			>
