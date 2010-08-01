@@ -11,6 +11,7 @@
 CWinThread *CDlgProgress::m_pThread = NULL;
 CDlgProgress *CDlgProgress::m_pDlg = NULL;
 AFX_THREADPROC CDlgProgress::m_ThreadProc = NULL;
+LPVOID CDlgProgress::m_lpParam = NULL;
 
 // CDlgProgress dialog
 
@@ -149,7 +150,7 @@ BOOL CDlgProgress::StartThread(AFX_THREADPROC ThreadProc, LPCTSTR sPromptInfo, i
 {
 	if(m_pThread==NULL){
 		m_ThreadProc = ThreadProc;
-		m_pThread = AfxBeginThread(ProgressThreadProc, (LPVOID)0);
+		m_pThread = AfxBeginThread(ProgressThreadProc, (LPVOID)m_lpParam);
 		if(m_pThread==NULL){
 			return FALSE;
 		}

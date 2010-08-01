@@ -29,6 +29,7 @@ public:
 	CString m_strPromptInfo;		//提示信息
 	CSkinProgress *m_pProgress;		//进度条对象
 
+	static LPVOID m_lpParam;
 	static CDlgProgress *m_pDlg;	//对话框对象
 	static CWinThread *m_pThread;	//启动的进程句柄
 	static AFX_THREADPROC m_ThreadProc;//用户传入进来的进程函数，即用户要执行的任务在该函数中实现
