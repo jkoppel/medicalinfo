@@ -1,0 +1,9 @@
+PROJECT_NAME = "X86 Atom JIT Compiler for Dalvik"
+INPUT = AnalysisO1.cpp GlueOpt.cpp LowerHelper.cpp  NcgAot.cpp AnalysisO1.h LowerAlu.cpp LowerInvoke.cpp NcgAot.h Schedule.cpp BytecodeVisitor.cpp LowerConst.cpp LowerJump.cpp NcgCodegenO1.cpp Scheduler.h CodegenInterface.cpp Lower.cpp LowerMove.cpp NcgHelper.cpp Translator.h DataFlow.cpp LowerGetPut.cpp LowerObject.cpp NcgHelper.h Lower.h LowerReturn.cpp NullCheckElim.cpp
+OUTPUT_DIRECTORY = x86-jit-docs
+GENERATE_HTML = YES
+HTML_OUTPUT = html/
+HTML_FILE_EXTENSION = .html
+EXTRACT_PRIVATE = YES
+EXTRACT_STATIC = YES
+EXTRACT_LOCAL_CLASSES = YES
