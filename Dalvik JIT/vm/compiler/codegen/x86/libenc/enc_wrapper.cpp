@@ -26,10 +26,21 @@
 bool dump_x86_inst = false;
 //map_reg
 const RegName map_of_regno_2_regname[] = {
+    /**
+     * enum PhysicalReg: physical register, index, PhysicalReg_EAX = 0 to PhysicalReg_ST7, PhysicalReg_Null; 
+     *                PhysicalReg_SCRATCH_1 = 100 to PhysicalReg_SCRATCH_10; PhysicalReg_GLUE_DVMDEX = 900, PhysicalReg_GLUE = 901
+     * enum Reg_No: eax_reg = 0, to ebp_reg, to xmm0_reg, to xmm7_reg, to fs_reg, the last is n_reg=total_num
+     * RegName is enum type, the following may not be continuous
+     * RegName format : #define REGNAME(k,s,i) ( ((k & OpndKind_Any)<<24) | ((s & OpndSize_Any)<<16) | (i&0xFF) )
+     *      | unused(31) | kind(30-24, OpndKind_Any=7F) | unused(23,22) | size(21-16, OpndSize_Any=3F) | unknow(15-8) | index(7-0) |
+     */
     RegName_EAX,    RegName_EBX,    RegName_ECX,    RegName_EDX,
     RegName_EDI,    RegName_ESI,    RegName_ESP,    RegName_EBP,
     RegName_XMM0,   RegName_XMM1,   RegName_XMM2,   RegName_XMM3,
     RegName_XMM4,   RegName_XMM5,   RegName_XMM6,   RegName_XMM7,
+    
+    //from fs_reg, the reg name is RegName_Null
+
     RegName_Null,   RegName_Null,   RegName_Null,   RegName_Null,
     RegName_Null,   RegName_Null,   RegName_Null,   RegName_Null,
     RegName_Null,
@@ -42,19 +53,41 @@ const RegName map_of_regno_2_regname[] = {
 
 //getRegSize, getAliasReg:
 //OpndSize, RegName, OpndExt: enum enc_defs.h
+//add a register to operand list
 inline void add_r(EncoderBase::Operands & args, int physicalReg, OpndSize sz, OpndExt ext = OpndExt_None) {
+    /**
+     * OpndExt: Defines type of extention allowed for particular operand. OpndExt_None/OpndExt_Signed/OpndExt_Zero/OpndExt_Any 
+     * For example imul r32,r_m32,imm8 sign extend imm8 before performing multiplication.
+     * To satisfy instruction constraints immediate operand should be either OpndExt_Signed or OpndExt_Any.
+     */
+
     RegName reg = map_of_regno_2_regname[physicalReg];
+
+    /**
+     * for a RegName, related functions: geRegIndex, getRegSize, getRegKind, getAliasReg
+     */
     if (sz != getRegSize(reg)) {
-       reg = getAliasReg(reg, sz);
+       reg = getAliasReg(reg, sz);//get alias: use kind, index of the original reg, and size with sz to combine a new reg
     }
     args.add(EncoderBase::Operand(reg, ext));
+    /**
+     * Operand class: with member variables: m_kind, m_size, m_ext, m_base, m_index, m_disp/m_reg/m_imm64, m_hash, m_need_rex
+     * and define a lot related member functions
+     */
+    /**
+     * Operands class: a list of Operand and its operations.
+     */
 }
+
+//add a memory(??) to operand list
 inline void add_m(EncoderBase::Operands & args, int baseReg, int disp, OpndSize sz, OpndExt ext = OpndExt_None) {
     args.add(EncoderBase::Operand(sz,
                                   map_of_regno_2_regname[baseReg],
                                   RegName_Null, 0,
                                   disp, ext));
 }
+
+//add a memory/ to operand list
 inline void add_m_scale(EncoderBase::Operands & args, int baseReg, int indexReg, int scale,
                         OpndSize sz, OpndExt ext = OpndExt_None) {
     args.add(EncoderBase::Operand(sz,
@@ -156,6 +189,7 @@ int decodeThenPrint(char* stream_start) {
     return numBytes;
 }
 
+/*encode immediate operand to stream*/
 extern "C" ENCODER_DECLARE_EXPORT char * encoder_imm(Mnemonic m, OpndSize size, int imm, char * stream) {
     EncoderBase::Operands args;
     //assert(imm.get_size() == size_32);
@@ -168,21 +202,28 @@ extern "C" ENCODER_DECLARE_EXPORT char * encoder_imm(Mnemonic m, OpndSize size, 
 #endif
     return stream;
 }
+
+/* decode instruction from stream and get instruction size */
 extern "C" ENCODER_DECLARE_EXPORT unsigned encoder_get_inst_size(char * stream) {
     Inst decInst;
     unsigned numBytes = DecoderBase::decode(stream, &decInst);
     return numBytes;
 }
 
+/* get current operand offset(location) */
 extern "C" ENCODER_DECLARE_EXPORT unsigned encoder_get_cur_operand_offset(int opnd_id)
 {
     return (unsigned)EncoderBase::getOpndLocation(opnd_id);
 }
 
+/**
+ * update current instruction's first operand, set it as the input immediate
+ * the input stream is Mnemonic + immediate, return the next instruct
+ */
 extern "C" ENCODER_DECLARE_EXPORT char * encoder_update_imm(int imm, char * stream) {
     Inst decInst;
     unsigned numBytes = DecoderBase::decode(stream, &decInst);
-    EncoderBase::Operands args;
+    EncoderBase::Operands args;//count=0 at first
     //assert(imm.get_size() == size_32);
     add_imm(args, decInst.operands[0].size(), imm, true/*is_signed*/);
     char* stream_next = (char *)EncoderBase::encode(stream, decInst.mn, args);
@@ -192,6 +233,8 @@ extern "C" ENCODER_DECLARE_EXPORT char * encoder_update_imm(int imm, char * stre
 #endif
     return stream_next;
 }
+
+//encode memory operand to stream
 extern "C" ENCODER_DECLARE_EXPORT char * encoder_mem(Mnemonic m, OpndSize size,
                int disp, int base_reg, bool isBasePhysical, char * stream) {
     EncoderBase::Operands args;
@@ -204,6 +247,8 @@ extern "C" ENCODER_DECLARE_EXPORT char * encoder_mem(Mnemonic m, OpndSize size,
 #endif
     return stream;
 }
+
+//encode memory operand to stream
 extern "C" ENCODER_DECLARE_EXPORT char * encoder_reg(Mnemonic m, OpndSize size,
                int reg, bool isPhysical, LowOpndRegType type, char * stream) {
     EncoderBase::Operands args;
@@ -220,6 +265,8 @@ extern "C" ENCODER_DECLARE_EXPORT char * encoder_reg(Mnemonic m, OpndSize size,
 #endif
     return stream;
 }
+
+//encode two register operands with same size to stream */
 //both operands have same size
 extern "C" ENCODER_DECLARE_EXPORT char * encoder_reg_reg(Mnemonic m, OpndSize size,
                    int reg, bool isPhysical,
@@ -239,6 +286,8 @@ extern "C" ENCODER_DECLARE_EXPORT char * encoder_reg_reg(Mnemonic m, OpndSize si
 #endif
     return stream;
 }
+
+//encode memory, reg operand with same size to stream
 extern "C" ENCODER_DECLARE_EXPORT char * encoder_mem_reg(Mnemonic m, OpndSize size,
                    int disp, int base_reg, bool isBasePhysical,
                    int reg, bool isPhysical, LowOpndRegType type, char * stream) {
@@ -253,6 +302,8 @@ extern "C" ENCODER_DECLARE_EXPORT char * encoder_mem_reg(Mnemonic m, OpndSize si
 #endif
     return stream;
 }
+
+//encode memory, scale, reg operands to stream
 extern "C" ENCODER_DECLARE_EXPORT char * encoder_mem_scale_reg(Mnemonic m, OpndSize size,
                          int base_reg, bool isBasePhysical, int index_reg, bool isIndexPhysical, int scale,
                          int reg, bool isPhysical, LowOpndRegType type, char * stream) {
@@ -267,6 +318,8 @@ extern "C" ENCODER_DECLARE_EXPORT char * encoder_mem_scale_reg(Mnemonic m, OpndS
 #endif
     return stream;
 }
+
+//encode reg, memory, scale operands to stream
 extern "C" ENCODER_DECLARE_EXPORT char * encoder_reg_mem_scale(Mnemonic m, OpndSize size,
                          int reg, bool isPhysical,
                          int base_reg, bool isBasePhysical, int index_reg, bool isIndexPhysical, int scale,
@@ -282,6 +335,8 @@ extern "C" ENCODER_DECLARE_EXPORT char * encoder_reg_mem_scale(Mnemonic m, OpndS
 #endif
     return stream;
 }
+
+//
 extern "C" ENCODER_DECLARE_EXPORT char * encoder_mem_disp_scale_reg(Mnemonic m, OpndSize size,
                          int base_reg, bool isBasePhysical, int disp, int index_reg, bool isIndexPhysical, int scale,
                          int reg, bool isPhysical, LowOpndRegType type, char * stream) {
