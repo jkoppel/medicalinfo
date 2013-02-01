@@ -30,6 +30,9 @@
 #define NUM_DEPENDENCIES 24 /* max number of dependencies from a LowOp */
 //compilaton flags used by NCG O1
 #define DUMP_EXCEPTION //to measure performance, required to have correct exception handling
+
+//各种优化选项, HARDREG, CFG, MOVE, SPILL, XFER, LIVERANGE, NULLCHECK, GLUE
+
 /*! multiple versions for hardcoded registers */
 #define HARDREG_OPT
 #define CFG_OPT
@@ -46,6 +49,9 @@
 //#define BOUNDCHECK_OPT
 /*! optimize the access to glue structure */
 #define GLUE_OPT
+
+//各种FIX
+
 #define CALL_FIX
 #define NATIVE_FIX
 #define INVOKE_FIX //optimization
@@ -205,7 +211,7 @@ typedef enum JmpCall_type {
 /* Due to space considation, a lowered op (LowOp) has two operands (LowOpnd), depending on
    the type of the operand, LowOpndReg or LowOpndImm or LowOpndMem will follow */
 /*! type of an operand can be immediate, register or memory */
-typedef enum LowOpndType {
+typedef enum LowOpndType {  //操作数类型
   LowOpndType_Imm = 0,
   LowOpndType_Reg,
   LowOpndType_Mem,
@@ -221,28 +227,28 @@ typedef enum LowOpndDefUse {
 
 /*!
 \brief base data structure for an operand */
-typedef struct LowOpnd {
-  LowOpndType type;
-  OpndSize size;
-  LowOpndDefUse defuse;
+typedef struct LowOpnd {    //操作数结构
+  LowOpndType type;     //类型
+  OpndSize size;        //大小
+  LowOpndDefUse defuse; //def use
 } LowOpnd;
 /*!
 \brief data structure for a register operand */
-typedef struct LowOpndReg {
-  LowOpndRegType regType;
-  int logicalReg;
-  int physicalReg;
+typedef struct LowOpndReg { //寄存器操作数
+  LowOpndRegType regType;   //寄存器类型
+  int logicalReg;           //逻辑寄存器
+  int physicalReg;          //物理寄存器
 } LowOpndReg;
 /*!
 \brief data structure for an immediate operand */
-typedef struct LowOpndImm {
+typedef struct LowOpndImm { //立即数操作数
   union {
-    s4 value;
-    unsigned char bytes[4];
+    s4 value;               //值
+    unsigned char bytes[4]; //值的字节表示
   };
 } LowOpndImm;
 
-typedef struct LowOpndNCG {
+typedef struct LowOpndNCG { //NCG: Native Code Generator, NCG操作数不知道是用来做什么的
   union {
     s4 value;
     unsigned char bytes[4];
@@ -250,7 +256,7 @@ typedef struct LowOpndNCG {
 } LowOpndNCG;
 
 #define LABEL_SIZE 256
-typedef struct LowOpndLabel {
+typedef struct LowOpndLabel {//LABEL操作数
   char label[LABEL_SIZE];
   bool isLocal;
 } LowOpndLabel;
@@ -286,17 +292,17 @@ typedef struct UseDefUserEntry {
 
 /*!
 \brief data structure for a memory operand */
-typedef struct LowOpndMem {
-  LowOpndImm m_disp;
-  LowOpndImm m_scale;
-  LowOpndReg m_index;
-  LowOpndReg m_base;
-  bool hasScale;
-  MemoryAccessType mType;
+typedef struct LowOpndMem { //内存操作数
+  LowOpndImm m_disp;    //disp
+  LowOpndImm m_scale;   //scale
+  LowOpndReg m_index;   //register index
+  LowOpndReg m_base;    //register base
+  bool hasScale;        //
+  MemoryAccessType mType;//access type
   int index;
 } LowOpndMem;
 
-typedef enum AtomOpCode {
+typedef enum AtomOpCode {   //ATOM平台的OPCODE
     ATOM_PSEUDO_CHAINING_CELL_BACKWARD_BRANCH = -15,
     ATOM_NORMAL_ALU = -14,
     ATOM_PSEUDO_ENTRY_BLOCK = -13,
