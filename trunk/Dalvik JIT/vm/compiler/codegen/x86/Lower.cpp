@@ -84,55 +84,55 @@ int LstrDivideByZero, LstrNegativeArraySizeException, LstrNoSuchMethodError, Lst
 int LdoubNeg, LvaluePosInfLong, LvalueNegInfLong, LvalueNanLong, LshiftMask, Lvalue64, L64bits, LintMax, LintMin;
 
 void initConstDataSec() {
-    char* tmpPtr = globalData;
+    char* tmpPtr = globalData;//char globalData[128]; data section of .ia32 
 
-    LdoubNeg = (int)tmpPtr;
+    LdoubNeg = (int)tmpPtr;         //8字节double，-1.0 / 0.0, Negative Infinity, 的位置
     *((u4*)tmpPtr) = 0x00000000;
     tmpPtr += sizeof(u4);
     *((u4*)tmpPtr) = 0x80000000;
     tmpPtr += sizeof(u4);
 
-    LvaluePosInfLong = (int)tmpPtr;
+    LvaluePosInfLong = (int)tmpPtr; //8字节long，+无穷大的位置, 2^63-1
     *((u4*)tmpPtr) = 0xFFFFFFFF;
     tmpPtr += sizeof(u4);
     *((u4*)tmpPtr) = 0x7FFFFFFF;
     tmpPtr += sizeof(u4);
 
-    LvalueNegInfLong = (int)tmpPtr;
+    LvalueNegInfLong = (int)tmpPtr; //8字节long，-无穷大的位置, -2^63
     *((u4*)tmpPtr) = 0x00000000;
     tmpPtr += sizeof(u4);
     *((u4*)tmpPtr) = 0x80000000;
     tmpPtr += sizeof(u4);
 
-    LvalueNanLong = (int)tmpPtr;
+    LvalueNanLong = (int)tmpPtr;    //8字节long，1/0, Not-a-Number (NaN)的位置
     *((u4*)tmpPtr) = 0;
     tmpPtr += sizeof(u4);
     *((u4*)tmpPtr) = 0;
     tmpPtr += sizeof(u4);
 
-    LshiftMask = (int)tmpPtr;
+    LshiftMask = (int)tmpPtr;       //移位掩码0x0000003f
     *((u4*)tmpPtr) = 0x3f;
     tmpPtr += sizeof(u4);
     *((u4*)tmpPtr) = 0;
     tmpPtr += sizeof(u4);
 
-    Lvalue64 = (int)tmpPtr;
+    Lvalue64 = (int)tmpPtr;         //值范围0x00000040
     *((u4*)tmpPtr) = 0x40;
     tmpPtr += sizeof(u4);
     *((u4*)tmpPtr) = 0;
     tmpPtr += sizeof(u4);
 
-    L64bits = (int)tmpPtr;
+    L64bits = (int)tmpPtr;          //
     *((u4*)tmpPtr) = 0xFFFFFFFF;
     tmpPtr += sizeof(u4);
     *((u4*)tmpPtr) = 0xFFFFFFFF;
     tmpPtr += sizeof(u4);
 
-    LintMin = (int)tmpPtr;
+    LintMin = (int)tmpPtr;          //int的最小值 -2^31
     *((u4*)tmpPtr) = 0x80000000;
     tmpPtr += sizeof(u4);
 
-    LintMax = (int)tmpPtr;
+    LintMax = (int)tmpPtr;          //int的最大值 2^31-1
     *((u4*)tmpPtr) = 0x7FFFFFFF;
     tmpPtr += sizeof(u4);
 
@@ -474,6 +474,18 @@ void endOfTrace(bool freeOnly) {
 //!
 //! each bytecode is translated to a sequence of machine codes
 int lowerByteCode(const Method* method) { //inputs: rPC & inst & stream & streamMethodStart
+
+    /**
+     * method->insns: 存放当前方法bytecode的起始地址
+     * rpc: 存放当前要转换的bytecode的地址
+     * offsetPC: 存放当前要转换的bytecode的相对地址
+     * streamMethodStart: 存放当前方法转换后机器码的起始地址, codecache
+     * stream: 存放转换后的机器码的起始地址
+     * offsetNCG: 存放当前机器的相对地址
+     * NCG: Native Code Generator
+     * mapFromBCtoNCG: 某个method的offsetPC到offsetNCG的映射表
+     */
+
     /* offsetPC is used in O1 code generator, where it is defined as the sequence number
        use a local version to avoid overwriting */
     int offsetPC = rPC - (u2*)method->insns;
