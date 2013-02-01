@@ -341,7 +341,7 @@ typedef struct LowOpBlock {
 
 /*!
 \brief data structure for a lowered operation */
-typedef struct LowOp {
+typedef struct LowOp {//底层一条操作指令
   LIR generic;
   Mnemonic opCode;
   AtomOpCode opCode2;
@@ -350,85 +350,85 @@ typedef struct LowOp {
   int numOperands;
 } LowOp;
 
-typedef struct LowOpLabel {
+typedef struct LowOpLabel {//Label指令
   LowOp lop;
   LowOpndLabel labelOpnd;
 }LowOpLabel;
 
-typedef struct LowOpNCG {
+typedef struct LowOpNCG {//NCG指令
   LowOp lop;
   LowOpndNCG ncgOpnd;
 }LowOpNCG;
 
-typedef struct LowOpBlockLabel {
+typedef struct LowOpBlockLabel {//Block Lable指令
   LowOpBlock lop;
   LowOpndImm immOpnd;
 } LowOpBlockLabel;
 
-typedef struct LowOpImm {
+typedef struct LowOpImm {//立即数指令
   LowOp lop;
   LowOpndImm immOpnd;
 } LowOpImm;
 
-typedef struct LowOpMem {
+typedef struct LowOpMem {//内存指令
   LowOp lop;
   LowOpndMem memOpnd;
 } LowOpMem;
 
-typedef struct LowOpReg {
+typedef struct LowOpReg {//寄存器指令
   LowOp lop;
   LowOpndReg regOpnd;
 } LowOpReg;
 
-typedef struct LowOpImmImm {
+typedef struct LowOpImmImm {//两个立即数指令
   LowOp lop;
   LowOpndImm immOpnd1;
   LowOpndImm immOpnd2;
 } LowOpImmImm;
 
-typedef struct LowOpImmReg {
+typedef struct LowOpImmReg {//立即数，寄存器
   LowOp lop;
   LowOpndImm immOpnd1;
   LowOpndReg regOpnd2;
 } LowOpImmReg;
 
-typedef struct LowOpImmMem {
+typedef struct LowOpImmMem {//立即数，内存
   LowOp lop;
   LowOpndImm immOpnd1;
   LowOpndMem memOpnd2;
 } LowOpImmMem;
 
-typedef struct LowOpRegImm {
+typedef struct LowOpRegImm {//寄存器，内存
   LowOp lop;
   LowOpndReg regOpnd1;
   LowOpndImm immOpnd2;
 } LowOpRegImm;
 
-typedef struct LowOpRegReg {
+typedef struct LowOpRegReg {//寄存器寄存器
   LowOp lop;
   LowOpndReg regOpnd1;
   LowOpndReg regOpnd2;
 } LowOpRegReg;
 
-typedef struct LowOpRegMem {
+typedef struct LowOpRegMem {//寄存器内存
   LowOp lop;
   LowOpndReg regOpnd1;
   LowOpndMem memOpnd2;
 } LowOpRegMem;
 
-typedef struct LowOpMemImm {
+typedef struct LowOpMemImm {//内存立即数
   LowOp lop;
   LowOpndMem memOpnd1;
   LowOpndImm immOpnd2;
 } LowOpMemImm;
 
-typedef struct LowOpMemReg {
+typedef struct LowOpMemReg {//内存寄存器
   LowOp lop;
   LowOpndMem memOpnd1;
   LowOpndReg regOpnd2;
 } LowOpMemReg;
 
-typedef struct LowOpMemMem {
+typedef struct LowOpMemMem {//内存内存
   LowOp lop;
   LowOpndMem memOpnd1;
   LowOpndMem memOpnd2;
@@ -455,7 +455,7 @@ extra label maps are used by code cache:
   globalDataWorklist VMAPIWorklist
 */
 typedef struct LabelMap {
-  char label[LABEL_SIZE];
+  char label[LABEL_SIZE];//LABEL_SIZE=256
   char* codePtr; //code corresponding to the label or code that uses the label
   struct LabelMap* nextItem;
   OpndSize size;
