@@ -29,19 +29,23 @@
 //! lower bytecode NEG_INT
 
 //!
-int op_neg_int() {
+int op_neg_int() {  //整数取负
+    /**
+     * #define INST_A(_inst)       (((_inst) >> 8) & 0x0f)
+     * #define INST_B(_inst)       ((_inst) >> 12)
+     */
     u2 vA = INST_A(inst); //destination
     u2 vB = INST_B(inst);
-    get_virtual_reg(vB, OpndSize_32, 1, false);
-    alu_unary_reg(OpndSize_32, neg_opc, 1, false);
-    set_virtual_reg(vA, OpndSize_32, 1, false);
+    get_virtual_reg(vB, OpndSize_32, 1, false);     //load from VR(virtual_reg) to a temporary
+    alu_unary_reg(OpndSize_32, neg_opc, 1, false);  //neg_opc, neg opcode
+    set_virtual_reg(vA, OpndSize_32, 1, false);     //load from a temporary to a VR
     rPC += 1;
     return 0;
 }
 //! lower bytecode NOT_INT
 
 //!
-int op_not_int() {
+int op_not_int() {  //整数取非
     u2 vA = INST_A(inst); //destination
     u2 vB = INST_B(inst);
     get_virtual_reg(vB, OpndSize_32, 1, false);
@@ -54,7 +58,7 @@ int op_not_int() {
 //! lower bytecode NEG_LONG
 
 //! This implementation uses XMM registers
-int op_neg_long() {
+int op_neg_long() { //长整数取负
     u2 vA = INST_A(inst); //destination
     u2 vB = INST_B(inst);
     get_virtual_reg(vB, OpndSize_64, 1, false);
