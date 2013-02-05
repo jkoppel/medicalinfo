@@ -107,6 +107,9 @@ const  Mnemonic map_of_64_opcode_2_mnemonic[] = {
 
 //!
 void set_reg_opnd(LowOpndReg* op_reg, int reg, bool isPhysical, LowOpndRegType type) {
+    /**
+     * LowOpndReg struct: regType, logicalReg, physicalReg, regNum, isPhysical
+     */
     op_reg->regType = type;
     if(isPhysical) {
         op_reg->logicalReg = -1;
@@ -120,6 +123,12 @@ void set_reg_opnd(LowOpndReg* op_reg, int reg, bool isPhysical, LowOpndRegType t
 
 //!
 void set_mem_opnd(LowOpndMem* mem, int disp, int base, bool isPhysical) {
+    /**
+     * LowOpndImm struct:   union{ s4 value; uchar bytes[4]; }
+     * 定义了LowOpndImm, LowOpndReg，再用它们来定义LowOpndMem
+     * LowOpndMem struct:   LowOpndImm m_disp, LowOpndImm m_scale, LowOpndReg m_index, LowOpndReg m_base,
+     *                      bool hasScale,  MemoryAccessType mType, int index
+     */
     mem->m_disp.value = disp;
     mem->hasScale = false;
     mem->m_base.regType = LowOpndRegType_gp;
@@ -234,6 +243,9 @@ LowOpImm* dump_special(AtomOpCode cc, int imm) {
 }
 
 LowOpLabel* lower_label(Mnemonic m, OpndSize size, int imm, const char* label, bool isLocal) {
+    /**
+     * ? 为什么label没有用上
+     */
     stream = encoder_imm(m, size, imm, stream);
     return NULL;
 }
@@ -250,7 +262,7 @@ LowOpNCG* dump_ncg(Mnemonic m, OpndSize size, int imm) {
 
 //!update fields of LowOp and generate a x86 instruction with a single immediate operand
 
-//!
+//! //编码单个立即数的指令
 LowOpImm* lower_imm(Mnemonic m, OpndSize size, int imm, bool updateTable) {
     stream = encoder_imm(m, size, imm, stream);
     return NULL;
@@ -260,6 +272,7 @@ LowOpImm* dump_imm(Mnemonic m, OpndSize size, int imm) {
     return lower_imm(m, size, imm, true);
 }
 
+//编码立即数指令到某个特定地址
 LowOpImm* dump_imm_with_codeaddr(Mnemonic m, OpndSize size,
                int imm, char* codePtr) {
     encoder_imm(m, size, imm, codePtr);
@@ -271,13 +284,14 @@ LowOpImm* dump_imm_with_codeaddr(Mnemonic m, OpndSize size,
 //!With NCG O1, we call freeReg to free up physical registers, then call registerAlloc to allocate a physical register for memory base
 LowOpMem* lower_mem(Mnemonic m, AtomOpCode m2, OpndSize size,
                int disp, int base_reg) {
+    /** 编码单个的内存操作数的指令 */
     stream = encoder_mem(m, size, disp, base_reg, true, stream);
     return NULL;
 }
 
 LowOpMem* dump_mem(Mnemonic m, AtomOpCode m2, OpndSize size,
                int disp, int base_reg, bool isBasePhysical) {
-    if(gDvm.executionMode == kExecutionModeNcgO1) {
+    if(gDvm.executionMode == kExecutionModeNcgO1) {//是否进行寄存器分配优化
         freeReg(true);
         //type of the base is gpr
         int regAll = registerAlloc(LowOpndRegType_gp, base_reg, isBasePhysical, true);
@@ -292,13 +306,14 @@ LowOpMem* dump_mem(Mnemonic m, AtomOpCode m2, OpndSize size,
 //!With NCG O1, wecall freeReg to free up physical registers, then call registerAlloc to allocate a physical register for the single operand
 LowOpReg* lower_reg(Mnemonic m, AtomOpCode m2, OpndSize size,
                int reg, LowOpndRegType type) {
+    /** 编码单个寄存器操作数的指令 */
     stream = encoder_reg(m, size, reg, true, type, stream);
     return NULL;
 }
 
 LowOpReg* dump_reg(Mnemonic m, AtomOpCode m2, OpndSize size,
                int reg, bool isPhysical, LowOpndRegType type) {
-    if(gDvm.executionMode == kExecutionModeNcgO1) {
+    if(gDvm.executionMode == kExecutionModeNcgO1) {//是否进行寄存器分配优化
         freeReg(true);
         if(m == Mnemonic_MUL || m == Mnemonic_IDIV) {
             //these two instructions use eax & edx implicitly
@@ -312,11 +327,14 @@ LowOpReg* dump_reg(Mnemonic m, AtomOpCode m2, OpndSize size,
         return NULL;
     }
 }
+
+
 LowOpReg* dump_reg_noalloc(Mnemonic m, OpndSize size,
                int reg, bool isPhysical, LowOpndRegType type) {
     return lower_reg(m, ATOM_NORMAL, size, reg, type);
 }
 
+//编码两个寄存器操作数的指令
 LowOpRegReg* lower_reg_reg(Mnemonic m, AtomOpCode m2, OpndSize size,
                  int reg, int reg2, LowOpndRegType type) {
     if(m == Mnemonic_FUCOMP || m == Mnemonic_FUCOM) {
@@ -332,12 +350,14 @@ LowOpRegReg* lower_reg_reg(Mnemonic m, AtomOpCode m2, OpndSize size,
 //!update fields of LowOp and generate a x86 instruction that takes two reg operands
 
 //Here, both registers are physical
+//编码两个都是物理寄存器操作数的指令
 LowOpRegReg* dump_reg_reg_noalloc(Mnemonic m, OpndSize size,
                            int reg, bool isPhysical,
                            int reg2, bool isPhysical2, LowOpndRegType type) {
     return lower_reg_reg(m, ATOM_NORMAL, size, reg, reg2, type);
 }
 
+//MOV类型的助记符
 inline bool isMnemonicMove(Mnemonic m) {
     return (m == Mnemonic_MOV || m == Mnemonic_MOVQ ||
             m == Mnemonic_MOVSS || m == Mnemonic_MOVSD);
@@ -361,6 +381,7 @@ LowOpRegReg* dump_reg_reg_noalloc_dst(Mnemonic m, OpndSize size,
 }
 //!update fields of LowOp and generate a x86 instruction that takes two reg operands
 
+//编码两个寄存器操作数的指令，src寄存器是物理寄存器
 //!here src reg is already allocated to a physical reg
 LowOpRegReg* dump_reg_reg_noalloc_src(Mnemonic m, AtomOpCode m2, OpndSize size,
                                int reg, bool isPhysical,
@@ -416,6 +437,7 @@ LowOpRegReg* dump_reg_reg(Mnemonic m, AtomOpCode m2, OpndSize size,
     return NULL;
 }
 
+/** 编码mem和reg两个操作数的指令*/
 LowOpRegMem* lower_mem_reg(Mnemonic m, AtomOpCode m2, OpndSize size,
                  int disp, int base_reg,
                  MemoryAccessType mType, int mIndex,
