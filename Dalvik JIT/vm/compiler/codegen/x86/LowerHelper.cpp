@@ -1719,12 +1719,17 @@ void move_sd_reg_to_mem(LowOp* op, int reg, bool isPhysical,
 //!load from VR to a temporary
 
 //!
+/**
+  * vB : destination
+  * size : OpndSize_32 or OpndSize_64
+  * reg :
+  */
 void get_virtual_reg_all(u2 vB, OpndSize size, int reg, bool isPhysical, Mnemonic m) {
-    LowOpndRegType type = getTypeFromIntSize(size);
+    LowOpndRegType type = getTypeFromIntSize(size);//gp if size=32, xmm if size=64
     LowOpndRegType pType = type;//gp or xmm
     OpndSize size2 = size;
     Mnemonic m2 = m;
-    if(m == Mnemonic_MOVSS) {
+    if(m == Mnemonic_MOVSS) {//MOVSS¡ªMove Scalar Single-Precision Floating-Point Values
         size = OpndSize_32;
         size2 = OpndSize_64;
         type = LowOpndRegType_ss;

@@ -31,8 +31,11 @@
 //!
 int op_neg_int() {  //整数取负
     /**
+     * inst : two bytes, u2
      * #define INST_A(_inst)       (((_inst) >> 8) & 0x0f)
      * #define INST_B(_inst)       ((_inst) >> 12)
+     * inst:   |15 B 12|11 A 8|7   0|
+     *         |15   AA      8|7   0|
      */
     u2 vA = INST_A(inst); //destination
     u2 vB = INST_B(inst);
