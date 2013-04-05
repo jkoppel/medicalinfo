@@ -18,15 +18,19 @@ public:
 
 // Operations
 public:
-    bool m_bFileOpened;
-    int m_pageNum;
-    int m_pageIndex;
-
     void openFile();
+    void closeFile();
     void gotoFirstPage();
     void gotoLastPage();
     void gotoNextPage();
     void gotoPrevPage();
+    void zoomIn();
+    void zoomOut();
+    void resume();
+    void moveLeft();
+    void moveRight();
+    void moveUp();
+    void moveDown();
 
 // Overrides
 public:
@@ -45,6 +49,15 @@ public:
     virtual void OnDraw(CDC* pDC);  // 重写以绘制该视图
 
 protected:
+    bool m_bFileOpened;
+    char m_sDocPath[1024];
+    char m_sDocTitle[256];
+    int m_iPageNum;
+    int m_iCurrPage;
+    int m_iZoom;
+    int m_iCX;
+    int m_iCY;
+
 
 // Generated message map functions
 protected:
@@ -54,6 +67,8 @@ protected:
     DECLARE_MESSAGE_MAP()
 public:
     afx_msg void OnSize(UINT nType, int cx, int cy);
+    afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+    afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
 #ifndef _DEBUG  // debug version in PdfClimateView.cpp
