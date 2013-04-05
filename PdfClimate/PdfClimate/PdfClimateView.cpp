@@ -113,6 +113,7 @@ void CPdfClimateView::openFile()
     _T("PDF Files (*.pdf)||"),
     NULL);
     if (dlg.DoModal()==IDCANCEL) {
+        testSQL();
         return;
     }
     sprintf(m_sDocPath, "%s", dlg.GetPathName().GetBuffer(dlg.GetPathName().GetLength()));
@@ -461,4 +462,39 @@ void CPdfClimateView::OnLButtonUp(UINT nFlags, CPoint point)
 	}
 
     CView::OnLButtonUp(nFlags, point);
+}
+
+#include <afxdb.h>
+
+void CPdfClimateView::testSQL()
+{
+    CDatabase   m_db;
+    CRecordset rs;
+    
+    TRY
+    {
+        m_db.OpenEx(_T("DSN=TestSQL01;"),CDatabase::noOdbcDialog);
+        rs.m_pDatabase = &m_db;
+        CString sql = _T("USE PdfClimate INSERT BookInfo(ID, Name) VALUES(123, 'Bob')");
+        m_db.ExecuteSQL(sql);
+    }
+    CATCH(CDBException,ex)
+    {
+        AfxMessageBox(ex->m_strError);
+        AfxMessageBox(ex->m_strStateNativeOrigin);
+    }
+    AND_CATCH(CMemoryException,pEx)
+    {
+        pEx->ReportError();
+        AfxMessageBox(_T("memory exception"));
+    }
+    AND_CATCH(CException,e)
+    {
+        TCHAR szError[100];
+        e->GetErrorMessage(szError,100);
+        AfxMessageBox(szError);
+    }
+    END_CATCH
+
+   return;
 }
