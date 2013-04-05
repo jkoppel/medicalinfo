@@ -829,10 +829,6 @@
 				Name="ColorComboEx"
 				>
 				<File
-					RelativePath=".\ExtLibs\ColorComboEx\ColorComboEx.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\ExtLibs\ColorComboEx\ColorComboEx.h"
 					>
 				</File>

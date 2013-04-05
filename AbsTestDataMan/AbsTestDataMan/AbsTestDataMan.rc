@@ -396,7 +396,7 @@ END
 // HTML
 //
 
-IDR_HTML_DLGDRAWAREASETUP HTML                    "DlgDrawAreaSetup.htm"
+//IDR_HTML_DLGDRAWAREASETUP HTML                    "DlgDrawAreaSetup.htm"
 
 /////////////////////////////////////////////////////////////////////////////
 //
