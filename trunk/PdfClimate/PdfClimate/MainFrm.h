@@ -58,6 +58,8 @@ public:
     afx_msg void OnViewLastpage();
     afx_msg void OnViewNextpage();
     afx_msg void OnViewPrevpage();
+    afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+    afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
 

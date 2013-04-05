@@ -13,14 +13,18 @@
 #include <string.h>
 #include <memory.h>
 
-#include "fitz.h"
+#include "mupdf.h"
+/*
 extern "C" {
-    void mupdf_close();
-    void mupdf_open(char *filename);
+    void mupdf_init();
+    void mupdf_destroy();
+    int mupdf_open_file(char *filename);
+    void mupdf_close_file();
     int mupdf_get_page_count();
-    const fz_pixmap *mupdf_load_page(int pagenumber, int zoom);
-    void mupdf_winblit(HDC hdc, int winw, int winh);
+    int mupdf_load_page(int pagenumber, int zoom);
+    void mupdf_winblit(HDC hdc, int winw, int winh, int cw, int ch);
 }
+*/
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -33,6 +37,8 @@ IMPLEMENT_DYNCREATE(CPdfClimateView, CView)
 
 BEGIN_MESSAGE_MAP(CPdfClimateView, CView)
     ON_WM_SIZE()
+    ON_WM_CHAR()
+    ON_WM_KEYDOWN()
 END_MESSAGE_MAP()
 
 // CPdfClimateView construction/destruction
@@ -40,13 +46,23 @@ END_MESSAGE_MAP()
 CPdfClimateView::CPdfClimateView()
 {
     m_bFileOpened = false;
-    m_pageNum = 0;
-    m_pageIndex = 0;
+    memset(m_sDocPath, 0, sizeof(m_sDocPath));
+    memset(m_sDocTitle, 0, sizeof(m_sDocTitle));
+    m_iPageNum = 0;
+    m_iCurrPage = 0;
+    m_iZoom = 100;
+    m_iCX = 0;
+    m_iCY = 0;
+
+    mupdf_init();
 }
 
 CPdfClimateView::~CPdfClimateView()
 {
-    mupdf_close();
+    if (m_bFileOpened) {
+        mupdf_close_file();
+    }
+    mupdf_destroy();
 }
 
 BOOL CPdfClimateView::PreCreateWindow(CREATESTRUCT& cs)
@@ -103,10 +119,7 @@ void CPdfClimateView::OnSize(UINT nType, int cx, int cy)
 
 void CPdfClimateView::openFile()
 {
-    char filename[256];
-	int pagenumber = 2;
-	int zoom = 100;
-	int rotation = 0;
+    wchar_t wbuf[1024];
 
     CFileDialog dlg(TRUE, 
     "PDF Files (*.pdf)", 
@@ -117,16 +130,52 @@ void CPdfClimateView::openFile()
     if (dlg.DoModal()==IDCANCEL) {
         return;
     }
-    snprintf(filename, 256, "%s", dlg.GetPathName().GetBuffer(dlg.GetPathName().GetLength()));
+    sprintf(m_sDocPath, "%s", dlg.GetPathName().GetBuffer(dlg.GetPathName().GetLength()));
 
-    mupdf_open(filename);
-    m_pageNum = mupdf_get_page_count();
-    m_pageIndex = 1;
-    mupdf_load_page(m_pageIndex, 100);
-    this->m_bFileOpened = true;
-    this->RedrawWindow();
+    //gb2312 to unicode
+    int wLen = MultiByteToWideChar(CP_ACP, 0, m_sDocPath, -1, NULL, 0);
+    LPWSTR wStr = new WCHAR[wLen];
+    MultiByteToWideChar(CP_ACP, 0, m_sDocPath, -1, wStr, wLen);
+    //unicode to utf8
+    int aLen = WideCharToMultiByte(CP_UTF8, 0, wStr, -1, NULL, 0, NULL, NULL);
+    char* converted = new char[aLen];
+    WideCharToMultiByte(CP_UTF8, 0, wStr, -1, converted, aLen, NULL, NULL);
+
+    bool bRet = mupdf_open_file(converted);
+
+    delete []wStr;
+    delete []converted;
+
+    if (!bRet) {
+        AfxMessageBox("Open failed!", MB_OK);
+        return;
+    }
+
+    m_iPageNum = mupdf_get_page_count();
+    m_iCurrPage = 0;
+    m_iCX = 0;
+    m_iCY = 0;
+    m_iZoom = 100;
+    mupdf_load_page(m_iCurrPage, m_iZoom);
+    m_bFileOpened = true;
+    RedrawWindow();
+    this->SetFocus();
 }
 
+void CPdfClimateView::closeFile()
+{
+    if (m_bFileOpened) {
+        if ( IDYES==::AfxMessageBox("close the file?", MB_YESNO) ){
+            mupdf_close_file();
+            m_iPageNum = 0;
+            m_iCurrPage = 0;
+            m_iCX = 0;
+            m_iCY = 0;
+            m_iZoom = 100;
+            RedrawWindow();
+        }
+    }
+}
 
 void CPdfClimateView::OnDraw(CDC* /*pDC*/)
 {
@@ -140,7 +189,7 @@ void CPdfClimateView::OnDraw(CDC* /*pDC*/)
 
         this->GetClientRect(&rect);
         HDC hdc = ::GetDC(m_hWnd);
-        mupdf_winblit(hdc, rect.Width(), rect.Height());;
+        mupdf_winblit(hdc, rect.Width(), rect.Height(), m_iCX, m_iCY);;
 	    hdc = NULL;
     }
 }
@@ -148,9 +197,9 @@ void CPdfClimateView::OnDraw(CDC* /*pDC*/)
 void CPdfClimateView::gotoFirstPage()
 {
     if (m_bFileOpened) {
-        if (m_pageIndex != 1){
-            m_pageIndex = 0;
-            mupdf_load_page(m_pageIndex, 100);
+        if (m_iCurrPage != 1){
+            m_iCurrPage = 0;
+            mupdf_load_page(m_iCurrPage, m_iZoom);
             this->RedrawWindow();
         }
     }
@@ -159,9 +208,9 @@ void CPdfClimateView::gotoFirstPage()
 void CPdfClimateView::gotoLastPage()
 {
     if (m_bFileOpened) {
-        if (m_pageIndex != m_pageNum-1){
-            m_pageIndex = m_pageNum-1;
-            mupdf_load_page(m_pageIndex, 100);
+        if (m_iCurrPage != m_iPageNum-1){
+            m_iCurrPage = m_iPageNum-1;
+            mupdf_load_page(m_iCurrPage, m_iZoom);
             this->RedrawWindow();
         }
     }
@@ -170,21 +219,170 @@ void CPdfClimateView::gotoLastPage()
 void CPdfClimateView::gotoNextPage()
 {
     if (m_bFileOpened) {
-        if (m_pageIndex != m_pageNum-1){
-            m_pageIndex ++;
-            mupdf_load_page(m_pageIndex, 100);
+        if (m_iCurrPage != m_iPageNum-1){
+            m_iCurrPage ++;
+            mupdf_load_page(m_iCurrPage, m_iZoom);
             this->RedrawWindow();
         }
+    }
+}
+
+void CPdfClimateView::zoomIn()
+{
+    if (m_bFileOpened) {
+        if (m_iZoom > 0) {
+            m_iZoom = (int)(m_iZoom / 1.1f);
+            mupdf_load_page(m_iCurrPage, m_iZoom);
+            RedrawWindow();
+        }
+    }
+}
+
+void CPdfClimateView::zoomOut()
+{
+    if (m_bFileOpened) {
+        if (m_iZoom < 500) {
+            m_iZoom = (int)(m_iZoom * 1.1f);
+            mupdf_load_page(m_iCurrPage, m_iZoom);
+            RedrawWindow();
+        }
+    }
+}
+
+void CPdfClimateView::resume()
+{
+    if (m_bFileOpened) {
+        m_iZoom = 100;
+        m_iCX = 0;
+        m_iCY = 0;
+        mupdf_load_page(m_iCurrPage, m_iZoom);
+        RedrawWindow();
+    }
+}
+
+void CPdfClimateView::moveLeft()
+{
+    if (m_bFileOpened) {
+        m_iCX -= 10;
+        RedrawWindow();
+    }
+}
+
+void CPdfClimateView::moveRight()
+{
+    if (m_bFileOpened) {
+        m_iCX += 10;
+        RedrawWindow();
+    }
+}
+
+void CPdfClimateView::moveUp()
+{
+    if (m_bFileOpened) {
+        m_iCY += 10;
+        RedrawWindow();
+    }
+}
+
+void CPdfClimateView::moveDown()
+{
+    if (m_bFileOpened) {
+        m_iCY -= 10;
+        RedrawWindow();
     }
 }
 
 void CPdfClimateView::gotoPrevPage()
 {
     if (m_bFileOpened) {
-        if (m_pageIndex >0){
-            m_pageIndex --;
-            mupdf_load_page(m_pageIndex, 100);
-            this->RedrawWindow();
+        if (m_iCurrPage >0){
+            m_iCurrPage --;
+            mupdf_load_page(m_iCurrPage, m_iZoom);
+            RedrawWindow();
         }
     }
+}
+
+void CPdfClimateView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+    switch (nChar) {
+        case '-':
+        {
+            zoomIn();
+            break;
+        }
+        case '=':
+        {
+            zoomOut();
+            break;
+        }
+        case 'r':
+        {
+            resume();
+            break;
+        }
+        case 'c':
+        {
+            closeFile();
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+
+    CView::OnChar(nChar, nRepCnt, nFlags);
+}
+
+void CPdfClimateView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+    switch (nChar) {
+        case VK_NEXT:
+        {
+            gotoNextPage();
+            break;
+        }
+        case VK_PRIOR:
+        {
+            gotoPrevPage();
+            break;
+        }
+        case VK_LEFT:
+        {
+            moveLeft();
+            break;
+        }
+        case VK_RIGHT:
+        {
+            moveRight();
+            break;
+        }
+        case VK_DOWN:
+        {
+            moveDown();
+            break;
+        }
+        case VK_UP:
+        {
+            moveUp();
+            break;
+        }
+        case VK_HOME:
+        {
+            gotoFirstPage();
+            break;
+        }
+        case VK_END:
+        {
+            gotoLastPage();
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+
+    CView::OnKeyDown(nChar, nRepCnt, nFlags);
 }

@@ -32,6 +32,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_VIEW_LASTPAGE, &CMainFrame::OnViewLastpage)
     ON_COMMAND(ID_VIEW_NEXTPAGE, &CMainFrame::OnViewNextpage)
     ON_COMMAND(ID_VIEW_PREVPAGE, &CMainFrame::OnViewPrevpage)
+    ON_WM_CHAR()
+    ON_WM_KEYDOWN()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -358,4 +360,18 @@ void CMainFrame::OnViewNextpage()
 void CMainFrame::OnViewPrevpage()
 {
     GetRightPane()->gotoPrevPage();
+}
+
+void CMainFrame::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+    GetRightPane()->OnChar(nChar, nRepCnt, nFlags);
+
+    CFrameWndEx::OnChar(nChar, nRepCnt, nFlags);
+}
+
+void CMainFrame::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+    GetRightPane()->OnKeyDown(nChar, nRepCnt, nFlags);
+
+    CFrameWndEx::OnKeyDown(nChar, nRepCnt, nFlags);
 }
