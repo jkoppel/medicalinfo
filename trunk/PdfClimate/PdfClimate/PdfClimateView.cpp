@@ -4,27 +4,14 @@
 
 #include "stdafx.h"
 #include "PdfClimate.h"
-
 #include "PdfClimateDoc.h"
 #include "PdfClimateView.h"
+#include "mupdf.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <memory.h>
 
-#include "mupdf.h"
-/*
-extern "C" {
-    void mupdf_init();
-    void mupdf_destroy();
-    int mupdf_open_file(char *filename);
-    void mupdf_close_file();
-    int mupdf_get_page_count();
-    int mupdf_load_page(int pagenumber, int zoom);
-    void mupdf_winblit(HDC hdc, int winw, int winh, int cw, int ch);
-}
-*/
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -39,6 +26,9 @@ BEGIN_MESSAGE_MAP(CPdfClimateView, CView)
     ON_WM_SIZE()
     ON_WM_CHAR()
     ON_WM_KEYDOWN()
+    ON_WM_LBUTTONDOWN()
+    ON_WM_MOUSEMOVE()
+    ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
 // CPdfClimateView construction/destruction
@@ -54,6 +44,12 @@ CPdfClimateView::CPdfClimateView()
     m_iCX = 0;
     m_iCY = 0;
 
+    m_ptOrig = CPoint(0, 0);
+    m_bDragging = false;
+    m_hCross = AfxGetApp()->LoadStandardCursor(IDC_CROSS);
+
+    m_iRectNum = 0;
+
     mupdf_init();
 }
 
@@ -67,21 +63,12 @@ CPdfClimateView::~CPdfClimateView()
 
 BOOL CPdfClimateView::PreCreateWindow(CREATESTRUCT& cs)
 {
-    // TODO: Modify the Window class or styles here by modifying
-    //  the CREATESTRUCT cs
-
     return CView::PreCreateWindow(cs);
 }
 
 void CPdfClimateView::OnInitialUpdate()
 {
     CView::OnInitialUpdate();
-}
-
-void CPdfClimateView::OnRButtonUp(UINT nFlags, CPoint point)
-{
-    ClientToScreen(&point);
-    OnContextMenu(this, point);
 }
 
 void CPdfClimateView::OnContextMenu(CWnd* pWnd, CPoint point)
@@ -119,8 +106,6 @@ void CPdfClimateView::OnSize(UINT nType, int cx, int cy)
 
 void CPdfClimateView::openFile()
 {
-    wchar_t wbuf[1024];
-
     CFileDialog dlg(TRUE, 
     "PDF Files (*.pdf)", 
     NULL, 
@@ -150,6 +135,8 @@ void CPdfClimateView::openFile()
         AfxMessageBox("Open failed!", MB_OK);
         return;
     }
+
+    ::AfxGetMainWnd()->SetWindowTextA(m_sDocPath);
 
     m_iPageNum = mupdf_get_page_count();
     m_iCurrPage = 0;
@@ -191,6 +178,24 @@ void CPdfClimateView::OnDraw(CDC* /*pDC*/)
         HDC hdc = ::GetDC(m_hWnd);
         mupdf_winblit(hdc, rect.Width(), rect.Height(), m_iCX, m_iCY);;
 	    hdc = NULL;
+
+        if (m_bDragging) {
+            CClientDC dc(this);
+            HBRUSH hb = (HBRUSH) GetStockObject(NULL_BRUSH);
+            CBrush* brush = CBrush::FromHandle(hb);
+            CBrush *pOldBrush = dc.SelectObject(brush);
+            dc.Rectangle(CRect(m_ptOrig, m_ptDest));
+            dc.SelectObject(pOldBrush);
+        }
+
+        for (int i=0; i<m_iRectNum; i++) {
+            CClientDC dc(this);
+            HBRUSH hb = (HBRUSH) GetStockObject(NULL_BRUSH);
+            CBrush* brush = CBrush::FromHandle(hb);
+            CBrush *pOldBrush = dc.SelectObject(brush);
+            dc.Rectangle(m_rectList[i]);
+            dc.SelectObject(pOldBrush);
+        }            
     }
 }
 
@@ -385,4 +390,75 @@ void CPdfClimateView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     }
 
     CView::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+void CPdfClimateView::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	SetCapture();
+	::SetCursor(m_hCross);
+	m_ptOrig = point;
+	m_bDragging = true;
+
+    CView::OnLButtonDown(nFlags, point);
+}
+
+void CPdfClimateView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	if (m_bDragging) {
+        m_ptDest = point;
+
+        RedrawWindow();
+    }
+
+    CView::OnMouseMove(nFlags, point);
+}
+
+void CPdfClimateView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	if (m_bDragging) {
+	    CDC *pDC = GetDC();
+	    CBitmap bm;
+
+	    RECT rect;
+        rect.left = m_ptOrig.x;
+        rect.top = m_ptOrig.y;
+        rect.right = point.x;
+        rect.bottom = point.y;
+        //this->ScreenToClient(&rect);
+        if (rect.left > rect.right) {
+            int tmp = rect.right;
+            rect.right = rect.left;
+            rect.left = tmp;
+        }
+        if (rect.top > rect.bottom) {
+            int tmp = rect.top;
+            rect.top = rect.bottom;
+            rect.bottom = tmp;
+        }
+
+        bm.CreateCompatibleBitmap(pDC, rect.right - rect.left, rect.bottom - rect.top);
+	    CDC tdc;
+	    tdc.CreateCompatibleDC(pDC);
+	    CBitmap *pOld=tdc.SelectObject(&bm);
+	    tdc.BitBlt(0, 0, rect.right - rect.left, rect.bottom - rect.top,
+                    pDC, rect.left, rect.top, SRCCOPY);
+	    CImage *image = new CImage; 
+	    image->Attach(bm); 
+        image->Save("c:\\a.jpg");
+
+
+        CClientDC dc(this);
+        HBRUSH hb = (HBRUSH) GetStockObject(NULL_BRUSH);
+        CBrush* brush = CBrush::FromHandle(hb);
+        CBrush *pOldBrush = dc.SelectObject(brush);
+        dc.Rectangle(CRect(m_ptOrig, point));
+        dc.SelectObject(pOldBrush);
+
+        m_rectList[m_iRectNum++] = CRect(m_ptOrig, point);
+
+		m_bDragging = false;
+		ReleaseCapture();
+	}
+
+    CView::OnLButtonUp(nFlags, point);
 }
