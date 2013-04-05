@@ -31,6 +31,7 @@ public:
     void moveRight();
     void moveUp();
     void moveDown();
+    void testSQL();
 
 // Overrides
 public:
