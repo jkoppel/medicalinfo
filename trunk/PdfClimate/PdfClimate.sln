@@ -1,33 +1,17 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PdfClimate", "PdfClimate\PdfClimate.vcproj", "{60CFB86D-65FB-4898-8760-2357E43D3B93}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5F615F91-DFF8-4F05-BF48-6222B7D86519} = {5F615F91-DFF8-4F05-BF48-6222B7D86519}
-		{EC81A9F3-88A6-4170-B7B4-C41CB789A7F6} = {EC81A9F3-88A6-4170-B7B4-C41CB789A7F6}
-		{5EDCF4FD-0291-4FB9-8D96-D58957CA5E3C} = {5EDCF4FD-0291-4FB9-8D96-D58957CA5E3C}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PdfClimate", "PdfClimate\PdfClimate.vcxproj", "{60CFB86D-65FB-4898-8760-2357E43D3B93}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generated", "mupdf\win32\generated.vcproj", "{A5053AA7-02E5-4903-B596-04F17AEB1526}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generated", "mupdf\win32\generated.vcxproj", "{A5053AA7-02E5-4903-B596-04F17AEB1526}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmupdf", "mupdf\win32\libmupdf.vcproj", "{5F615F91-DFF8-4F05-BF48-6222B7D86519}"
-	ProjectSection(ProjectDependencies) = postProject
-		{A5053AA7-02E5-4903-B596-04F17AEB1526} = {A5053AA7-02E5-4903-B596-04F17AEB1526}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmupdf", "mupdf\win32\libmupdf.vcxproj", "{5F615F91-DFF8-4F05-BF48-6222B7D86519}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmupdf-nov8", "mupdf\win32\libmupdf-nov8.vcproj", "{EC81A9F3-88A6-4170-B7B4-C41CB789A7F6}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5F615F91-DFF8-4F05-BF48-6222B7D86519} = {5F615F91-DFF8-4F05-BF48-6222B7D86519}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmupdf-nov8", "mupdf\win32\libmupdf-nov8.vcxproj", "{EC81A9F3-88A6-4170-B7B4-C41CB789A7F6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mupdf", "mupdf\win32\mupdf.vcproj", "{E74F29F0-FA43-4ADC-B92C-6AFA08E4A417}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5F615F91-DFF8-4F05-BF48-6222B7D86519} = {5F615F91-DFF8-4F05-BF48-6222B7D86519}
-		{EC81A9F3-88A6-4170-B7B4-C41CB789A7F6} = {EC81A9F3-88A6-4170-B7B4-C41CB789A7F6}
-		{5EDCF4FD-0291-4FB9-8D96-D58957CA5E3C} = {5EDCF4FD-0291-4FB9-8D96-D58957CA5E3C}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mupdf", "mupdf\win32\mupdf.vcxproj", "{E74F29F0-FA43-4ADC-B92C-6AFA08E4A417}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libthirdparty", "mupdf\win32\libthirdparty.vcproj", "{5EDCF4FD-0291-4FB9-8D96-D58957CA5E3C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libthirdparty", "mupdf\win32\libthirdparty.vcxproj", "{5EDCF4FD-0291-4FB9-8D96-D58957CA5E3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
