@@ -8,6 +8,12 @@
 #include "MainFrm.h"
 #include "LeftView.h"
 #include "PdfClimateView.h"
+#include "DottedGraphView.h"
+#include "FacetGraphView.h"
+#include "LinearGraphView.h"
+#include "ColumnarGraphView.h"
+#include "GraphSelectView.h"
+#include "GlobalVars.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -28,12 +34,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnApplicationLook)
     ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnUpdateApplicationLook)
     ON_COMMAND(ID_FILE_OPEN, &CMainFrame::OnFileOpen)
-    ON_COMMAND(ID_VIEW_FIRST, &CMainFrame::OnViewFirst)
-    ON_COMMAND(ID_VIEW_LASTPAGE, &CMainFrame::OnViewLastpage)
-    ON_COMMAND(ID_VIEW_NEXTPAGE, &CMainFrame::OnViewNextpage)
-    ON_COMMAND(ID_VIEW_PREVPAGE, &CMainFrame::OnViewPrevpage)
-    ON_WM_CHAR()
-    ON_WM_KEYDOWN()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -158,21 +158,55 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     return 0;
 }
 
-BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT /*lpcs*/,
+BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
     CCreateContext* pContext)
 {
     // create splitter window
-    if (!m_wndSplitter.CreateStatic(this, 1, 2))
+	if(!m_wndSplitter1.CreateStatic(this, 1, 2)){
+		return FALSE;
+	}
+    if (!m_wndSplitter1.CreateView(0, 0, RUNTIME_CLASS(CLeftView), CSize(240, 200), pContext)) {
+        m_wndSplitter1.DestroyWindow();
         return FALSE;
-
-    if (!m_wndSplitter.CreateView(0, 0, RUNTIME_CLASS(CLeftView), CSize(240, 200), pContext) ||
-        !m_wndSplitter.CreateView(0, 1, RUNTIME_CLASS(CPdfClimateView), CSize(100, 100), pContext))
-    {
-        m_wndSplitter.DestroyWindow();
+    }
+    if (!m_wndSplitter2.CreateStatic(&m_wndSplitter1, 2, 1, WS_CHILD | WS_VISIBLE, m_wndSplitter1.IdFromRowCol(0, 1))) {
+        m_wndSplitter1.DestroyWindow();
+        return FALSE;
+    }
+    if (!m_wndSplitter2.CreateView(0, 0, RUNTIME_CLASS(CGraphSelectView), CSize(100, 25), pContext)) {
+        m_wndSplitter1.DestroyWindow();
+        m_wndSplitter2.DestroyWindow();
+        return FALSE;
+    }
+    if (!m_wndSplitter3.CreateStatic(&m_wndSplitter2, 5, 1, WS_CHILD | WS_VISIBLE, m_wndSplitter2.IdFromRowCol(1, 0))) {
+        m_wndSplitter1.DestroyWindow();
+        m_wndSplitter2.DestroyWindow();
+        return FALSE;
+    }
+    if (!m_wndSplitter3.CreateView(0, 0, RUNTIME_CLASS(CPdfClimateView), CSize(100,100), pContext) ||
+        !m_wndSplitter3.CreateView(1, 0, RUNTIME_CLASS(CDottedGraphView), CSize(100,100), pContext) ||
+        !m_wndSplitter3.CreateView(2, 0, RUNTIME_CLASS(CFacetGraphView), CSize(100,100), pContext) ||
+        !m_wndSplitter3.CreateView(3, 0, RUNTIME_CLASS(CLinearGraphView), CSize(100,100), pContext) ||
+        !m_wndSplitter3.CreateView(4, 0, RUNTIME_CLASS(CColumnarGraphView), CSize(100,100), pContext)
+        ) {
+        m_wndSplitter1.DestroyWindow();
+        m_wndSplitter2.DestroyWindow();
+        m_wndSplitter3.DestroyWindow();
         return FALSE;
     }
 
-    return TRUE;
+    g_pLeftView = (CLeftView*)m_wndSplitter1.GetPane(0, 0);
+    g_pGraphSelectView = (CGraphSelectView*)m_wndSplitter2.GetPane(0, 0);
+    g_pPdfClimateView = (CPdfClimateView*)m_wndSplitter3.GetPane(0, 0);
+    g_pDottedGraphView = (CDottedGraphView*)m_wndSplitter3.GetPane(1, 0);
+    g_pFacetGraphView = (CFacetGraphView*)m_wndSplitter3.GetPane(2, 0);
+    g_pLinearGraphView = (CLinearGraphView*)m_wndSplitter3.GetPane(3, 0);
+    g_pColumnarGraphView = (CColumnarGraphView*)m_wndSplitter3.GetPane(4, 0);
+
+    setActiveGraphView(0);
+	m_wndSplitter2.LockBar();
+
+    return CFrameWndEx::OnCreateClient(lpcs, pContext);
 }
 
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
@@ -322,56 +356,29 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
     return TRUE;
 }
 
-CLeftView* CMainFrame::GetLeftPane()
-{
-    CLeftView *pView = (CLeftView*) m_wndSplitter.GetPane(0, 0);
-    return pView;
-}
-
-CPdfClimateView* CMainFrame::GetRightPane()
-{
-    CPdfClimateView *pView = (CPdfClimateView*) m_wndSplitter.GetPane(0, 1);
-    return pView;
-}
-
-
 void CMainFrame::OnFileOpen()
 {
-    CPdfClimateView *pView = GetRightPane();
-    pView->openFile();
+    g_pPdfClimateView->openFile();
 }
 
-
-void CMainFrame::OnViewFirst()
+void CMainFrame::setActiveGraphView(int index)
 {
-    GetRightPane()->gotoFirstPage();
-}
+    if (index<0 || index>4) {
+        return;
+    }
 
-void CMainFrame::OnViewLastpage()
-{
-    GetRightPane()->gotoLastPage();
-}
-
-void CMainFrame::OnViewNextpage()
-{
-    GetRightPane()->gotoNextPage();
-}
-
-void CMainFrame::OnViewPrevpage()
-{
-    GetRightPane()->gotoPrevPage();
-}
-
-void CMainFrame::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
-{
-    GetRightPane()->OnChar(nChar, nRepCnt, nFlags);
-
-    CFrameWndEx::OnChar(nChar, nRepCnt, nFlags);
-}
-
-void CMainFrame::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
-{
-    GetRightPane()->OnKeyDown(nChar, nRepCnt, nFlags);
-
-    CFrameWndEx::OnKeyDown(nChar, nRepCnt, nFlags);
+    for (int i=0; i<5; i++) {
+        if (i != index) {
+            m_wndSplitter3.SetRowInfo(i, 0, 0);
+            m_wndSplitter3.GetPane(i, 0)->ShowWindow(SW_HIDE);
+        }
+        else {
+            m_wndSplitter3.SetRowInfo(i, 800, 100);
+            m_wndSplitter3.GetPane(i, 0)->ShowWindow(SW_SHOW);
+        }
+    }
+    SetActiveView((CView*)m_wndSplitter3.GetPane(index, 0));
+    m_wndSplitter3.hideSplitter();
+    m_wndSplitter3.RecalcLayout();
+    m_wndSplitter3.LockBar();
 }

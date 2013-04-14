@@ -175,6 +175,3 @@ void CPdfClimateApp::SaveCustomState()
 }
 
 // CPdfClimateApp message handlers
-
-
-
