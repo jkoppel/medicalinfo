@@ -58,6 +58,7 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -124,7 +125,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ColumnarGraphView.cpp" />
+    <ClCompile Include="CtrlLib\LBTabCtrl\LBSpinButtonCtrl.cpp" />
+    <ClCompile Include="CtrlLib\LBTabCtrl\LBTabCtrl.cpp" />
+    <ClCompile Include="CtrlLib\MySplitterWndEx\MySplitterWndEx.cpp" />
+    <ClCompile Include="DottedGraphView.cpp" />
+    <ClCompile Include="FacetGraphView.cpp" />
+    <ClCompile Include="GlobalVars.cpp" />
+    <ClCompile Include="GraphSelectView.cpp" />
+    <ClCompile Include="ImageProcess\BaseDocument.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ImageProcess\BaseGraph.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ImageProcess\BaseGraphItem.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="LeftView.cpp" />
+    <ClCompile Include="LinearGraphView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="mupdf.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -141,7 +163,18 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ColumnarGraphView.h" />
+    <ClInclude Include="CtrlLib\LBTabCtrl\LBSpinButtonCtrl.h" />
+    <ClInclude Include="CtrlLib\LBTabCtrl\LBTabCtrl.h" />
+    <ClInclude Include="CtrlLib\MySplitterWndEx\MySplitterWndEx.h" />
+    <ClInclude Include="DottedGraphView.h" />
+    <ClInclude Include="FacetGraphView.h" />
+    <ClInclude Include="GraphSelectView.h" />
+    <ClInclude Include="ImageProcess\BaseDocument.h" />
+    <ClInclude Include="ImageProcess\BaseGraph.h" />
+    <ClInclude Include="ImageProcess\BaseGraphItem.h" />
     <ClInclude Include="LeftView.h" />
+    <ClInclude Include="LinearGraphView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="mupdf.h" />
     <ClInclude Include="PdfClimate.h" />

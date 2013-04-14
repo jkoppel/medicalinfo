@@ -26,7 +26,12 @@
 #define ID_VIEW_APPLOOK_OFF_2007_BLACK  216
 #define ID_VIEW_APPLOOK_OFF_2007_SILVER 217
 #define ID_VIEW_APPLOOK_OFF_2007_AQUA   218
+#define IDC_DRAW_TAB                    301
 #define IDS_EDIT_MENU                   306
+#define IDD_DOTTED_GRAPH                310
+#define IDD_FACET_GRAPH                 311
+#define IDD_LINEAR_GRAPH                312
+#define IDD_COLUMNAR                    313
 #define ID_VIEW_DISPLAYBYTECODE         32771
 #define ID_VIEW_FIRST                   32772
 #define ID_VIEW_LASTPAGE                32773
@@ -37,7 +42,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        310
+#define _APS_NEXT_RESOURCE_VALUE        314
 #define _APS_NEXT_COMMAND_VALUE         32776
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           310

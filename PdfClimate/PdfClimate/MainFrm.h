@@ -6,6 +6,8 @@
 class CLeftView;
 class CPdfClimateView;
 
+#include "CtrlLib/MySplitterWndEx/MySplitterWndEx.h"
+
 class CMainFrame : public CFrameWndEx
 {
     
@@ -16,6 +18,10 @@ protected: // create from serialization only
 // Attributes
 protected:
     CSplitterWnd m_wndSplitter;
+    CMySplitterWndEx m_wndSplitter1;
+    CMySplitterWndEx m_wndSplitter2; 
+    CMySplitterWndEx m_wndSplitter3; 
+
 public:
 
 // Operations
@@ -30,8 +36,8 @@ public:
 // Implementation
 public:
     virtual ~CMainFrame();
-    CLeftView* GetLeftPane();
-    CPdfClimateView* GetRightPane();
+    void setActiveGraphView(int index);
+
 #ifdef _DEBUG
     virtual void AssertValid() const;
     virtual void Dump(CDumpContext& dc) const;
@@ -54,12 +60,6 @@ protected:
 
 public:
     afx_msg void OnFileOpen();
-    afx_msg void OnViewFirst();
-    afx_msg void OnViewLastpage();
-    afx_msg void OnViewNextpage();
-    afx_msg void OnViewPrevpage();
-    afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
-    afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
 

@@ -61,7 +61,7 @@ protected:
     CPoint m_ptOrig, m_ptDest;
     bool m_bDragging;
     HCURSOR m_hCross;
-    CRect m_rectList[128];
+    //CRect m_rectList[128];
     int m_iRectNum;
 
 // Generated message map functions
@@ -76,6 +76,7 @@ public:
     afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
     afx_msg void OnMouseMove(UINT nFlags, CPoint point);
     afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 };
 
 #ifndef _DEBUG  // debug version in PdfClimateView.cpp

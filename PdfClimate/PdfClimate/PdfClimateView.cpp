@@ -7,6 +7,7 @@
 #include "PdfClimateDoc.h"
 #include "PdfClimateView.h"
 #include "mupdf.h"
+#include "CtrlLib/LBTabCtrl/LBTabCtrl.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,6 +30,7 @@ BEGIN_MESSAGE_MAP(CPdfClimateView, CView)
     ON_WM_LBUTTONDOWN()
     ON_WM_MOUSEMOVE()
     ON_WM_LBUTTONUP()
+    ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 // CPdfClimateView construction/destruction
@@ -188,15 +190,6 @@ void CPdfClimateView::OnDraw(CDC* /*pDC*/)
             dc.Rectangle(CRect(m_ptOrig, m_ptDest));
             dc.SelectObject(pOldBrush);
         }
-
-        for (int i=0; i<m_iRectNum; i++) {
-            CClientDC dc(this);
-            HBRUSH hb = (HBRUSH) GetStockObject(NULL_BRUSH);
-            CBrush* brush = CBrush::FromHandle(hb);
-            CBrush *pOldBrush = dc.SelectObject(brush);
-            dc.Rectangle(m_rectList[i]);
-            dc.SelectObject(pOldBrush);
-        }            
     }
 }
 
@@ -455,8 +448,6 @@ void CPdfClimateView::OnLButtonUp(UINT nFlags, CPoint point)
         dc.Rectangle(CRect(m_ptOrig, point));
         dc.SelectObject(pOldBrush);
 
-        m_rectList[m_iRectNum++] = CRect(m_ptOrig, point);
-
 		m_bDragging = false;
 		ReleaseCapture();
 	}
@@ -497,4 +488,12 @@ void CPdfClimateView::testSQL()
     END_CATCH
 
    return;
+}
+
+int CPdfClimateView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+    if (CView::OnCreate(lpCreateStruct) == -1)
+        return -1;
+
+    return 0;
 }
