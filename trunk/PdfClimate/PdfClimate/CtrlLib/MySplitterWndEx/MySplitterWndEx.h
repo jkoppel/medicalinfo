@@ -39,8 +39,7 @@ public:
 	BOOL IsBarLocked(){return m_bBarLocked;}
 	void LockBar(BOOL bState=TRUE){m_bBarLocked=bState;}
 	BOOL ReplaceView(int row, int col,CRuntimeClass * pViewClass,SIZE size);
-    void showSplitter();
-    void hideSplitter();
+    void setSplitterSize(int size);
 
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CMySplitterWndEx)

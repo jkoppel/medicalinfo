@@ -93,7 +93,7 @@ void CGraphSelectView::OnSize(UINT nType, int cx, int cy)
     if (m_pTab && ::IsWindow(m_pTab->m_hWnd))
 	{
 		// stretch tree to fill window
-		m_pTab->MoveWindow(0, 0, cx, 25);
+		m_pTab->MoveWindow(0, 0, cx, 26);
 	}
 }
 
@@ -109,7 +109,7 @@ int CGraphSelectView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_TABSTOP;// | WS_BORDER;
 
-	CRect rect(0, 0, 100, 25);
+	CRect rect(0, 0, 100, 26);
 
 	VERIFY(m_pTab->Create(dwStyle, rect, this, IDC_DRAW_TAB));
 

@@ -85,7 +85,7 @@ void CMySplitterWndEx::LayoutRowCol(CSplitterWnd::CRowColInfo* pInfoArray,
 {
 	ASSERT(pInfoArray != NULL);
 	ASSERT(nMax > 0);
-	ASSERT(nSizeSplitter > 0);
+	ASSERT(nSizeSplitter >= 0);
 
 	CSplitterWnd::CRowColInfo* pInfo;
 	int i;
@@ -398,14 +398,8 @@ BOOL CMySplitterWndEx::ReplaceView(int row, int col,CRuntimeClass * pViewClass,S
    return TRUE;
 }
     
-void CMySplitterWndEx::hideSplitter()
+void CMySplitterWndEx::setSplitterSize(int size)
 {
-    m_cxSplitterGap = 1;
-    m_cySplitterGap = 1;
-}
-
-void CMySplitterWndEx::showSplitter()
-{
-    m_cxSplitterGap = m_iCX;;
-    m_cySplitterGap = m_iCY;
+    m_cxSplitterGap = size;
+    m_cySplitterGap = size;
 }

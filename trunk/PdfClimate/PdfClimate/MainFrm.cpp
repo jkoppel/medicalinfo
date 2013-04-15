@@ -173,7 +173,7 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
         m_wndSplitter1.DestroyWindow();
         return FALSE;
     }
-    if (!m_wndSplitter2.CreateView(0, 0, RUNTIME_CLASS(CGraphSelectView), CSize(100, 25), pContext)) {
+    if (!m_wndSplitter2.CreateView(0, 0, RUNTIME_CLASS(CGraphSelectView), CSize(100, 26), pContext)) {
         m_wndSplitter1.DestroyWindow();
         m_wndSplitter2.DestroyWindow();
         return FALSE;
@@ -356,11 +356,6 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
     return TRUE;
 }
 
-void CMainFrame::OnFileOpen()
-{
-    g_pPdfClimateView->openFile();
-}
-
 void CMainFrame::setActiveGraphView(int index)
 {
     if (index<0 || index>4) {
@@ -378,7 +373,12 @@ void CMainFrame::setActiveGraphView(int index)
         }
     }
     SetActiveView((CView*)m_wndSplitter3.GetPane(index, 0));
-    m_wndSplitter3.hideSplitter();
+    m_wndSplitter3.setSplitterSize(0);
     m_wndSplitter3.RecalcLayout();
     m_wndSplitter3.LockBar();
+}
+
+void CMainFrame::OnFileOpen()
+{
+    g_pPdfClimateView->openFile();
 }
