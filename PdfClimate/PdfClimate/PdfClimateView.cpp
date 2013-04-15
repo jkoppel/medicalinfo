@@ -8,6 +8,8 @@
 #include "PdfClimateView.h"
 #include "mupdf.h"
 #include "CtrlLib/LBTabCtrl/LBTabCtrl.h"
+#include "LeftView.h"
+#include "GlobalVars.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -109,11 +111,12 @@ void CPdfClimateView::OnSize(UINT nType, int cx, int cy)
 void CPdfClimateView::openFile()
 {
     CFileDialog dlg(TRUE, 
-    "PDF Files (*.pdf)", 
-    NULL, 
-    OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ENABLESIZING,
-    _T("PDF Files (*.pdf)||"),
-    NULL);
+                    "PDF Files (*.pdf)", 
+                    NULL, 
+                    OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ENABLESIZING,
+                    _T("PDF Files (*.pdf)||"),
+                    NULL
+                   );
     if (dlg.DoModal()==IDCANCEL) {
         testSQL();
         return;
@@ -140,6 +143,8 @@ void CPdfClimateView::openFile()
     }
 
     ::AfxGetMainWnd()->SetWindowTextA(m_sDocPath);
+
+    g_pLeftView->GetTreeCtrl().InsertItem(m_sDocPath);
 
     m_iPageNum = mupdf_get_page_count();
     m_iCurrPage = 0;

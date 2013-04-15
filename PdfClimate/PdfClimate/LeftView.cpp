@@ -45,7 +45,7 @@ void CLeftView::OnInitialUpdate()
 {
     CTreeView::OnInitialUpdate();
 
-    this->GetTreeCtrl().ModifyStyle(0,TVS_HASLINES|TVS_LINESATROOT|TVS_HASBUTTONS); 
+    this->GetTreeCtrl().ModifyStyle(0,TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS); 
 }
 
 
