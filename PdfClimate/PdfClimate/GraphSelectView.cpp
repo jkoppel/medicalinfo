@@ -93,7 +93,7 @@ void CGraphSelectView::OnSize(UINT nType, int cx, int cy)
     if (m_pTab && ::IsWindow(m_pTab->m_hWnd))
 	{
 		// stretch tree to fill window
-		m_pTab->MoveWindow(0, 0, cx, 26);
+		m_pTab->MoveWindow(0, 0, cx, 27);
 	}
 }
 
@@ -107,9 +107,9 @@ int CGraphSelectView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// note:  TVS_NOTOOLTIPS is set in CXHtmlTree::PreCreateWindow()
 
-	DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_TABSTOP;// | WS_BORDER;
+	DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER;
 
-	CRect rect(0, 0, 100, 26);
+	CRect rect(0, 0, 100, 27);
 
 	VERIFY(m_pTab->Create(dwStyle, rect, this, IDC_DRAW_TAB));
 

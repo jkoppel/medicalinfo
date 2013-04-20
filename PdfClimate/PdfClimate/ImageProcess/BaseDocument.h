@@ -4,11 +4,11 @@
 #include "GraphDefs.h"
 #include "BaseGraph.h"
 
-class BaseDocument {
+class CBaseDocument {
 public:
-    BaseDocument();
-    BaseDocument(int iID, const char *sName, const char *sPath, const char *sAuthor);
-    ~BaseDocument();
+    CBaseDocument();
+    CBaseDocument(int iID, const char *sName, const char *sPath, const char *sAuthor);
+    ~CBaseDocument();
     void setID(int iID) { m_iID = iID; }
     int getID() { return m_iID; }
     void setName(const char *sName) { snprintf(m_sName, sizeof(m_sName), "%s", sName); }
@@ -17,25 +17,27 @@ public:
     const char *getPath() { return m_sPath; }
     void setAuthor(const char *sAuthor) { snprintf(m_sAuthor, sizeof(m_sAuthor), "%s", sAuthor); }
     const char *getAuthor() { return m_sAuthor; }
+    void setTreeItem(void *hItem) { m_hItem = hItem; }
+    const void* getTreeItem() { return m_hItem; }
     int getDottedGraphNum() { return m_iDottedGraphNum; }
-    BaseGraph *getDottedGraph(int index) { return m_pDottedGraphList[index]; }
-    bool addDottedGraph(BaseGraph *pDottedGraph);
+    CBaseGraph *getDottedGraph(int index) { return m_pDottedGraphList[index]; }
+    bool addDottedGraph(CBaseGraph *pDottedGraph);
     bool removeDottedGraph(int index);
     int getFacetGraphNum() { return m_iFacetGraphNum; }
-    BaseGraph *getFacetGraph(int index) { return m_pFacetGraphList[index]; }
-    bool addFacetGraph(BaseGraph *pFacetGraph);
+    CBaseGraph *getFacetGraph(int index) { return m_pFacetGraphList[index]; }
+    bool addFacetGraph(CBaseGraph *pFacetGraph);
     bool removeFacetGraph(int index);
     int getLinearGraphNum() { return m_iLinearGraphNum; }
-    BaseGraph *getLinearGraph(int index) { return m_pLinearGraphList[index]; }
-    bool addLinearGraph(BaseGraph *pLinearGraph);
+    CBaseGraph *getLinearGraph(int index) { return m_pLinearGraphList[index]; }
+    bool addLinearGraph(CBaseGraph *pLinearGraph);
     bool removeLinearGraph(int index);
     int getColumnarGraphNum() { return m_iColumnarGraphNum; }
-    BaseGraph *getColumnarGraph(int index) { return m_pColumnarGraphList[index]; }
-    bool addColumnarGraph(BaseGraph *pColumnarGraph);
+    CBaseGraph *getColumnarGraph(int index) { return m_pColumnarGraphList[index]; }
+    bool addColumnarGraph(CBaseGraph *pColumnarGraph);
     bool removeColumnarGraph(int index);
     int getUnknownGraphNum() { return m_iUnknownGraphNum; }
-    BaseGraph *getUnknownGraph(int index) { return m_pUnknownGraphList[index]; }
-    bool addUnknownGraph(BaseGraph *pUnknownGraph);
+    CBaseGraph *getUnknownGraph(int index) { return m_pUnknownGraphList[index]; }
+    bool addUnknownGraph(CBaseGraph *pUnknownGraph);
     bool removeUnknownGraph(int index);
 
 protected:
@@ -43,16 +45,17 @@ protected:
     char m_sName[256];
     char m_sPath[256];
     char m_sAuthor[256];
+    void* m_hItem;
     int m_iDottedGraphNum;
-    BaseGraph *m_pDottedGraphList[MAX_GRAPH_NUM];
+    CBaseGraph *m_pDottedGraphList[MAX_GRAPH_NUM];
     int m_iFacetGraphNum;
-    BaseGraph *m_pFacetGraphList[MAX_GRAPH_NUM];
+    CBaseGraph *m_pFacetGraphList[MAX_GRAPH_NUM];
     int m_iLinearGraphNum;
-    BaseGraph *m_pLinearGraphList[MAX_GRAPH_NUM];
+    CBaseGraph *m_pLinearGraphList[MAX_GRAPH_NUM];
     int m_iColumnarGraphNum;
-    BaseGraph *m_pColumnarGraphList[MAX_GRAPH_NUM];
+    CBaseGraph *m_pColumnarGraphList[MAX_GRAPH_NUM];
     int m_iUnknownGraphNum;
-    BaseGraph *m_pUnknownGraphList[MAX_GRAPH_NUM];
+    CBaseGraph *m_pUnknownGraphList[MAX_GRAPH_NUM];
 };
 
 #endif

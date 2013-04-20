@@ -2,18 +2,18 @@
 
 
 
-// CLinearGraphView form view
+// CUnknownGraphView form view
 
-class CLinearGraphView : public CFormView
+class CUnknownGraphView : public CFormView
 {
-	DECLARE_DYNCREATE(CLinearGraphView)
+	DECLARE_DYNCREATE(CUnknownGraphView)
 
 protected:
-	CLinearGraphView();           // protected constructor used by dynamic creation
-	virtual ~CLinearGraphView();
+	CUnknownGraphView();           // protected constructor used by dynamic creation
+	virtual ~CUnknownGraphView();
 
 public:
-	enum { IDD = IDD_LINEAR_GRAPH };
+	enum { IDD = IDD_UNKNOWN_GRAPH };
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 #ifndef _WIN32_WCE

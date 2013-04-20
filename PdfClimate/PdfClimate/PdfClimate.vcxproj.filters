@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="LeftView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
-    <ClCompile Include="mupdf.c" />
     <ClCompile Include="PdfClimate.cpp" />
     <ClCompile Include="PdfClimateDoc.cpp" />
     <ClCompile Include="PdfClimateView.cpp" />
@@ -32,11 +31,48 @@
     <ClCompile Include="ColumnarGraphView.cpp" />
     <ClCompile Include="GraphSelectView.cpp" />
     <ClCompile Include="GlobalVars.cpp" />
+    <ClCompile Include="CtrlLib\XHtmlTree\CeXDib.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\CreateCheckboxImageList.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\PPDrawManager.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\PPHtmlDrawer.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\PPTooltip.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\VisualStylesXP.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\XHtmlDraw.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\XHtmlDrawLink.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\XHtmlTree.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\XmlDocument.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\XNamedColors.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\XString.cpp">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClCompile>
+    <ClCompile Include="UnknownGraphView.cpp" />
+    <ClCompile Include="MyPdf.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LeftView.h" />
     <ClInclude Include="MainFrm.h" />
-    <ClInclude Include="mupdf.h" />
     <ClInclude Include="PdfClimate.h" />
     <ClInclude Include="PdfClimateDoc.h" />
     <ClInclude Include="PdfClimateView.h" />
@@ -66,6 +102,48 @@
     <ClInclude Include="LinearGraphView.h" />
     <ClInclude Include="ColumnarGraphView.h" />
     <ClInclude Include="GraphSelectView.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\CeXDib.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\CreateCheckboxImageList.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\PPDrawManager.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\PPHtmlDrawer.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\PPTooltip.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\VisualStylesXP.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\XHtmlDraw.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\XHtmlDrawLink.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\XHtmlTree.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\XmlDocument.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\XNamedColors.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\XString.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlLib\XHtmlTree\XTrace.h">
+      <Filter>CtrlLibs\XHtmlTree</Filter>
+    </ClInclude>
+    <ClInclude Include="UnknownGraphView.h" />
+    <ClInclude Include="GlobalVars.h" />
+    <ClInclude Include="MyPdf.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PdfClimate.rc" />
@@ -78,6 +156,8 @@
     <None Include="res\Toolbar256.bmp" />
     <None Include="UserImages.bmp" />
     <None Include="ReadMe.txt" />
+    <None Include="res\state_images.bmp" />
+    <None Include="res\pdf_toolbar.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ImageProcess">
@@ -91,6 +171,9 @@
     </Filter>
     <Filter Include="CtrlLibs\MySplitterWndEx">
       <UniqueIdentifier>{d1115349-5099-4e9e-ade7-1dea99b62ff0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CtrlLibs\XHtmlTree">
+      <UniqueIdentifier>{0bf40a56-da01-4af0-9492-b8ea31e09642}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

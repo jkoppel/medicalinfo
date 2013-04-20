@@ -8,6 +8,7 @@ class CDottedGraphView;
 class CFacetGraphView;
 class CLinearGraphView;
 class CColumnarGraphView;
+class CUnknownGraphView;
 
 extern CLeftView *g_pLeftView;
 extern CGraphSelectView *g_pGraphSelectView;
@@ -16,5 +17,6 @@ extern CDottedGraphView *g_pDottedGraphView;
 extern CLinearGraphView *g_pLinearGraphView;
 extern CFacetGraphView *g_pFacetGraphView;
 extern CColumnarGraphView *g_pColumnarGraphView;
+extern CUnknownGraphView *g_pUnknownGraphView;
 
 #endif

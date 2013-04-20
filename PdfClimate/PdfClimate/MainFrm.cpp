@@ -12,6 +12,7 @@
 #include "FacetGraphView.h"
 #include "LinearGraphView.h"
 #include "ColumnarGraphView.h"
+#include "UnknownGraphView.h"
 #include "GraphSelectView.h"
 #include "GlobalVars.h"
 
@@ -34,6 +35,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnApplicationLook)
     ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnUpdateApplicationLook)
     ON_COMMAND(ID_FILE_OPEN, &CMainFrame::OnFileOpen)
+    ON_COMMAND(ID_CLOSE_FILE, &CMainFrame::OnFileClose)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -173,12 +175,13 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
         m_wndSplitter1.DestroyWindow();
         return FALSE;
     }
-    if (!m_wndSplitter2.CreateView(0, 0, RUNTIME_CLASS(CGraphSelectView), CSize(100, 26), pContext)) {
+    if (!m_wndSplitter2.CreateView(0, 0, RUNTIME_CLASS(CGraphSelectView), CSize(100, 27), pContext)) {
         m_wndSplitter1.DestroyWindow();
         m_wndSplitter2.DestroyWindow();
         return FALSE;
     }
-    if (!m_wndSplitter3.CreateStatic(&m_wndSplitter2, 5, 1, WS_CHILD | WS_VISIBLE, m_wndSplitter2.IdFromRowCol(1, 0))) {
+    m_wndSplitter2.setSplitterSize(0);
+    if (!m_wndSplitter3.CreateStatic(&m_wndSplitter2, 6, 1, WS_CHILD | WS_VISIBLE, m_wndSplitter2.IdFromRowCol(1, 0))) {
         m_wndSplitter1.DestroyWindow();
         m_wndSplitter2.DestroyWindow();
         return FALSE;
@@ -187,7 +190,8 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
         !m_wndSplitter3.CreateView(1, 0, RUNTIME_CLASS(CDottedGraphView), CSize(100,100), pContext) ||
         !m_wndSplitter3.CreateView(2, 0, RUNTIME_CLASS(CFacetGraphView), CSize(100,100), pContext) ||
         !m_wndSplitter3.CreateView(3, 0, RUNTIME_CLASS(CLinearGraphView), CSize(100,100), pContext) ||
-        !m_wndSplitter3.CreateView(4, 0, RUNTIME_CLASS(CColumnarGraphView), CSize(100,100), pContext)
+        !m_wndSplitter3.CreateView(4, 0, RUNTIME_CLASS(CColumnarGraphView), CSize(100,100), pContext) ||
+        !m_wndSplitter3.CreateView(5, 0, RUNTIME_CLASS(CUnknownGraphView), CSize(100,100), pContext)
         ) {
         m_wndSplitter1.DestroyWindow();
         m_wndSplitter2.DestroyWindow();
@@ -202,6 +206,7 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
     g_pFacetGraphView = (CFacetGraphView*)m_wndSplitter3.GetPane(2, 0);
     g_pLinearGraphView = (CLinearGraphView*)m_wndSplitter3.GetPane(3, 0);
     g_pColumnarGraphView = (CColumnarGraphView*)m_wndSplitter3.GetPane(4, 0);
+    g_pUnknownGraphView = (CUnknownGraphView*)m_wndSplitter3.GetPane(5, 0);
 
     setActiveGraphView(0);
 	m_wndSplitter2.LockBar();
@@ -358,11 +363,11 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
 
 void CMainFrame::setActiveGraphView(int index)
 {
-    if (index<0 || index>4) {
+    if (index<0 || index>5) {
         return;
     }
 
-    for (int i=0; i<5; i++) {
+    for (int i=0; i<6; i++) {
         if (i != index) {
             m_wndSplitter3.SetRowInfo(i, 0, 0);
             m_wndSplitter3.GetPane(i, 0)->ShowWindow(SW_HIDE);
@@ -380,5 +385,11 @@ void CMainFrame::setActiveGraphView(int index)
 
 void CMainFrame::OnFileOpen()
 {
-    g_pPdfClimateView->openFile();
+    g_pLeftView->openFile();
+}
+
+
+void CMainFrame::OnFileClose()
+{
+    g_pLeftView->closeFile();
 }

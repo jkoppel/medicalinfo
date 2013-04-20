@@ -17,7 +17,6 @@ protected: // create from serialization only
 
 // Attributes
 protected:
-    CSplitterWnd m_wndSplitter;
     CMySplitterWndEx m_wndSplitter1;
     CMySplitterWndEx m_wndSplitter2; 
     CMySplitterWndEx m_wndSplitter3; 
@@ -60,6 +59,7 @@ protected:
 
 public:
     afx_msg void OnFileOpen();
+    afx_msg void OnFileClose();
 };
 
 

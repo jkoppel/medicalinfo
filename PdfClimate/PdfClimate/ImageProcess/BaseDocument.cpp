@@ -1,6 +1,6 @@
 #include "BaseDocument.h"
 
-BaseDocument::BaseDocument()
+CBaseDocument::CBaseDocument()
 {
     m_iID = 0;
     memset(m_sName, 0, sizeof(m_sName));
@@ -18,7 +18,7 @@ BaseDocument::BaseDocument()
     memset(m_pUnknownGraphList, 0, sizeof(m_pUnknownGraphList));
 }
 
-BaseDocument::BaseDocument(int iID, const char *sName, const char *sPath, const char *sAuthor) :
+CBaseDocument::CBaseDocument(int iID, const char *sName, const char *sPath, const char *sAuthor) :
     m_iID(iID)
 {
     snprintf(m_sName, sizeof(m_sName), "%s", sName);
@@ -36,7 +36,7 @@ BaseDocument::BaseDocument(int iID, const char *sName, const char *sPath, const 
     memset(m_pUnknownGraphList, 0, sizeof(m_pUnknownGraphList));
 }
 
-BaseDocument::~BaseDocument()
+CBaseDocument::~CBaseDocument()
 {
     int i;
 
@@ -57,7 +57,7 @@ BaseDocument::~BaseDocument()
     }
 }
 
-bool BaseDocument::addDottedGraph(BaseGraph *pDottedGraph)
+bool CBaseDocument::addDottedGraph(CBaseGraph *pDottedGraph)
 {
     if (m_iDottedGraphNum< MAX_GRAPH_NUM) {
         m_pDottedGraphList[m_iDottedGraphNum++] = pDottedGraph;
@@ -66,7 +66,7 @@ bool BaseDocument::addDottedGraph(BaseGraph *pDottedGraph)
     return false;
 }
 
-bool BaseDocument::removeDottedGraph(int iIndex)
+bool CBaseDocument::removeDottedGraph(int iIndex)
 {
     if (iIndex >= 0 && iIndex < m_iDottedGraphNum) {
         delete m_pDottedGraphList[iIndex];
@@ -81,7 +81,7 @@ bool BaseDocument::removeDottedGraph(int iIndex)
     return false;
 }
 
-bool BaseDocument::addFacetGraph(BaseGraph *pFacetGraph)
+bool CBaseDocument::addFacetGraph(CBaseGraph *pFacetGraph)
 {
     if (m_iFacetGraphNum< MAX_GRAPH_NUM) {
         m_pFacetGraphList[m_iFacetGraphNum++] = pFacetGraph;
@@ -90,7 +90,7 @@ bool BaseDocument::addFacetGraph(BaseGraph *pFacetGraph)
     return false;
 }
 
-bool BaseDocument::removeFacetGraph(int iIndex)
+bool CBaseDocument::removeFacetGraph(int iIndex)
 {
     if (iIndex >= 0 && iIndex < m_iFacetGraphNum) {
         delete m_pFacetGraphList[iIndex];
@@ -105,7 +105,7 @@ bool BaseDocument::removeFacetGraph(int iIndex)
     return false;
 }
 
-bool BaseDocument::addLinearGraph(BaseGraph *pLinearGraph)
+bool CBaseDocument::addLinearGraph(CBaseGraph *pLinearGraph)
 {
     if (m_iLinearGraphNum< MAX_GRAPH_NUM) {
         m_pLinearGraphList[m_iLinearGraphNum++] = pLinearGraph;
@@ -114,7 +114,7 @@ bool BaseDocument::addLinearGraph(BaseGraph *pLinearGraph)
     return false;
 }
 
-bool BaseDocument::removeLinearGraph(int iIndex)
+bool CBaseDocument::removeLinearGraph(int iIndex)
 {
     if (iIndex >= 0 && iIndex < m_iLinearGraphNum) {
         delete m_pLinearGraphList[iIndex];
@@ -129,7 +129,7 @@ bool BaseDocument::removeLinearGraph(int iIndex)
     return false;
 }
 
-bool BaseDocument::addColumnarGraph(BaseGraph *pColumnarGraph)
+bool CBaseDocument::addColumnarGraph(CBaseGraph *pColumnarGraph)
 {
     if (m_iColumnarGraphNum< MAX_GRAPH_NUM) {
         m_pColumnarGraphList[m_iColumnarGraphNum++] = pColumnarGraph;
@@ -138,7 +138,7 @@ bool BaseDocument::addColumnarGraph(BaseGraph *pColumnarGraph)
     return false;
 }
 
-bool BaseDocument::removeColumnarGraph(int iIndex)
+bool CBaseDocument::removeColumnarGraph(int iIndex)
 {
     if (iIndex >= 0 && iIndex < m_iColumnarGraphNum) {
         delete m_pColumnarGraphList[iIndex];
@@ -153,7 +153,7 @@ bool BaseDocument::removeColumnarGraph(int iIndex)
     return false;
 }
 
-bool BaseDocument::addUnknownGraph(BaseGraph *pUnknownGraph)
+bool CBaseDocument::addUnknownGraph(CBaseGraph *pUnknownGraph)
 {
     if (m_iUnknownGraphNum< MAX_GRAPH_NUM) {
         m_pUnknownGraphList[m_iUnknownGraphNum++] = pUnknownGraph;
@@ -162,7 +162,7 @@ bool BaseDocument::addUnknownGraph(BaseGraph *pUnknownGraph)
     return false;
 }
 
-bool BaseDocument::removeUnknownGraph(int iIndex)
+bool CBaseDocument::removeUnknownGraph(int iIndex)
 {
     if (iIndex >= 0 && iIndex < m_iUnknownGraphNum) {
         delete m_pUnknownGraphList[iIndex];

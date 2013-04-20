@@ -3,14 +3,14 @@
 
 #include "GraphDefs.h"
 
-class BaseDocument;
-class BaseGraph;
+class CBaseDocument;
+class CBaseGraph;
 
-class BaseGraphItem {
+class CBaseGraphItem {
 public:
-	BaseGraphItem();
-    BaseGraphItem(const char *sName, int iPageIndex);
-    ~BaseGraphItem();
+	CBaseGraphItem();
+    CBaseGraphItem(const char *sName, int iPageIndex);
+    ~CBaseGraphItem();
 
     void setName(const char *sName) { snprintf(m_sName, sizeof(m_sName), "%s", sName); }
     const char *getName() { return m_sName; }
@@ -23,12 +23,12 @@ public:
     void setCoordinateInfo(CoorPixelPair map0, CoorPixelPair map1) { m_cppMapOfCoor[0] = map0; m_cppMapOfCoor[1] = map1; }
 	void getCoordinateInfo(CoorPixelPair &map0, CoorPixelPair &map1) { map0 = m_cppMapOfCoor[0]; map1 = m_cppMapOfCoor[1]; }
     void setPixelRecognizedInfo(int iPixNum, const POINT *pPixelList);
-    int BaseGraphItem::getPixelRecognizedNum() { return m_iPixelRecognizedNum; }
-    const POINT *BaseGraphItem::getPixelRecognizedList() { return m_pPixelRecognizedList; }
-    void setBaseGraph(const BaseGraph *pBaseGraph) { m_pBaseGraph = pBaseGraph; }
-    const BaseGraph *getBaseGraph() { return m_pBaseGraph; }
-    void setBaseDocument(const BaseDocument *pBaseDocument) {  m_pBaseDocument = pBaseDocument; }
-    const BaseDocument *getBaseDocument() { return m_pBaseDocument; }
+    int CBaseGraphItem::getPixelRecognizedNum() { return m_iPixelRecognizedNum; }
+    const POINT *CBaseGraphItem::getPixelRecognizedList() { return m_pPixelRecognizedList; }
+    void setBaseGraph(const CBaseGraph *pBaseGraph) { m_pBaseGraph = pBaseGraph; }
+    const CBaseGraph *getBaseGraph() { return m_pBaseGraph; }
+    void setBaseDocument(const CBaseDocument *pBaseDocument) {  m_pBaseDocument = pBaseDocument; }
+    const CBaseDocument *getBaseDocument() { return m_pBaseDocument; }
     virtual void drawGraph() {};
 
 protected:
@@ -39,8 +39,8 @@ protected:
     CoorPixelPair m_cppMapOfCoor[2];
     int m_iPixelRecognizedNum;
     POINT *m_pPixelRecognizedList;
-    const BaseGraph *m_pBaseGraph;
-    const BaseDocument *m_pBaseDocument;
+    const CBaseGraph *m_pBaseGraph;
+    const CBaseDocument *m_pBaseDocument;
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include "mupdf.h"
+#include "MyPdf.h"
 #include "fitz.h"
 
 #include <windows.h>
