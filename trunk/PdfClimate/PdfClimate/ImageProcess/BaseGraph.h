@@ -4,13 +4,13 @@
 #include "GraphDefs.h"
 #include "BaseGraphItem.h"
 
-class BaseDocument;
+class CBaseDocument;
 
-class BaseGraph {
+class CBaseGraph {
 public:
-    BaseGraph();
-    BaseGraph(int iID, GraphType iType, const char *sName, const char *sXUnitName, const char *sYUnitName);
-    ~BaseGraph();
+    CBaseGraph();
+    CBaseGraph(int iID, GraphType iType, const char *sName, const char *sXUnitName, const char *sYUnitName);
+    ~CBaseGraph();
     void setID(int iID) { m_iID = iID; }
     int getID() { return m_iID; }
     void setName(const char *sName) { snprintf(m_sName, sizeof(m_sName), "%s", sName); }
@@ -23,10 +23,10 @@ public:
     const char *getXUnitName() { return m_sXUnitName; }
     void setYUnitName(const char sYUnitName) { snprintf(m_sYUnitName, sizeof(m_sYUnitName), "%s", sYUnitName); }
     const char *getYUnitName() { return m_sYUnitName; }
-    bool addGraphItem(BaseGraphItem *pGraphItem);
+    bool addGraphItem(CBaseGraphItem *pGraphItem);
     bool removeGraphItem(int iIndex);
-    void setBaseDocument(const BaseDocument *pBaseDocument) { m_pBaseDocument = pBaseDocument; }
-    const BaseDocument *getBaseDocument(const BaseDocument *pBaseDocument) { return m_pBaseDocument; }
+    void setBaseDocument(const CBaseDocument *pBaseDocument) { m_pBaseDocument = pBaseDocument; }
+    const CBaseDocument *getBaseDocument(const CBaseDocument *pBaseDocument) { return m_pBaseDocument; }
 
 protected:
     int m_iID;
@@ -36,8 +36,8 @@ protected:
     char m_sXUnitName[256];
     char m_sYUnitName[256];
     int m_iGraphItemNum;
-    BaseGraphItem *m_pGraphItemList[MAX_GRAPH_ITEM_NUM];
-    const BaseDocument *m_pBaseDocument;
+    CBaseGraphItem *m_pGraphItemList[MAX_GRAPH_ITEM_NUM];
+    const CBaseDocument *m_pBaseDocument;
 };
 
 #endif

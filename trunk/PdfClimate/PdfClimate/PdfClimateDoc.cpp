@@ -37,7 +37,7 @@ BOOL CPdfClimateDoc::OnNewDocument()
     if (!CDocument::OnNewDocument())
         return FALSE;
 
-    SetTitle("Pdf Climate");
+    SetTitle("古气候文档数据采集系统");
 
     return TRUE;
 }

@@ -35,6 +35,7 @@ public:
     virtual void Dump(CDumpContext& dc) const;
 #endif
     virtual void OnDraw(CDC* pDC);  // 重写以绘制该视图
+    CLBTabCtrl *getTabCtrl() { return m_pTab; }
 
 protected:
     int m_iCurrTabIndex;		//当前选中页面

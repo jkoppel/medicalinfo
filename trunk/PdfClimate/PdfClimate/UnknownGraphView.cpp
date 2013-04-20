@@ -1,24 +1,24 @@
-// FacetGraphView.cpp : implementation file
+// UnknownGraphView.cpp : implementation file
 //
 
 #include "stdafx.h"
 #include "PdfClimate.h"
-#include "FacetGraphView.h"
+#include "UnknownGraphView.h"
 
 
-// CFacetGraphView
+// CUnknownGraphView
 
-IMPLEMENT_DYNCREATE(CFacetGraphView, CFormView)
+IMPLEMENT_DYNCREATE(CUnknownGraphView, CFormView)
 
-CFacetGraphView::CFacetGraphView()
-	: CFormView(CFacetGraphView::IDD)
+CUnknownGraphView::CUnknownGraphView()
+	: CFormView(CUnknownGraphView::IDD)
 {
     m_rSrcRect = RECT();
     m_pSrcImage = new CImage;
     m_pSrcBitmap = new CBitmap;
 }
 
-CFacetGraphView::~CFacetGraphView()
+CUnknownGraphView::~CUnknownGraphView()
 {
     if (!m_pSrcImage->IsNull()) {
         m_pSrcImage->Detach();
@@ -27,25 +27,25 @@ CFacetGraphView::~CFacetGraphView()
     delete m_pSrcImage;
 }
 
-void CFacetGraphView::DoDataExchange(CDataExchange* pDX)
+void CUnknownGraphView::DoDataExchange(CDataExchange* pDX)
 {
 	CFormView::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CFacetGraphView, CFormView)
+BEGIN_MESSAGE_MAP(CUnknownGraphView, CFormView)
 END_MESSAGE_MAP()
 
 
-// CFacetGraphView diagnostics
+// CUnknownGraphView diagnostics
 
 #ifdef _DEBUG
-void CFacetGraphView::AssertValid() const
+void CUnknownGraphView::AssertValid() const
 {
 	CFormView::AssertValid();
 }
 
 #ifndef _WIN32_WCE
-void CFacetGraphView::Dump(CDumpContext& dc) const
+void CUnknownGraphView::Dump(CDumpContext& dc) const
 {
 	CFormView::Dump(dc);
 }
@@ -53,8 +53,8 @@ void CFacetGraphView::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 
-// CFacetGraphView message handlers
-void CFacetGraphView::OnDraw(CDC* pDC)
+// CUnknownGraphView message handlers
+void CUnknownGraphView::OnDraw(CDC* pDC)
 {
     pDC=GetDC();
 
@@ -77,4 +77,3 @@ void CFacetGraphView::OnDraw(CDC* pDC)
 
     }
 }
-

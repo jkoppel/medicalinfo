@@ -3,7 +3,7 @@
 #include "BaseDocument.h"
 #include "GraphDefs.h"
 
-BaseGraph::BaseGraph()
+CBaseGraph::CBaseGraph()
 {
     m_iID = 0;
     m_iType = GRAPH_UNKNOWN;
@@ -17,7 +17,7 @@ BaseGraph::BaseGraph()
     m_pDIBInfo = dib_init();
 }
 
-BaseGraph::BaseGraph(int iID, GraphType iType, const char *sName, const char *sXUnitName, const char *sYUnitName):
+CBaseGraph::CBaseGraph(int iID, GraphType iType, const char *sName, const char *sXUnitName, const char *sYUnitName):
     m_iID(iID), m_iType(iType)
 {
     snprintf(m_sName, sizeof(m_sName), "%s", sName);
@@ -30,17 +30,17 @@ BaseGraph::BaseGraph(int iID, GraphType iType, const char *sName, const char *sX
     m_pDIBInfo = dib_init();
 }
 
-BaseGraph::~BaseGraph()
+CBaseGraph::~CBaseGraph()
 {
     dib_destroy(m_pDIBInfo);
 }
 
-void BaseGraph::setBitmapInfo(const BITMAPINFO *bitmap)
+void CBaseGraph::setBitmapInfo(const BITMAPINFO *bitmap)
 {
     //TODO
 }
 
-bool BaseGraph::addGraphItem(BaseGraphItem *pGraphItem)
+bool CBaseGraph::addGraphItem(CBaseGraphItem *pGraphItem)
 {
     if (m_iGraphItemNum < MAX_GRAPH_ITEM_NUM) {
         m_pGraphItemList[m_iGraphItemNum++] = pGraphItem;
@@ -49,7 +49,7 @@ bool BaseGraph::addGraphItem(BaseGraphItem *pGraphItem)
     return false;
 }
 
-bool BaseGraph::removeGraphItem(int iIndex)
+bool CBaseGraph::removeGraphItem(int iIndex)
 {
     if (iIndex >= 0 && iIndex < m_iGraphItemNum) {
         delete m_pGraphItemList[iIndex];

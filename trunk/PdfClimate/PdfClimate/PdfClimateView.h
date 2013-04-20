@@ -18,6 +18,14 @@ public:
 
 // Operations
 public:
+    enum DragMode {
+        Drag_Normal,
+        Drag_Dotted,
+        Drag_Facet,
+        Drag_Linear,
+        Drag_Columnar,
+        Drag_Unknow,
+    };
     void openFile();
     void closeFile();
     void gotoFirstPage();
@@ -61,8 +69,10 @@ protected:
     CPoint m_ptOrig, m_ptDest;
     bool m_bDragging;
     HCURSOR m_hCross;
-    //CRect m_rectList[128];
-    int m_iRectNum;
+    CToolBarCtrl m_ctrlToolBar;
+    CToolTipCtrl m_ctrlToolTip;
+    CImageList  m_ilToolBar;
+    DragMode m_iMode;
 
 // Generated message map functions
 protected:
@@ -77,6 +87,18 @@ public:
     afx_msg void OnMouseMove(UINT nFlags, CPoint point);
     afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
     afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+    afx_msg void OnPageFirst();
+    afx_msg void OnPageLast();
+    afx_msg void OnPagePrev();
+    afx_msg void OnPageNext();
+    afx_msg void OnZoomOut();
+    afx_msg void OnZoomIn();
+    afx_msg void OnDragNormal();
+    afx_msg void OnDragDotted();
+    afx_msg void OnDragFacet();
+    afx_msg void OnDragLinear();
+    afx_msg void OnDragColumnar();
+    afx_msg void OnDragUnknown();
 };
 
 #ifndef _DEBUG  // debug version in PdfClimateView.cpp

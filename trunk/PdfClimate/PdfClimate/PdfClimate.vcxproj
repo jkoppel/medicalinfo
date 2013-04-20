@@ -129,6 +129,30 @@
     <ClCompile Include="CtrlLib\LBTabCtrl\LBSpinButtonCtrl.cpp" />
     <ClCompile Include="CtrlLib\LBTabCtrl\LBTabCtrl.cpp" />
     <ClCompile Include="CtrlLib\MySplitterWndEx\MySplitterWndEx.cpp" />
+    <ClCompile Include="CtrlLib\XHtmlTree\CeXDib.cpp" />
+    <ClCompile Include="CtrlLib\XHtmlTree\CreateCheckboxImageList.cpp" />
+    <ClCompile Include="CtrlLib\XHtmlTree\PPDrawManager.cpp" />
+    <ClCompile Include="CtrlLib\XHtmlTree\PPHtmlDrawer.cpp" />
+    <ClCompile Include="CtrlLib\XHtmlTree\PPTooltip.cpp" />
+    <ClCompile Include="CtrlLib\XHtmlTree\VisualStylesXP.cpp" />
+    <ClCompile Include="CtrlLib\XHtmlTree\XHtmlDraw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\XHtmlDrawLink.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\XHtmlTree.cpp" />
+    <ClCompile Include="CtrlLib\XHtmlTree\XmlDocument.cpp" />
+    <ClCompile Include="CtrlLib\XHtmlTree\XNamedColors.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="CtrlLib\XHtmlTree\XString.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="DottedGraphView.cpp" />
     <ClCompile Include="FacetGraphView.cpp" />
     <ClCompile Include="GlobalVars.cpp" />
@@ -148,7 +172,7 @@
     <ClCompile Include="LeftView.cpp" />
     <ClCompile Include="LinearGraphView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
-    <ClCompile Include="mupdf.c">
+    <ClCompile Include="MyPdf.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -161,14 +185,29 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UnknownGraphView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ColumnarGraphView.h" />
     <ClInclude Include="CtrlLib\LBTabCtrl\LBSpinButtonCtrl.h" />
     <ClInclude Include="CtrlLib\LBTabCtrl\LBTabCtrl.h" />
     <ClInclude Include="CtrlLib\MySplitterWndEx\MySplitterWndEx.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\CeXDib.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\CreateCheckboxImageList.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\PPDrawManager.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\PPHtmlDrawer.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\PPTooltip.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\VisualStylesXP.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\XHtmlDraw.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\XHtmlDrawLink.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\XHtmlTree.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\XmlDocument.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\XNamedColors.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\XString.h" />
+    <ClInclude Include="CtrlLib\XHtmlTree\XTrace.h" />
     <ClInclude Include="DottedGraphView.h" />
     <ClInclude Include="FacetGraphView.h" />
+    <ClInclude Include="GlobalVars.h" />
     <ClInclude Include="GraphSelectView.h" />
     <ClInclude Include="ImageProcess\BaseDocument.h" />
     <ClInclude Include="ImageProcess\BaseGraph.h" />
@@ -176,18 +215,21 @@
     <ClInclude Include="LeftView.h" />
     <ClInclude Include="LinearGraphView.h" />
     <ClInclude Include="MainFrm.h" />
-    <ClInclude Include="mupdf.h" />
+    <ClInclude Include="MyPdf.h" />
     <ClInclude Include="PdfClimate.h" />
     <ClInclude Include="PdfClimateDoc.h" />
     <ClInclude Include="PdfClimateView.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="UnknownGraphView.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\PdfClimate.ico" />
     <None Include="res\PdfClimate.rc2" />
     <None Include="res\PdfClimateDoc.ico" />
+    <None Include="res\pdf_toolbar.bmp" />
+    <None Include="res\state_images.bmp" />
     <None Include="res\Toolbar.bmp" />
     <None Include="res\Toolbar256.bmp" />
     <None Include="UserImages.bmp" />

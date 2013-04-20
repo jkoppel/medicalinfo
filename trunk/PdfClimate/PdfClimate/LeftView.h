@@ -5,9 +5,14 @@
 
 #pragma once
 
-class CPdfClimateDoc;
+#include "ImageProcess/BaseDocument.h"
 
-class CLeftView : public CTreeView
+#define MAX_BASE_DOCUMENT_NUM   128
+
+class CPdfClimateDoc;
+class CXHtmlTree;
+
+class CLeftView : public CView//CTreeView
 {
 protected: // create from serialization only
     CLeftView();
@@ -16,16 +21,19 @@ protected: // create from serialization only
 // Attributes
 public:
     CPdfClimateDoc* GetDocument();
-    void addFile(const char *file);
+    void openFile();
+    void closeFile();
+    void selectFile(int index);
+    int getCurrDocIndex();
 
 // Operations
 public:
 
 // Overrides
     public:
-    virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
     protected:
     virtual void OnInitialUpdate(); // called first time after construct
+    virtual void OnDraw(CDC* pDC);      // overridden to draw this view
 
 // Implementation
 public:
@@ -36,13 +44,18 @@ public:
 #endif
 
 protected:
-    CStringList m_strFileList;
-    HTREEITEM hRoot;
+    CXHtmlTree *m_pTreeCtrl;
+    CImageList m_ilColorList;
+    int m_iBaseDocumentNum;
+    CBaseDocument *m_pBaseDocumentList[MAX_BASE_DOCUMENT_NUM];
+    int m_iCurrDocumentIndex;
 
 // Generated message map functions
 protected:
     DECLARE_MESSAGE_MAP()
 public:
+    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+    afx_msg void OnSize(UINT nType, int cx, int cy);
     afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
 };
 

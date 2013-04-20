@@ -27,24 +27,45 @@
 #define ID_VIEW_APPLOOK_OFF_2007_SILVER 217
 #define ID_VIEW_APPLOOK_OFF_2007_AQUA   218
 #define IDC_DRAW_TAB                    301
-#define IDS_EDIT_MENU                   306
+#define IDC_LEFT_TREE                   302
+#define IDS_EDIT_MENU                   303
+#define IDM_GOTO_PREV_PAGE              304
+#define IDM_GOTO_NEXT_PAGE              305
+#define IDT_VIEW_ZOOMOUT                306
+#define IDT_VIEW_ZOOMIN                 307
+#define IDC_REBAR                       308
+#define IDC_TOOLBAR                     309
 #define IDD_DOTTED_GRAPH                310
 #define IDD_FACET_GRAPH                 311
 #define IDD_LINEAR_GRAPH                312
 #define IDD_COLUMNAR                    313
+#define IDB_COLOR_LIST                  314
+#define IDD_UNKNOWN_GRAPH               315
+#define IDB_TOOLBAR                     316
+#define IDM_GOTO_FIRST_PAGE             317
+#define IDM_GOTO_LAST_PAGE              318
+#define IDD_DRAG_NORMAL                 319
+#define IDD_DRAG_DOTTED                 320
+#define IDD_DRAG_FACET                  321
+#define IDD_DRAG_LINEAR                 322
+#define IDD_DRAG_COLUMNAR               323
+#define IDD_DRAG_UNKNOWN                324
+#define IDC_COMBO1                      1000
 #define ID_VIEW_DISPLAYBYTECODE         32771
 #define ID_VIEW_FIRST                   32772
 #define ID_VIEW_LASTPAGE                32773
 #define ID_VIEW_NEXTPAGE                32774
 #define ID_VIEW_PREVPAGE                32775
+#define ID                              32776
+#define ID_CLOSE_FILE                   32777
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        314
-#define _APS_NEXT_COMMAND_VALUE         32776
-#define _APS_NEXT_CONTROL_VALUE         1000
-#define _APS_NEXT_SYMED_VALUE           310
+#define _APS_NEXT_RESOURCE_VALUE        325
+#define _APS_NEXT_COMMAND_VALUE         32778
+#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_SYMED_VALUE           325
 #endif
 #endif

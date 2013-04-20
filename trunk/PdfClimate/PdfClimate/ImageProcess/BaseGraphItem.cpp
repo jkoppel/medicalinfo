@@ -3,7 +3,7 @@
 #include "BaseDocument.h"
 
 
-BaseGraphItem::BaseGraphItem()
+CBaseGraphItem::CBaseGraphItem()
 {
     memset(m_sName, 0, sizeof(m_sName));
     m_iPageIndex = 0;
@@ -16,7 +16,7 @@ BaseGraphItem::BaseGraphItem()
     m_pDIBInfo = dib_init();
 }
 
-BaseGraphItem::BaseGraphItem(const char *sName, int iPageIndex)
+CBaseGraphItem::CBaseGraphItem(const char *sName, int iPageIndex)
 {
     memset(m_cppMapOfCoor, 0, sizeof(m_cppMapOfCoor));
     m_iPixelRecognizedNum = 0;
@@ -30,7 +30,7 @@ BaseGraphItem::BaseGraphItem(const char *sName, int iPageIndex)
     m_pDIBInfo = dib_init();
 }
 
-BaseGraphItem::~BaseGraphItem()
+CBaseGraphItem::~CBaseGraphItem()
 {
     dib_destroy(m_pDIBInfo);
     if (m_pPixelRecognizedList != NULL) {
@@ -38,12 +38,12 @@ BaseGraphItem::~BaseGraphItem()
     }
 }
 
-void BaseGraphItem::setBitmapInfo(const BITMAPINFO *bitmap)
+void CBaseGraphItem::setBitmapInfo(const BITMAPINFO *bitmap)
 {
     //TODO
 }
 
-void BaseGraphItem::setPixelRecognizedInfo(int iPixNum, const POINT *pPixelList)
+void CBaseGraphItem::setPixelRecognizedInfo(int iPixNum, const POINT *pPixelList)
 {
     m_iPixelRecognizedNum = iPixNum;
     if (m_pPixelRecognizedList != NULL) {
