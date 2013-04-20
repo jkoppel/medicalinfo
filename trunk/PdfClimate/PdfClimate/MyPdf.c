@@ -133,6 +133,16 @@ bool mupdf_load_page(int pagenumber, int zoom)
     return true;
 }
 
+void mupdf_get_size(int *width, int *height)
+{
+    if (!fz_is_open){
+        return;
+    }
+
+	*width= fz_pixmap_width(ctx, pix);
+	*height = fz_pixmap_height(ctx, pix);
+}
+
 void mupdf_winblit(HDC hdc, int winw, int winh, int cw, int cy)
 {
     int image_w, image_h, image_n, x0, y0, x1, y1;

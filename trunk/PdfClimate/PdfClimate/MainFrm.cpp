@@ -36,6 +36,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnUpdateApplicationLook)
     ON_COMMAND(ID_FILE_OPEN, &CMainFrame::OnFileOpen)
     ON_COMMAND(ID_CLOSE_FILE, &CMainFrame::OnFileClose)
+    ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -209,7 +210,9 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
     g_pUnknownGraphView = (CUnknownGraphView*)m_wndSplitter3.GetPane(5, 0);
 
     setActiveGraphView(0);
+	m_wndSplitter1.LockBar();
 	m_wndSplitter2.LockBar();
+	m_wndSplitter3.LockBar();
 
     return CFrameWndEx::OnCreateClient(lpcs, pContext);
 }
@@ -392,4 +395,12 @@ void CMainFrame::OnFileOpen()
 void CMainFrame::OnFileClose()
 {
     g_pLeftView->closeFile();
+}
+
+
+void CMainFrame::OnSize(UINT nType, int cx, int cy)
+{
+    CFrameWndEx::OnSize(nType, cx, cy);
+
+    // TODO: Add your message handler code here
 }
