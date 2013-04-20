@@ -20,6 +20,8 @@ protected:
     CMySplitterWndEx m_wndSplitter1;
     CMySplitterWndEx m_wndSplitter2; 
     CMySplitterWndEx m_wndSplitter3; 
+    bool             m_bViewCreated;
+    int              m_iCurSel;
 
 public:
 
@@ -60,6 +62,7 @@ protected:
 public:
     afx_msg void OnFileOpen();
     afx_msg void OnFileClose();
+    afx_msg void OnSize(UINT nType, int cx, int cy);
 };
 
 

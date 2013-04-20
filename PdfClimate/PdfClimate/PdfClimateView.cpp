@@ -122,12 +122,19 @@ void CPdfClimateView::OnSize(UINT nType, int cx, int cy)
 
 void CPdfClimateView::openFile()
 {
+    RECT rect;
+    GetClientRect(&rect);
+
     m_iPageNum = mupdf_get_page_count();
     m_iCurrPage = 0;
-    m_iCX = -200;
-    m_iCY = 0;
-    m_iZoom = 100;
     mupdf_load_page(m_iCurrPage, m_iZoom);
+    int w, h;
+    CRect crect;
+    mupdf_get_size(&w, &h);
+    GetClientRect(&crect);
+    m_iCX = -(crect.Width() - w)/4;
+    m_iCY = 80;
+    m_iZoom = 100;
     m_bFileOpened = true;
     RedrawWindow();
     this->SetFocus();
@@ -221,7 +228,7 @@ void CPdfClimateView::gotoNextPage()
 void CPdfClimateView::zoomOut()
 {
     if (m_bFileOpened) {
-        if (m_iZoom > 0) {
+        if (m_iZoom > 5) {
             m_iZoom = (int)(m_iZoom / 1.1f);
             mupdf_load_page(m_iCurrPage, m_iZoom);
             RedrawWindow();
@@ -233,7 +240,12 @@ void CPdfClimateView::zoomIn()
 {
     if (m_bFileOpened) {
         if (m_iZoom < 500) {
-            m_iZoom = (int)(m_iZoom * 1.1f);
+            if (m_iZoom < 10) {
+                m_iZoom = (int)(m_iZoom * 1.2f);
+            }
+            else {
+                m_iZoom = (int)(m_iZoom * 1.1f);
+            }
             mupdf_load_page(m_iCurrPage, m_iZoom);
             RedrawWindow();
         }
