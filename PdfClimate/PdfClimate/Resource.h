@@ -56,7 +56,6 @@
 #define ID_VIEW_LASTPAGE                32773
 #define ID_VIEW_NEXTPAGE                32774
 #define ID_VIEW_PREVPAGE                32775
-//#define ID                              32776
 #define ID_CLOSE_FILE                   32777
 
 // Next default values for new objects
