@@ -61,14 +61,14 @@ void CFacetGraphView::OnDraw(CDC* pDC)
     if (!m_pSrcImage->IsNull()) {
         BITMAP bm;
         m_pSrcBitmap->GetBitmap(&bm);
-        
+
+        /*
         char *buf = new char[bm.bmWidth * bm.bmWidth];
-        for (int i=0; i<bm.bmWidth; i++){
-            m_pSrcImage->SetPixel(i, bm.bmHeight/2, RGB(255, 0, 0));
-        }
         memset(buf, 0, bm.bmWidth * bm.bmWidth);
         m_pSrcBitmap->GetBitmapBits(bm.bmWidth * bm.bmWidth, buf);
         m_pSrcBitmap->SetBitmapBits(bm.bmWidth * bm.bmWidth, buf);
+        delete []buf;
+        */
 
         m_pSrcImage->Draw(pDC->m_hDC, 100, 100,
                         m_rSrcRect.right - m_rSrcRect.left,

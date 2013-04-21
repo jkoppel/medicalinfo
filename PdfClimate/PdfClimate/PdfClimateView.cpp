@@ -564,11 +564,11 @@ static ToolbarButtonInfo gToolbarButtons[] = {
     { 3,   IDT_VIEW_ZOOMIN,       0 },
     { -1,  0,                     0 },
     { 6,   IDD_DRAG_NORMAL,       0 },
-    { 6,   IDD_DRAG_DOTTED,       0 },
-    { 6,   IDD_DRAG_FACET,       0 },
-    { 6,   IDD_DRAG_LINEAR,       0 },
-    { 6,   IDD_DRAG_COLUMNAR,       0 },
-    { 6,   IDD_DRAG_UNKNOWN,       0 },
+    { 7,   IDD_DRAG_DOTTED,       0 },
+    { 8,   IDD_DRAG_FACET,       0 },
+    { 9,   IDD_DRAG_LINEAR,       0 },
+    { 10,   IDD_DRAG_COLUMNAR,       0 },
+    { 11,   IDD_DRAG_UNKNOWN,       0 },
 };
 
 #define TOOLBAR_BUTTONS_COUNT (sizeof(gToolbarButtons)/sizeof(ToolbarButtonInfo))
