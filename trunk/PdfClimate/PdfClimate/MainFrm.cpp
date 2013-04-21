@@ -35,7 +35,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnApplicationLook)
     ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnUpdateApplicationLook)
     ON_COMMAND(ID_FILE_OPEN, &CMainFrame::OnFileOpen)
-    ON_COMMAND(ID_CLOSE_FILE, &CMainFrame::OnFileClose)
+    ON_COMMAND(ID_FILE_CLOSE1, &CMainFrame::OnFileClose)
     ON_WM_SIZE()
 END_MESSAGE_MAP()
 
@@ -139,9 +139,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     // TODO: define your own basic commands, ensuring that each pulldown menu has at least one basic command.
     CList<UINT, UINT> lstBasicCommands;
 
-    lstBasicCommands.AddTail(ID_FILE_NEW);
     lstBasicCommands.AddTail(ID_FILE_OPEN);
-    lstBasicCommands.AddTail(ID_FILE_CLOSE);
+    lstBasicCommands.AddTail(ID_FILE_CLOSE1);
     lstBasicCommands.AddTail(ID_FILE_SAVE);
     lstBasicCommands.AddTail(ID_FILE_PRINT);
     lstBasicCommands.AddTail(ID_APP_EXIT);
@@ -212,7 +211,6 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
     g_pUnknownGraphView = (CUnknownGraphView*)m_wndSplitter3.GetPane(5, 0);
 
     setActiveGraphView(0);
-	m_wndSplitter1.LockBar();
 	m_wndSplitter2.LockBar();
 	m_wndSplitter3.LockBar();
 
@@ -390,7 +388,6 @@ void CMainFrame::setActiveGraphView(int index)
     SetActiveView((CView*)m_wndSplitter3.GetPane(index, 0));
     m_wndSplitter3.setSplitterSize(0);
     m_wndSplitter3.RecalcLayout();
-    m_wndSplitter3.LockBar();
 
     m_iCurSel = index;
 }

@@ -51,19 +51,14 @@
 #define IDD_DRAG_COLUMNAR               323
 #define IDD_DRAG_UNKNOWN                324
 #define IDC_COMBO1                      1000
-#define ID_VIEW_DISPLAYBYTECODE         32771
-#define ID_VIEW_FIRST                   32772
-#define ID_VIEW_LASTPAGE                32773
-#define ID_VIEW_NEXTPAGE                32774
-#define ID_VIEW_PREVPAGE                32775
-#define ID_CLOSE_FILE                   32777
+#define ID_FILE_CLOSE1                  32771
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        325
-#define _APS_NEXT_COMMAND_VALUE         32778
+#define _APS_NEXT_COMMAND_VALUE         32772
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           325
 #endif
