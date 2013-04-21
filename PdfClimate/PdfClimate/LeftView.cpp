@@ -210,7 +210,7 @@ void CLeftView::openFile()
                     "PDF Files (*.pdf)", 
                     NULL, 
                     OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ENABLESIZING,
-                    _T("PDF Files (*.pdf)||"),
+                    _T("PDF Files (*.pdf)|*.pdf|All Files(*.*)|*.*||"),
                     NULL
                    );
     if (dlg.DoModal()==IDCANCEL) {
