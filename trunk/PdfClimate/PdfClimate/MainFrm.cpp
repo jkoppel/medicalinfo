@@ -52,6 +52,7 @@ static UINT indicators[] =
 CMainFrame::CMainFrame()
 {
     theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_VS_2005);
+    m_bViewCreated = false;
 }
 
 CMainFrame::~CMainFrame()
@@ -214,6 +215,8 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
 	m_wndSplitter2.LockBar();
 	m_wndSplitter3.LockBar();
 
+    m_bViewCreated = true;
+
     return CFrameWndEx::OnCreateClient(lpcs, pContext);
 }
 
@@ -370,13 +373,16 @@ void CMainFrame::setActiveGraphView(int index)
         return;
     }
 
+    CRect rect;
+    GetClientRect(&rect);
+    int h = rect.Height()-27 > 0 ? rect.Height()-27 : 1;
     for (int i=0; i<6; i++) {
         if (i != index) {
-            m_wndSplitter3.SetRowInfo(i, 0, 0);
+            m_wndSplitter3.SetRowInfo(i, h, 0);
             m_wndSplitter3.GetPane(i, 0)->ShowWindow(SW_HIDE);
         }
         else {
-            m_wndSplitter3.SetRowInfo(i, 800, 100);
+            m_wndSplitter3.SetRowInfo(i, h, 0);
             m_wndSplitter3.GetPane(i, 0)->ShowWindow(SW_SHOW);
         }
     }
@@ -384,6 +390,8 @@ void CMainFrame::setActiveGraphView(int index)
     m_wndSplitter3.setSplitterSize(0);
     m_wndSplitter3.RecalcLayout();
     m_wndSplitter3.LockBar();
+
+    m_iCurSel = index;
 }
 
 void CMainFrame::OnFileOpen()
@@ -402,5 +410,19 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 {
     CFrameWndEx::OnSize(nType, cx, cy);
 
-    // TODO: Add your message handler code here
+    if (m_bViewCreated) {
+        CRect rect;
+        GetClientRect(&rect);
+        m_wndSplitter1.SetColumnInfo(0, rect.Width()/4, 0);
+        m_wndSplitter2.SetRowInfo(0, 27, 0);
+
+        m_wndSplitter1.RecalcLayout();
+        m_wndSplitter2.RecalcLayout();
+        setActiveGraphView(m_iCurSel);
+        m_wndSplitter1.UpdateWindow();
+        m_wndSplitter2.UpdateWindow();
+        m_wndSplitter3.UpdateWindow();
+
+        RedrawWindow(NULL, NULL, RDW_ALLCHILDREN | RDW_INVALIDATE | RDW_UPDATENOW | RDW_FRAME | RDW_ERASE);
+    }
 }
