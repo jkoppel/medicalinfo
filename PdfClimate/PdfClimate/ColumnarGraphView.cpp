@@ -8,31 +8,23 @@
 
 // CColumnarGraphView
 
-IMPLEMENT_DYNCREATE(CColumnarGraphView, CFormView)
+IMPLEMENT_DYNCREATE(CColumnarGraphView, CGraphFormView)
 
 CColumnarGraphView::CColumnarGraphView()
-	: CFormView(CColumnarGraphView::IDD)
+	: CGraphFormView(CColumnarGraphView::IDD)
 {
-    m_rSrcRect = RECT();
-    m_pSrcImage = new CImage;
-    m_pSrcBitmap = new CBitmap;
 }
 
 CColumnarGraphView::~CColumnarGraphView()
 {
-    if (!m_pSrcImage->IsNull()) {
-        m_pSrcImage->Detach();
-    }
-    delete m_pSrcBitmap;
-    delete m_pSrcImage;
 }
 
 void CColumnarGraphView::DoDataExchange(CDataExchange* pDX)
 {
-	CFormView::DoDataExchange(pDX);
+	CGraphFormView::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CColumnarGraphView, CFormView)
+BEGIN_MESSAGE_MAP(CColumnarGraphView, CGraphFormView)
 END_MESSAGE_MAP()
 
 
@@ -41,13 +33,13 @@ END_MESSAGE_MAP()
 #ifdef _DEBUG
 void CColumnarGraphView::AssertValid() const
 {
-	CFormView::AssertValid();
+	CGraphFormView::AssertValid();
 }
 
 #ifndef _WIN32_WCE
 void CColumnarGraphView::Dump(CDumpContext& dc) const
 {
-	CFormView::Dump(dc);
+	CGraphFormView::Dump(dc);
 }
 #endif
 #endif //_DEBUG
@@ -56,24 +48,5 @@ void CColumnarGraphView::Dump(CDumpContext& dc) const
 // CColumnarGraphView message handlers
 void CColumnarGraphView::OnDraw(CDC* pDC)
 {
-    pDC=GetDC();
-
-    if (!m_pSrcImage->IsNull()) {
-        BITMAP bm;
-        m_pSrcBitmap->GetBitmap(&bm);
-
-        /*
-        char *buf = new char[bm.bmWidth * bm.bmWidth];
-        memset(buf, 0, bm.bmWidth * bm.bmWidth);
-        m_pSrcBitmap->GetBitmapBits(bm.bmWidth * bm.bmWidth, buf);
-        m_pSrcBitmap->SetBitmapBits(bm.bmWidth * bm.bmWidth, buf);
-        delete []buf;
-        */
-
-        m_pSrcImage->Draw(pDC->m_hDC, 100, 100,
-                        m_rSrcRect.right - m_rSrcRect.left,
-                        m_rSrcRect.bottom - m_rSrcRect.top
-                       );
-
-    }
+    CGraphFormView::OnDraw(pDC);
 }

@@ -73,9 +73,17 @@ protected:
     CToolTipCtrl m_ctrlToolTip;
     CImageList  m_ilToolBar;
     DragMode m_iMode;
+    bool m_bDocInfoShowing;
+    HWND m_hwndPageText;
+    HWND m_hwndPageBox;
+    HWND m_hwndPageBg;
+    HWND m_hwndPageTotal;
 
 // Generated message map functions
 protected:
+    void createPageBox();
+    void UpdateToolbarPageText(int pageCount, bool updateOnly);
+
     afx_msg void OnFilePrintPreview();
     afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
     DECLARE_MESSAGE_MAP()
@@ -99,6 +107,7 @@ public:
     afx_msg void OnDragLinear();
     afx_msg void OnDragColumnar();
     afx_msg void OnDragUnknown();
+    afx_msg void OnShowDocInfo();
 };
 
 #ifndef _DEBUG  // debug version in PdfClimateView.cpp

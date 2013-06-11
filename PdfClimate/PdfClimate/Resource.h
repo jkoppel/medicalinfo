@@ -38,7 +38,7 @@
 #define IDD_DOTTED_GRAPH                310
 #define IDD_FACET_GRAPH                 311
 #define IDD_LINEAR_GRAPH                312
-#define IDD_COLUMNAR                    313
+#define IDD_COLUMNAR_GRAPH              313
 #define IDB_COLOR_LIST                  314
 #define IDD_UNKNOWN_GRAPH               315
 #define IDB_TOOLBAR                     316
@@ -50,16 +50,24 @@
 #define IDD_DRAG_LINEAR                 322
 #define IDD_DRAG_COLUMNAR               323
 #define IDD_DRAG_UNKNOWN                324
+#define IDD_DOC_INFO                    325
 #define IDC_COMBO1                      1000
+#define IDC_DOC_NAME                    1001
+#define IDC_DOC_AUTHOR                  1002
+#define IDC_DOC_EDITSAVE                1003
+#define IDC_STATIC_MAIN_IMAGE           1004
+#define IDC_BUTTON1                     1005
+#define IDC_GRAPH_INFO                  1006
+#define IDC_COORDINATE_INFO             1007
 #define ID_FILE_CLOSE1                  32771
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        325
+#define _APS_NEXT_RESOURCE_VALUE        326
 #define _APS_NEXT_COMMAND_VALUE         32772
-#define _APS_NEXT_CONTROL_VALUE         1001
-#define _APS_NEXT_SYMED_VALUE           325
+#define _APS_NEXT_CONTROL_VALUE         1008
+#define _APS_NEXT_SYMED_VALUE           328
 #endif
 #endif

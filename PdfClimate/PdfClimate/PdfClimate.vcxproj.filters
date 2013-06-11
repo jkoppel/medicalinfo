@@ -69,6 +69,8 @@
     </ClCompile>
     <ClCompile Include="UnknownGraphView.cpp" />
     <ClCompile Include="MyPdf.c" />
+    <ClCompile Include="DocInfoView.cpp" />
+    <ClCompile Include="GraphFormView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LeftView.h" />
@@ -144,6 +146,8 @@
     <ClInclude Include="UnknownGraphView.h" />
     <ClInclude Include="GlobalVars.h" />
     <ClInclude Include="MyPdf.h" />
+    <ClInclude Include="DocInfoView.h" />
+    <ClInclude Include="GraphFormView.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PdfClimate.rc" />

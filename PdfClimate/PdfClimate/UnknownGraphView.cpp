@@ -8,31 +8,23 @@
 
 // CUnknownGraphView
 
-IMPLEMENT_DYNCREATE(CUnknownGraphView, CFormView)
+IMPLEMENT_DYNCREATE(CUnknownGraphView, CGraphFormView)
 
 CUnknownGraphView::CUnknownGraphView()
-	: CFormView(CUnknownGraphView::IDD)
+	: CGraphFormView(CUnknownGraphView::IDD)
 {
-    m_rSrcRect = RECT();
-    m_pSrcImage = new CImage;
-    m_pSrcBitmap = new CBitmap;
 }
 
 CUnknownGraphView::~CUnknownGraphView()
 {
-    if (!m_pSrcImage->IsNull()) {
-        m_pSrcImage->Detach();
-    }
-    delete m_pSrcBitmap;
-    delete m_pSrcImage;
 }
 
 void CUnknownGraphView::DoDataExchange(CDataExchange* pDX)
 {
-	CFormView::DoDataExchange(pDX);
+	CGraphFormView::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CUnknownGraphView, CFormView)
+BEGIN_MESSAGE_MAP(CUnknownGraphView, CGraphFormView)
 END_MESSAGE_MAP()
 
 
@@ -41,13 +33,13 @@ END_MESSAGE_MAP()
 #ifdef _DEBUG
 void CUnknownGraphView::AssertValid() const
 {
-	CFormView::AssertValid();
+	CGraphFormView::AssertValid();
 }
 
 #ifndef _WIN32_WCE
 void CUnknownGraphView::Dump(CDumpContext& dc) const
 {
-	CFormView::Dump(dc);
+	CGraphFormView::Dump(dc);
 }
 #endif
 #endif //_DEBUG
@@ -56,24 +48,5 @@ void CUnknownGraphView::Dump(CDumpContext& dc) const
 // CUnknownGraphView message handlers
 void CUnknownGraphView::OnDraw(CDC* pDC)
 {
-    pDC=GetDC();
-
-    if (!m_pSrcImage->IsNull()) {
-        BITMAP bm;
-        m_pSrcBitmap->GetBitmap(&bm);
-
-        /*
-        char *buf = new char[bm.bmWidth * bm.bmWidth];
-        memset(buf, 0, bm.bmWidth * bm.bmWidth);
-        m_pSrcBitmap->GetBitmapBits(bm.bmWidth * bm.bmWidth, buf);
-        m_pSrcBitmap->SetBitmapBits(bm.bmWidth * bm.bmWidth, buf);
-        delete []buf;
-        */
-
-        m_pSrcImage->Draw(pDC->m_hDC, 100, 100,
-                        m_rSrcRect.right - m_rSrcRect.left,
-                        m_rSrcRect.bottom - m_rSrcRect.top
-                       );
-
-    }
+    CGraphFormView::OnDraw(pDC);
 }

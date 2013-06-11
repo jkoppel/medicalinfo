@@ -52,6 +52,7 @@ BEGIN_MESSAGE_MAP(CPdfClimateView, CView)
     ON_COMMAND(IDD_DRAG_LINEAR, &CPdfClimateView::OnDragLinear)
     ON_COMMAND(IDD_DRAG_COLUMNAR, &CPdfClimateView::OnDragColumnar)
     ON_COMMAND(IDD_DRAG_UNKNOWN, &CPdfClimateView::OnDragUnknown)
+    ON_COMMAND(IDD_DOC_INFO, &CPdfClimateView::OnShowDocInfo)
 END_MESSAGE_MAP()
 
 // CPdfClimateView construction/destruction
@@ -69,6 +70,8 @@ CPdfClimateView::CPdfClimateView()
     m_ptOrig = CPoint(0, 0);
     m_bDragging = false;
     m_hCross = AfxGetApp()->LoadStandardCursor(IDC_CROSS);
+
+    m_bDocInfoShowing = false;
 }
 
 CPdfClimateView::~CPdfClimateView()
@@ -477,23 +480,6 @@ void CPdfClimateView::OnLButtonUp(UINT nFlags, CPoint point)
             }
 	        pImage->Attach(*pBitmap);
 
-            switch(m_iMode){
-            case Drag_Dotted:
-                g_pDottedGraphView->setSrcRect(rect);
-                break;
-            case Drag_Facet:
-                g_pFacetGraphView->setSrcRect(rect);
-                break;
-            case Drag_Linear:
-                g_pLinearGraphView->setSrcRect(rect);
-                break;
-            case Drag_Columnar:
-                g_pColumnarGraphView->setSrcRect(rect);
-                break;
-            case Drag_Unknow:
-                g_pUnknownGraphView->setSrcRect(rect);
-                break;
-            }
             ((CMainFrame*)AfxGetMainWnd())->setActiveGraphView((int)m_iMode);
             g_pGraphSelectView->getTabCtrl()->SetCurSel((int)m_iMode);
         }
@@ -553,7 +539,7 @@ struct ToolbarButtonInfo {
 };
 
 static ToolbarButtonInfo gToolbarButtons[] = {
-    { -1,  0,                     0 },
+    { -1,  0,                     0},
     { 4,   IDM_GOTO_FIRST_PAGE,      0},
     { 5,   IDM_GOTO_LAST_PAGE,       0 },
     { -1,  0,                     0 },
@@ -569,6 +555,8 @@ static ToolbarButtonInfo gToolbarButtons[] = {
     { 9,   IDD_DRAG_LINEAR,       0 },
     { 10,   IDD_DRAG_COLUMNAR,       0 },
     { 11,   IDD_DRAG_UNKNOWN,       0 },
+    { -1,  0,                     0 },
+    { 12,   IDD_DOC_INFO,       0 },
 };
 
 #define TOOLBAR_BUTTONS_COUNT (sizeof(gToolbarButtons)/sizeof(ToolbarButtonInfo))
@@ -646,6 +634,8 @@ int CPdfClimateView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
     m_ctrlToolBar.SetToolTips(&m_ctrlToolTip);
 
+    //createPageBox();
+
     return 0;
 }
 
@@ -687,24 +677,93 @@ void CPdfClimateView::OnDragNormal()
 void CPdfClimateView::OnDragDotted()
 {
     m_iMode = Drag_Dotted;
+    //m_ctrlToolBar.MarkButton(IDD_DRAG_DOTTED, true);
 }
 
 void CPdfClimateView::OnDragFacet()
 {
     m_iMode = Drag_Facet;
+    //m_ctrlToolBar.MarkButton(IDD_DRAG_FACET, true);
 }
 
 void CPdfClimateView::OnDragLinear()
 {
     m_iMode = Drag_Linear;
+    //m_ctrlToolBar.MarkButton(IDD_DRAG_LINEAR, true);
 }
 
 void CPdfClimateView::OnDragColumnar()
 {
     m_iMode = Drag_Columnar;
+    //m_ctrlToolBar.MarkButton(IDD_DRAG_COLUMNAR, true);
 }
 
 void CPdfClimateView::OnDragUnknown()
 {
     m_iMode = Drag_Unknow;
+    //m_ctrlToolBar.MarkButton(IDD_DRAG_UNKNOWN, true);
+}
+
+void CPdfClimateView::OnShowDocInfo()
+{
+    ((CMainFrame*)AfxGetMainWnd())->showDocInfo(!m_bDocInfoShowing);
+    m_bDocInfoShowing = !m_bDocInfoShowing;
+}
+
+static WNDPROC DefWndProcPageBox = NULL;
+
+static LRESULT CALLBACK WndProcPageBox(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    if (WM_CHAR == message) {
+        switch (wParam) {
+        case VK_RETURN: {
+            char buf[256];//(win::GetText(win->hwndPageBox));
+            int newPageNo;
+            g_pPdfClimateView->gotoFirstPage();
+            return 1;
+        }
+        case VK_ESCAPE:
+            SetFocus(g_pPdfClimateView->m_hWnd);
+            return 1;
+        }
+    } 
+
+    return CallWindowProc(DefWndProcPageBox, hwnd, message, wParam, lParam);
+}
+
+#define PAGE_BOX_WIDTH  40
+
+void CPdfClimateView::UpdateToolbarPageText(int pageCount, bool updateOnly)
+{
+}
+
+void CPdfClimateView::createPageBox()
+{
+    HWND pageBg = CreateWindowEx(WS_EX_STATICEDGE, WC_STATIC, "", WS_VISIBLE | WS_CHILD,
+                            0, 1, 40, 24,
+                            m_ctrlToolBar.m_hWnd, (HMENU)0, ::AfxGetInstanceHandle(), NULL);
+
+
+    HWND page = CreateWindowEx(0, WC_EDIT, "0", WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL | ES_NUMBER | ES_RIGHT,
+                            0, 1, 40 - 2 * GetSystemMetrics(SM_CXEDGE), 22,
+                            m_ctrlToolBar.m_hWnd, (HMENU)0, ::AfxGetInstanceHandle(), NULL);
+
+    HWND label = CreateWindowEx(0, WC_STATIC, "", WS_VISIBLE | WS_CHILD,
+                            0, 1, 0, 0,
+                            m_ctrlToolBar.m_hWnd, (HMENU)0, ::AfxGetInstanceHandle(), NULL);
+
+    HWND total = CreateWindowEx(0, WC_STATIC, "", WS_VISIBLE | WS_CHILD,
+                            0, 1, 0, 0,
+                            m_ctrlToolBar.m_hWnd, (HMENU)0, ::AfxGetInstanceHandle(), NULL);
+
+    if (!DefWndProcPageBox)
+        DefWndProcPageBox = (WNDPROC)GetWindowLongPtr(page, GWLP_WNDPROC);
+    SetWindowLongPtr(page, GWLP_WNDPROC, (LONG_PTR)WndProcPageBox);
+
+    m_hwndPageText = label;
+    m_hwndPageBox = page;
+    m_hwndPageBg = pageBg;
+    m_hwndPageTotal = total;
+
+    UpdateToolbarPageText(-1, true);
 }
