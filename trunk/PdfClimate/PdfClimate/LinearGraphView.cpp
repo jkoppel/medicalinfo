@@ -8,31 +8,23 @@
 
 // CLinearGraphView
 
-IMPLEMENT_DYNCREATE(CLinearGraphView, CFormView)
+IMPLEMENT_DYNCREATE(CLinearGraphView, CGraphFormView)
 
 CLinearGraphView::CLinearGraphView()
-	: CFormView(CLinearGraphView::IDD)
+	: CGraphFormView(CLinearGraphView::IDD)
 {
-    m_rSrcRect = RECT();
-    m_pSrcImage = new CImage;
-    m_pSrcBitmap = new CBitmap;
 }
 
 CLinearGraphView::~CLinearGraphView()
 {
-    if (!m_pSrcImage->IsNull()) {
-        m_pSrcImage->Detach();
-    }
-    delete m_pSrcBitmap;
-    delete m_pSrcImage;
 }
 
 void CLinearGraphView::DoDataExchange(CDataExchange* pDX)
 {
-	CFormView::DoDataExchange(pDX);
+	CGraphFormView::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CLinearGraphView, CFormView)
+BEGIN_MESSAGE_MAP(CLinearGraphView, CGraphFormView)
 END_MESSAGE_MAP()
 
 
@@ -41,13 +33,13 @@ END_MESSAGE_MAP()
 #ifdef _DEBUG
 void CLinearGraphView::AssertValid() const
 {
-	CFormView::AssertValid();
+	CGraphFormView::AssertValid();
 }
 
 #ifndef _WIN32_WCE
 void CLinearGraphView::Dump(CDumpContext& dc) const
 {
-	CFormView::Dump(dc);
+	CGraphFormView::Dump(dc);
 }
 #endif
 #endif //_DEBUG
@@ -56,25 +48,6 @@ void CLinearGraphView::Dump(CDumpContext& dc) const
 // CLinearGraphView message handlers
 void CLinearGraphView::OnDraw(CDC* pDC)
 {
-    pDC=GetDC();
-
-    if (!m_pSrcImage->IsNull()) {
-        BITMAP bm;
-        m_pSrcBitmap->GetBitmap(&bm);
-
-        /*
-        char *buf = new char[bm.bmWidth * bm.bmWidth];
-        memset(buf, 0, bm.bmWidth * bm.bmWidth);
-        m_pSrcBitmap->GetBitmapBits(bm.bmWidth * bm.bmWidth, buf);
-        m_pSrcBitmap->SetBitmapBits(bm.bmWidth * bm.bmWidth, buf);
-        delete []buf;
-        */
-
-        m_pSrcImage->Draw(pDC->m_hDC, 100, 100,
-                        m_rSrcRect.right - m_rSrcRect.left,
-                        m_rSrcRect.bottom - m_rSrcRect.top
-                       );
-
-    }
+    CGraphFormView::OnDraw(pDC);
 }
 

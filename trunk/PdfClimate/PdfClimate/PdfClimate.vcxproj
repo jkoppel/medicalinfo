@@ -153,9 +153,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="DocInfoView.cpp" />
     <ClCompile Include="DottedGraphView.cpp" />
     <ClCompile Include="FacetGraphView.cpp" />
     <ClCompile Include="GlobalVars.cpp" />
+    <ClCompile Include="GraphFormView.cpp" />
     <ClCompile Include="GraphSelectView.cpp" />
     <ClCompile Include="ImageProcess\BaseDocument.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -205,9 +207,11 @@
     <ClInclude Include="CtrlLib\XHtmlTree\XNamedColors.h" />
     <ClInclude Include="CtrlLib\XHtmlTree\XString.h" />
     <ClInclude Include="CtrlLib\XHtmlTree\XTrace.h" />
+    <ClInclude Include="DocInfoView.h" />
     <ClInclude Include="DottedGraphView.h" />
     <ClInclude Include="FacetGraphView.h" />
     <ClInclude Include="GlobalVars.h" />
+    <ClInclude Include="GraphFormView.h" />
     <ClInclude Include="GraphSelectView.h" />
     <ClInclude Include="ImageProcess\BaseDocument.h" />
     <ClInclude Include="ImageProcess\BaseGraph.h" />

@@ -20,6 +20,7 @@ protected:
     CMySplitterWndEx m_wndSplitter1;
     CMySplitterWndEx m_wndSplitter2; 
     CMySplitterWndEx m_wndSplitter3; 
+    CMySplitterWndEx m_wndSplitter4; 
     bool             m_bViewCreated;
     int              m_iCurSel;
 
@@ -38,6 +39,7 @@ public:
 public:
     virtual ~CMainFrame();
     void setActiveGraphView(int index);
+    void showDocInfo(bool bShow = true);
 
 #ifdef _DEBUG
     virtual void AssertValid() const;

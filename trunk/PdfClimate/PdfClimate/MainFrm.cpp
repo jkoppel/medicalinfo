@@ -14,6 +14,7 @@
 #include "ColumnarGraphView.h"
 #include "UnknownGraphView.h"
 #include "GraphSelectView.h"
+#include "DocInfoView.h"
 #include "GlobalVars.h"
 
 #ifdef _DEBUG
@@ -125,6 +126,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     // enable quick (Alt+drag) toolbar customization
     CMFCToolBar::EnableQuickCustomization();
 
+    /*
     if (CMFCToolBar::GetUserImages() == NULL)
     {
         // load user-defined toolbar images
@@ -134,6 +136,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
             CMFCToolBar::SetUserImages(&m_UserImages);
         }
     }
+    */
 
     // enable menu personalization (most-recently used commands)
     // TODO: define your own basic commands, ensuring that each pulldown menu has at least one basic command.
@@ -188,7 +191,7 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
         m_wndSplitter2.DestroyWindow();
         return FALSE;
     }
-    if (!m_wndSplitter3.CreateView(0, 0, RUNTIME_CLASS(CPdfClimateView), CSize(100,100), pContext) ||
+    if (/*!m_wndSplitter3.CreateView(0, 0, RUNTIME_CLASS(CPdfClimateView), CSize(100,100), pContext) ||*/
         !m_wndSplitter3.CreateView(1, 0, RUNTIME_CLASS(CDottedGraphView), CSize(100,100), pContext) ||
         !m_wndSplitter3.CreateView(2, 0, RUNTIME_CLASS(CFacetGraphView), CSize(100,100), pContext) ||
         !m_wndSplitter3.CreateView(3, 0, RUNTIME_CLASS(CLinearGraphView), CSize(100,100), pContext) ||
@@ -200,10 +203,27 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
         m_wndSplitter3.DestroyWindow();
         return FALSE;
     }
+    if (!m_wndSplitter4.CreateStatic(&m_wndSplitter3, 2, 1, WS_CHILD | WS_VISIBLE, m_wndSplitter2.IdFromRowCol(0, 0))) {
+        m_wndSplitter1.DestroyWindow();
+        m_wndSplitter2.DestroyWindow();
+        m_wndSplitter3.DestroyWindow();
+        return FALSE;
+    }
+    if (!m_wndSplitter4.CreateView(0, 0, RUNTIME_CLASS(CDocInfoView), CSize(100,100), pContext) ||
+        !m_wndSplitter4.CreateView(1, 0, RUNTIME_CLASS(CPdfClimateView), CSize(100,100), pContext)
+        ) {
+        m_wndSplitter1.DestroyWindow();
+        m_wndSplitter2.DestroyWindow();
+        m_wndSplitter3.DestroyWindow();
+        m_wndSplitter4.DestroyWindow();
+        return FALSE;
+    }
+    m_wndSplitter4.setSplitterSize(2);
+    showDocInfo(false);
 
     g_pLeftView = (CLeftView*)m_wndSplitter1.GetPane(0, 0);
     g_pGraphSelectView = (CGraphSelectView*)m_wndSplitter2.GetPane(0, 0);
-    g_pPdfClimateView = (CPdfClimateView*)m_wndSplitter3.GetPane(0, 0);
+    g_pPdfClimateView = (CPdfClimateView*)m_wndSplitter4.GetPane(1, 0);
     g_pDottedGraphView = (CDottedGraphView*)m_wndSplitter3.GetPane(1, 0);
     g_pFacetGraphView = (CFacetGraphView*)m_wndSplitter3.GetPane(2, 0);
     g_pLinearGraphView = (CLinearGraphView*)m_wndSplitter3.GetPane(3, 0);
@@ -385,7 +405,12 @@ void CMainFrame::setActiveGraphView(int index)
             m_wndSplitter3.GetPane(i, 0)->ShowWindow(SW_SHOW);
         }
     }
-    SetActiveView((CView*)m_wndSplitter3.GetPane(index, 0));
+    if (index>0) {
+        SetActiveView((CView*)m_wndSplitter3.GetPane(index, 0));
+    }
+    else {
+        SetActiveView((CView*)m_wndSplitter4.GetPane(1, 0));
+    }
     m_wndSplitter3.setSplitterSize(0);
     m_wndSplitter3.RecalcLayout();
 
@@ -411,4 +436,17 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
     if (m_bViewCreated) {
         setActiveGraphView(m_iCurSel);
     }
+}
+
+void CMainFrame::showDocInfo(bool bShow)
+{
+    if (bShow) {
+        m_wndSplitter4.SetRowInfo(0, 120, 0);
+        m_wndSplitter4.GetPane(0, 0)->ShowWindow(SW_SHOW);
+   }
+    else {
+        m_wndSplitter4.SetRowInfo(0, 0, 0);
+        m_wndSplitter4.GetPane(0, 0)->ShowWindow(SW_HIDE);
+    }
+    m_wndSplitter4.RecalcLayout();
 }
