@@ -179,5 +179,8 @@
     <Filter Include="CtrlLibs\XHtmlTree">
       <UniqueIdentifier>{0bf40a56-da01-4af0-9492-b8ea31e09642}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DBLibs">
+      <UniqueIdentifier>{de2d2f98-37aa-4a12-9f94-434891aa1110}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

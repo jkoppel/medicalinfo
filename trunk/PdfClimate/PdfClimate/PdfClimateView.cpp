@@ -428,28 +428,9 @@ void CPdfClimateView::OnLButtonUp(UINT nFlags, CPoint point)
 	        CDC *pDC = GetDC();
             CBitmap *pBitmap;
             CImage *pImage;
-            switch (m_iMode) {
-            case Drag_Dotted:
-                pBitmap = g_pDottedGraphView->getSrcBitmap();
-                pImage= g_pDottedGraphView->getSrcImage();
-                break;
-            case Drag_Facet:
-                pBitmap = g_pFacetGraphView->getSrcBitmap();
-                pImage= g_pFacetGraphView->getSrcImage();
-                break;
-            case Drag_Linear:
-                pBitmap = g_pLinearGraphView->getSrcBitmap();
-                pImage = g_pLinearGraphView->getSrcImage();
-                break;
-            case Drag_Columnar:
-                pBitmap = g_pColumnarGraphView->getSrcBitmap();
-                pImage= g_pColumnarGraphView->getSrcImage();
-                break;
-            case Drag_Unknow:
-                pBitmap = g_pUnknownGraphView->getSrcBitmap();
-                pImage = g_pUnknownGraphView->getSrcImage();
-                break;
-            }
+            CGraphFormView *pView = g_pViewList[m_iMode-1];
+            pBitmap = pView->getSrcBitmap();
+            pImage= pView->getSrcImage();
 
 	        RECT rect;
             rect.left = m_ptOrig.x;
@@ -482,6 +463,7 @@ void CPdfClimateView::OnLButtonUp(UINT nFlags, CPoint point)
 
             ((CMainFrame*)AfxGetMainWnd())->setActiveGraphView((int)m_iMode);
             g_pGraphSelectView->getTabCtrl()->SetCurSel((int)m_iMode);
+            pView->onAddGraph();
         }
         else {
             m_iCX += m_ptDest.x - m_ptOrig.x;
@@ -676,32 +658,52 @@ void CPdfClimateView::OnDragNormal()
 
 void CPdfClimateView::OnDragDotted()
 {
+    if (g_pDottedGraphView->isDataModified()){
+        if (::AfxMessageBox("当前点状图数据未保存，是否要放弃保存，添加新的点状图？", MB_YESNO) != IDYES) {
+            return;
+        }
+    }
     m_iMode = Drag_Dotted;
-    //m_ctrlToolBar.MarkButton(IDD_DRAG_DOTTED, true);
 }
 
 void CPdfClimateView::OnDragFacet()
 {
+    if (g_pFacetGraphView->isDataModified()){
+        if (::AfxMessageBox("当前面状图数据未保存，是否要放弃保存，添加新的面状图？", MB_YESNO) != IDYES) {
+            return;
+        }
+    }
     m_iMode = Drag_Facet;
-    //m_ctrlToolBar.MarkButton(IDD_DRAG_FACET, true);
 }
 
 void CPdfClimateView::OnDragLinear()
 {
+    if (g_pLinearGraphView->isDataModified()){
+        if (::AfxMessageBox("当前线状图数据未保存，是否要放弃保存，添加新的线状图？", MB_YESNO) != IDYES) {
+            return;
+        }
+    }
     m_iMode = Drag_Linear;
-    //m_ctrlToolBar.MarkButton(IDD_DRAG_LINEAR, true);
 }
 
 void CPdfClimateView::OnDragColumnar()
 {
+    if (g_pColumnarGraphView->isDataModified()){
+        if (::AfxMessageBox("当前柱状图数据未保存，是否要放弃保存，添加新的柱状图？", MB_YESNO) != IDYES) {
+            return;
+        }
+    }
     m_iMode = Drag_Columnar;
-    //m_ctrlToolBar.MarkButton(IDD_DRAG_COLUMNAR, true);
 }
 
 void CPdfClimateView::OnDragUnknown()
 {
+    if (g_pUnknownGraphView->isDataModified()){
+        if (::AfxMessageBox("当前普通图数据未保存，是否要放弃保存，添加新的普通图？", MB_YESNO) != IDYES) {
+            return;
+        }
+    }
     m_iMode = Drag_Unknow;
-    //m_ctrlToolBar.MarkButton(IDD_DRAG_UNKNOWN, true);
 }
 
 void CPdfClimateView::OnShowDocInfo()

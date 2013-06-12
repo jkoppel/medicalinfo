@@ -50,3 +50,9 @@ void CUnknownGraphView::OnDraw(CDC* pDC)
 {
     CGraphFormView::OnDraw(pDC);
 }
+
+
+void CUnknownGraphView::OnInitialUpdate()
+{
+    CGraphFormView::OnInitialUpdate();
+}

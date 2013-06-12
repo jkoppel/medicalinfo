@@ -229,6 +229,11 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
     g_pLinearGraphView = (CLinearGraphView*)m_wndSplitter3.GetPane(3, 0);
     g_pColumnarGraphView = (CColumnarGraphView*)m_wndSplitter3.GetPane(4, 0);
     g_pUnknownGraphView = (CUnknownGraphView*)m_wndSplitter3.GetPane(5, 0);
+    g_pViewList[0] = g_pDottedGraphView;
+    g_pViewList[1] = g_pFacetGraphView;
+    g_pViewList[2] = g_pLinearGraphView;
+    g_pViewList[3] = g_pColumnarGraphView;
+    g_pViewList[4] = g_pUnknownGraphView;
 
     setActiveGraphView(0);
 	m_wndSplitter2.LockBar();

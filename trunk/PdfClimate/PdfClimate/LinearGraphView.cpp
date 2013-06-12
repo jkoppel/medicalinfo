@@ -51,3 +51,9 @@ void CLinearGraphView::OnDraw(CDC* pDC)
     CGraphFormView::OnDraw(pDC);
 }
 
+
+
+void CLinearGraphView::OnInitialUpdate()
+{
+    CGraphFormView::OnInitialUpdate();
+}
