@@ -51,3 +51,9 @@ void CFacetGraphView::OnDraw(CDC* pDC)
     CGraphFormView::OnDraw(pDC);
 }
 
+
+
+void CFacetGraphView::OnInitialUpdate()
+{
+    CGraphFormView::OnInitialUpdate();
+}

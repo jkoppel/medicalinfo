@@ -24,8 +24,6 @@ CDottedGraphView::~CDottedGraphView()
 void CDottedGraphView::DoDataExchange(CDataExchange* pDX)
 {
     CGraphFormView::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_GRAPH_INFO, m_ctrlGraphInfo);
-    DDX_Control(pDX, IDC_COORDINATE_INFO, m_ctrlCoordinateInfo);
 }
 
 BEGIN_MESSAGE_MAP(CDottedGraphView, CGraphFormView)
@@ -61,7 +59,4 @@ void CDottedGraphView::OnDraw(CDC* pDC)
 void CDottedGraphView::OnInitialUpdate()
 {
     CGraphFormView::OnInitialUpdate();
-
-    POSITION index = 0;
-    m_lstCtrlGroup1.AddTail(m_ctrlGraphInfo.GetWindow(0));
 }

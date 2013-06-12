@@ -50,3 +50,9 @@ void CColumnarGraphView::OnDraw(CDC* pDC)
 {
     CGraphFormView::OnDraw(pDC);
 }
+
+
+void CColumnarGraphView::OnInitialUpdate()
+{
+    CGraphFormView::OnInitialUpdate();
+}

@@ -11,6 +11,7 @@
 #include "LinearGraphView.h"
 #include "ColumnarGraphView.h"
 #include "UnknownGraphView.h"
+#include "GraphFormView.h"
 
 CLeftView *g_pLeftView = NULL;
 CGraphSelectView *g_pGraphSelectView = NULL;
@@ -20,3 +21,4 @@ CLinearGraphView *g_pLinearGraphView = NULL;
 CFacetGraphView *g_pFacetGraphView = NULL;
 CColumnarGraphView *g_pColumnarGraphView = NULL;
 CUnknownGraphView *g_pUnknownGraphView = NULL;
+CGraphFormView *g_pViewList[5];

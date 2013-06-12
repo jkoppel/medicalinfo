@@ -51,7 +51,7 @@
 #define IDD_DRAG_COLUMNAR               323
 #define IDD_DRAG_UNKNOWN                324
 #define IDD_DOC_INFO                    325
-#define IDC_COMBO1                      1000
+#define IDC_CMB_GRAPH_LIST              1000
 #define IDC_DOC_NAME                    1001
 #define IDC_DOC_AUTHOR                  1002
 #define IDC_DOC_EDITSAVE                1003
@@ -59,6 +59,32 @@
 #define IDC_BUTTON1                     1005
 #define IDC_GRAPH_INFO                  1006
 #define IDC_COORDINATE_INFO             1007
+#define IDC_BTN_DEL_GRAPH               1018
+#define IDC_GRAPHINFO_LABEL_NAME        1020
+#define IDC_COORINFO_LABEL_UNITNAME     1021
+#define IDC_COORINFO_EDIT_UNITNAME      1022
+#define IDC_COORINFO_LABEL_COORA_PIX_VAL 1023
+#define IDC_COORINFO_LABEL_COORA        1024
+#define IDC_COORINFO_LABEL_COORB        1025
+#define IDC_COORINFO_LABEL_COORA_X      1026
+#define IDC_COORINFO_LABEL_COORA_Y      1027
+#define IDC_COORINFO_LABEL_COORB_PIX_VAL 1028
+#define IDC_COORINFO_LABEL_COORB_X      1029
+#define IDC_COORINFO_LABEL_COORB_Y      1030
+#define IDC_COORINFO                    1031
+#define IDC_GRAPHINFO                   1032
+#define IDC_GRAPHINFO_EDIT_NAME         1033
+#define IDC_GRAPHINFO_BTN_EDITSAVE      1034
+#define IDC_COORINFO_EDIT_COORA_PIX_VAL 1035
+#define IDC_COORINFO_BTN_SNAP_COORA_PIX_VAL 1036
+#define IDC_COORINFO_EDIT_COORA_X       1037
+#define IDC_COORINFO_EDIT_COORA_Y       1038
+#define IDC_COORINFO_EDIT_COORB_X       1039
+#define IDC_COORINFO_EDIT_COORB_Y       1040
+#define IDC_COORINFO_BTN_EDITSAVE       1041
+#define IDC_COORINFO_BTN_SNAP_COORB_PIX_VAL 1042
+#define IDC_COORINFO_EDIT_COORB_PIX_VAL 1043
+#define IDC_COORINFO_BTN_EDITSAVE2      1044
 #define ID_FILE_CLOSE1                  32771
 
 // Next default values for new objects
@@ -67,7 +93,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        326
 #define _APS_NEXT_COMMAND_VALUE         32772
-#define _APS_NEXT_CONTROL_VALUE         1008
+#define _APS_NEXT_CONTROL_VALUE         1044
 #define _APS_NEXT_SYMED_VALUE           328
 #endif
 #endif

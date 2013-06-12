@@ -26,6 +26,8 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
     virtual void OnDraw(CDC* /*pDC*/);
+public:
+    virtual void OnInitialUpdate();
 };
 
 
