@@ -176,3 +176,91 @@ bool CBaseDocument::removeUnknownGraph(int iIndex)
 
     return false;
 }
+
+int CBaseDocument::getFreeGraphID(GraphType iGraphType)
+{
+    switch (iGraphType) {
+        case Graph_Dotted:
+            return getFreeDottedGraphID();
+        case Graph_Facet:
+            return getFreeFacetGraphID();
+        case Graph_Linear:
+            return getFreeLinearGraphID();
+        case Graph_Columnar:
+            return getFreeColumnarGraphID();
+        case Graph_Unknown:
+            return getFreeUnknownGraphID();
+    }
+
+    return 0;
+}
+
+bool CBaseDocument::addGraph(GraphType iGraphType, CBaseGraph* pGraph)
+{
+    switch (iGraphType) {
+        case Graph_Dotted:
+            return addDottedGraph(pGraph);
+        case Graph_Facet:
+            return addFacetGraph(pGraph);
+        case Graph_Linear:
+            return addLinearGraph(pGraph);
+        case Graph_Columnar:
+            return addColumnarGraph(pGraph);
+        case Graph_Unknown:
+            return addUnknownGraph(pGraph);
+    }
+    return false;
+}
+
+bool CBaseDocument::removeGraph(GraphType iGraphType, int index)
+{
+    switch (iGraphType) {
+        case Graph_Dotted:
+            return removeDottedGraph(index);
+        case Graph_Facet:
+            return removeFacetGraph(index);
+        case Graph_Linear:
+            return removeLinearGraph(index);
+        case Graph_Columnar:
+            return removeColumnarGraph(index);
+        case Graph_Unknown:
+            return removeUnknownGraph(index);
+    }
+    return false;
+}
+
+int CBaseDocument::getGraphNum(GraphType iGraphType)
+{
+    switch (iGraphType) {
+        case Graph_Dotted:
+            return getDottedGraphNum();
+        case Graph_Facet:
+            return getFacetGraphNum();
+        case Graph_Linear:
+            return getLinearGraphNum();
+        case Graph_Columnar:
+            return getColumnarGraphNum();
+        case Graph_Unknown:
+            return getUnknownGraphNum();
+    }
+
+    return 0;
+}
+
+CBaseGraph *CBaseDocument::getGraph(GraphType iGraphType, int index)
+{
+    switch (iGraphType) {
+        case Graph_Dotted:
+            return getDottedGraph(index);
+        case Graph_Facet:
+            return getFacetGraph(index);
+        case Graph_Linear:
+            return getLinearGraph(index);
+        case Graph_Columnar:
+            return getColumnarGraph(index);
+        case Graph_Unknown:
+            return getUnknownGraph(index);
+    }
+
+    return NULL;
+}

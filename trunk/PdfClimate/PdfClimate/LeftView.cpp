@@ -13,6 +13,12 @@
 #include "resource.h"
 #include "MyPdf.h"
 #include "GlobalVars.h"
+#include "DocInfoView.h"
+#include "DottedGraphView.h"
+#include "FacetGraphView.h"
+#include "LinearGraphView.h"
+#include "ColumnarGraphView.h"
+#include "UnknownGraphView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -300,6 +306,7 @@ void CLeftView::openFile()
     m_pTreeCtrl->SelectItem(hItem);
 
     g_pPdfClimateView->openFile();
+    updateView();
 }
 
 void CLeftView::closeFile()
@@ -328,6 +335,7 @@ void CLeftView::closeFile()
         g_pPdfClimateView->closeFile();
         mupdf_close_file();
         m_iCurrDocumentIndex = -1;
+        updateView();
     }
 
     m_pTreeCtrl->DeleteItem((HTREEITEM)(m_pBaseDocumentList[index]->getTreeItem()));
@@ -348,11 +356,14 @@ void CLeftView::selectFile(int index)
     if (m_iCurrDocumentIndex==index) {
         return;
     }
-    HTREEITEM hItemOld = (HTREEITEM)m_pBaseDocumentList[m_iCurrDocumentIndex]->getTreeItem();
-    m_pTreeCtrl->SetItemImage(hItemOld, Color2Index(RGB(0, 0, 0)), Color2Index(RGB(0, 0, 0)));
 
-    g_pPdfClimateView->closeFile();
-    mupdf_close_file();
+    if (m_iCurrDocumentIndex >= 0) {
+        HTREEITEM hItemOld = (HTREEITEM)m_pBaseDocumentList[m_iCurrDocumentIndex]->getTreeItem();
+        m_pTreeCtrl->SetItemImage(hItemOld, Color2Index(RGB(0, 0, 0)), Color2Index(RGB(0, 0, 0)));
+
+        g_pPdfClimateView->closeFile();
+        mupdf_close_file();
+    }
 
     char sDocPath[256];
     sprintf(sDocPath, "%s", m_pBaseDocumentList[index]->getPath());
@@ -385,6 +396,7 @@ void CLeftView::selectFile(int index)
     m_pTreeCtrl->SelectItem(hItem);
 
     g_pPdfClimateView->openFile();
+    updateView();
 }
 
 int CLeftView::getCurrDocIndex()
@@ -409,4 +421,15 @@ void CLeftView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
     m_pTreeCtrl->Expand(hItem, TVE_TOGGLE);
 
     *pResult = 0;
+}
+
+void CLeftView::updateView()
+{
+    g_pCurrDocument = m_iCurrDocumentIndex>=0 ? m_pBaseDocumentList[m_iCurrDocumentIndex] : NULL;
+    g_pDocInfoView->loadDataFromDB();
+    g_pDottedGraphView->loadDataFromDB();
+    g_pFacetGraphView->loadDataFromDB();
+    g_pLinearGraphView->loadDataFromDB();
+    g_pColumnarGraphView->loadDataFromDB();
+    g_pUnknownGraphView->loadDataFromDB();
 }

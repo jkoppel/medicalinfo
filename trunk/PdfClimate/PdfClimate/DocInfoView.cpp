@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "PdfClimate.h"
 #include "DocInfoView.h"
+#include "GlobalVars.h"
+#include "ImageProcess/BaseDocument.h"
 
 
 // CDocInfoView
@@ -62,9 +64,32 @@ void CDocInfoView::OnBnClickedDocEditsave()
     }
     else {
         //TODO: save to database
+        if (g_pCurrDocument) {
+            char buf[256];
+            m_ctrlEditDocName.GetWindowText(buf, sizeof(buf));
+            g_pCurrDocument->setName(buf);
+            m_ctrlEditDocAuthor.GetWindowText(buf, sizeof(buf));
+            g_pCurrDocument->setAuthor(buf);
+        }
         m_ctrlEditDocName.SetReadOnly();
         m_ctrlEditDocAuthor.SetReadOnly();
         m_ctrlBtnEditSave.SetWindowText("±à¼­");
     }
     m_bIsEditing = !m_bIsEditing;
+}
+
+void CDocInfoView::loadDataFromDB()
+{
+    m_ctrlEditDocName.SetReadOnly();
+    m_ctrlEditDocAuthor.SetReadOnly();
+    m_ctrlBtnEditSave.SetWindowText("±à¼­");
+    m_bIsEditing = false;
+    if (g_pCurrDocument) {
+        m_ctrlEditDocName.SetWindowText( g_pCurrDocument->getName() );
+        m_ctrlEditDocAuthor.SetWindowText( g_pCurrDocument->getAuthor() );
+    }
+    else {
+        m_ctrlEditDocName.SetWindowText( "" );
+        m_ctrlEditDocAuthor.SetWindowText( "");
+    }
 }

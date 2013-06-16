@@ -11,7 +11,7 @@
 IMPLEMENT_DYNCREATE(CUnknownGraphView, CGraphFormView)
 
 CUnknownGraphView::CUnknownGraphView()
-	: CGraphFormView(CUnknownGraphView::IDD)
+	: CGraphFormView(CUnknownGraphView::IDD, Graph_Unknown)
 {
 }
 
@@ -25,6 +25,7 @@ void CUnknownGraphView::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CUnknownGraphView, CGraphFormView)
+    ON_BN_CLICKED(IDC_GRAPHINFO_BTN_EDITSAVE, &CUnknownGraphView::OnBnClickedGraphinfoBtnEditsave)
 END_MESSAGE_MAP()
 
 
@@ -55,4 +56,10 @@ void CUnknownGraphView::OnDraw(CDC* pDC)
 void CUnknownGraphView::OnInitialUpdate()
 {
     CGraphFormView::OnInitialUpdate();
+}
+
+
+void CUnknownGraphView::OnBnClickedGraphinfoBtnEditsave()
+{
+    CGraphFormView::OnBnClickedGraphinfoBtnEditsave();
 }

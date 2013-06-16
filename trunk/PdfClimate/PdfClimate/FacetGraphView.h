@@ -31,6 +31,7 @@ public:
     afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
     virtual void OnDraw(CDC* /*pDC*/);
     virtual void OnInitialUpdate();
+    afx_msg void OnBnClickedGraphinfoBtnEditsave();
 };
 
 

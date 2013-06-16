@@ -171,6 +171,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ImageProcess\ColumnarGraph.cpp" />
+    <ClCompile Include="ImageProcess\DottedGraph.cpp" />
+    <ClCompile Include="ImageProcess\FacetGraph.cpp" />
+    <ClCompile Include="ImageProcess\LinearGraph.cpp" />
+    <ClCompile Include="ImageProcess\UnknownGraph.cpp" />
     <ClCompile Include="LeftView.cpp" />
     <ClCompile Include="LinearGraphView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
@@ -216,6 +221,11 @@
     <ClInclude Include="ImageProcess\BaseDocument.h" />
     <ClInclude Include="ImageProcess\BaseGraph.h" />
     <ClInclude Include="ImageProcess\BaseGraphItem.h" />
+    <ClInclude Include="ImageProcess\ColumnarGraph.h" />
+    <ClInclude Include="ImageProcess\DottedGraph.h" />
+    <ClInclude Include="ImageProcess\FacetGraph.h" />
+    <ClInclude Include="ImageProcess\LinearGraph.h" />
+    <ClInclude Include="ImageProcess\UnknownGraph.h" />
     <ClInclude Include="LeftView.h" />
     <ClInclude Include="LinearGraphView.h" />
     <ClInclude Include="MainFrm.h" />

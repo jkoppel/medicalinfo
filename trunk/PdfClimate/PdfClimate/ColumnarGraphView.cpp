@@ -11,7 +11,7 @@
 IMPLEMENT_DYNCREATE(CColumnarGraphView, CGraphFormView)
 
 CColumnarGraphView::CColumnarGraphView()
-	: CGraphFormView(CColumnarGraphView::IDD)
+	: CGraphFormView(CColumnarGraphView::IDD, Graph_Columnar)
 {
 }
 
@@ -25,6 +25,7 @@ void CColumnarGraphView::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CColumnarGraphView, CGraphFormView)
+    ON_BN_CLICKED(IDC_GRAPHINFO_BTN_EDITSAVE, &CColumnarGraphView::OnBnClickedGraphinfoBtnEditsave)
 END_MESSAGE_MAP()
 
 
@@ -55,4 +56,10 @@ void CColumnarGraphView::OnDraw(CDC* pDC)
 void CColumnarGraphView::OnInitialUpdate()
 {
     CGraphFormView::OnInitialUpdate();
+}
+
+
+void CColumnarGraphView::OnBnClickedGraphinfoBtnEditsave()
+{
+    CGraphFormView::OnBnClickedGraphinfoBtnEditsave();
 }

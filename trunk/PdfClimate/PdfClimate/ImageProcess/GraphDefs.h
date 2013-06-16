@@ -12,11 +12,11 @@
 #define snprintf _snprintf
 
 typedef enum GraphType {
-    GRAPH_UNKNOWN,
-    GRAPH_DOTTED,
-    GRAPH_FACET,
-    GRAPH_LINEAR,
-    GRAPH_COLUMNAR,
+    Graph_Dotted,
+    Graph_Facet,
+    Graph_Linear,
+    Graph_Columnar,
+    Graph_Unknown,
 } GraphType;
 
 typedef struct CoorPixelPair {
