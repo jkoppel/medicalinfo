@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "PdfClimate.h"
-#include "GraphFormView.h"
+#include "BaseGraphView.h"
 #include "resource.h"
 #include "GlobalVars.h"
 #include "ImageProcess/BaseDocument.h"
@@ -14,11 +14,11 @@
 #include "ImageProcess/UnknownGraph.h"
 
 
-// CGraphFormView
+// CBaseGraphView
 
-IMPLEMENT_DYNCREATE(CGraphFormView, CFormView)
+IMPLEMENT_DYNCREATE(CBaseGraphView, CFormView)
 
-void CGraphFormView::initialize()
+void CBaseGraphView::initialize()
 {
     m_pSrcImage = new CImage;
     m_pSrcBitmap = new CBitmap;
@@ -36,7 +36,7 @@ void CGraphFormView::initialize()
     m_hCross = AfxGetApp()->LoadStandardCursor(IDC_CROSS);
 }
 
-void CGraphFormView::destroy()
+void CBaseGraphView::destroy()
 {
     if (m_pSrcImage) {
         if (!m_pSrcImage->IsNull()) {
@@ -47,26 +47,26 @@ void CGraphFormView::destroy()
     }
 }
 
-CGraphFormView::CGraphFormView()
-	: CFormView(CGraphFormView::IDD)
+CBaseGraphView::CBaseGraphView()
+	: CFormView(CBaseGraphView::IDD)
 {
     initialize();
     m_iGraphType = Graph_Unknown;
 }
 
-CGraphFormView::CGraphFormView(UINT nIDTemplate, GraphType iGraphType)
+CBaseGraphView::CBaseGraphView(UINT nIDTemplate, GraphType iGraphType)
 	: CFormView(nIDTemplate)
 {
     initialize();
     m_iGraphType = iGraphType;
 }
 
-CGraphFormView::~CGraphFormView()
+CBaseGraphView::~CBaseGraphView()
 {
     destroy();
 }
 
-void CGraphFormView::DoDataExchange(CDataExchange* pDX)
+void CBaseGraphView::DoDataExchange(CDataExchange* pDX)
 {
 	CFormView::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_CMB_GRAPH_LIST, m_ctrlGraphList);
@@ -87,26 +87,27 @@ void CGraphFormView::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_COORINFO_BTN_EDITSAVE, m_ctrlCoorInfo_BtnEditSave);
 }
 
-BEGIN_MESSAGE_MAP(CGraphFormView, CFormView)
-    ON_BN_CLICKED(IDC_COORINFO_BTN_EDITSAVE, &CGraphFormView::OnBnClickedCoorinfoBtnEditsave)
+BEGIN_MESSAGE_MAP(CBaseGraphView, CFormView)
+    ON_BN_CLICKED(IDC_COORINFO_BTN_EDITSAVE, &CBaseGraphView::OnBnClickedCoorinfoBtnEditsave)
     ON_WM_LBUTTONDOWN()
     ON_WM_MOUSEMOVE()
     ON_WM_LBUTTONUP()
-    ON_BN_CLICKED(IDC_COORINFO_BTN_SNAP_COORA_PIX_VAL, &CGraphFormView::OnBnClickedCoorinfoBtnSnapCooraPixVal)
-    ON_BN_CLICKED(IDC_COORINFO_BTN_SNAP_COORB_PIX_VAL, &CGraphFormView::OnBnClickedCoorinfoBtnSnapCoorbPixVal)
+    ON_BN_CLICKED(IDC_COORINFO_BTN_SNAP_COORA_PIX_VAL, &CBaseGraphView::OnBnClickedCoorinfoBtnSnapCooraPixVal)
+    ON_BN_CLICKED(IDC_COORINFO_BTN_SNAP_COORB_PIX_VAL, &CBaseGraphView::OnBnClickedCoorinfoBtnSnapCoorbPixVal)
+    ON_CBN_SELCHANGE(IDC_CMB_GRAPH_LIST, &CBaseGraphView::OnCbnSelchangeCmbGraphList)
 END_MESSAGE_MAP()
 
 
-// CGraphFormView diagnostics
+// CBaseGraphView diagnostics
 
 #ifdef _DEBUG
-void CGraphFormView::AssertValid() const
+void CBaseGraphView::AssertValid() const
 {
 	CFormView::AssertValid();
 }
 
 #ifndef _WIN32_WCE
-void CGraphFormView::Dump(CDumpContext& dc) const
+void CBaseGraphView::Dump(CDumpContext& dc) const
 {
 	CFormView::Dump(dc);
 }
@@ -114,10 +115,10 @@ void CGraphFormView::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 
-// CGraphFormView message handlers
+// CBaseGraphView message handlers
 
 
-void CGraphFormView::OnDraw(CDC* pDC)
+void CBaseGraphView::OnDraw(CDC* pDC)
 {
     if (!m_pSrcImage->IsNull()) {
         CRect rect;
@@ -214,7 +215,7 @@ void CGraphFormView::OnDraw(CDC* pDC)
 }
 
 
-void CGraphFormView::OnInitialUpdate()
+void CBaseGraphView::OnInitialUpdate()
 {
     CFormView::OnInitialUpdate();
 
@@ -259,7 +260,7 @@ void CGraphFormView::OnInitialUpdate()
 }
 
 
-void CGraphFormView::OnBnClickedGraphinfoBtnEditsave()
+void CBaseGraphView::OnBnClickedGraphinfoBtnEditsave()
 {
     if (m_bIsGraphInfoEditing && g_pCurrDocument) {
         char sName[256], sXUnitName[256], sYUnitName[256];
@@ -271,35 +272,49 @@ void CGraphFormView::OnBnClickedGraphinfoBtnEditsave()
         m_ctrlGraphInfo_EditUnitName_X.GetWindowText(sXUnitName, sizeof(sXUnitName));
         m_ctrlGraphInfo_EditUnitName_Y.GetWindowText(sYUnitName, sizeof(sYUnitName));
         if (m_iEditMode==Edit_Adding) {
+            CBaseGraph *pBaseGraph;
             int iID = g_pCurrDocument->getFreeGraphID(m_iGraphType);
 
             switch (m_iGraphType) {
                 case Graph_Dotted: {
                     CDottedGraph *dottedGraph = new CDottedGraph(iID, sName, sXUnitName, sYUnitName);
                     g_pCurrDocument->addGraph(m_iGraphType, dottedGraph);
+                    pBaseGraph = dottedGraph;
                 }
                 break;
                 case Graph_Facet: {
                     CFacetGraph *facetGraph = new CFacetGraph(iID, sName, sXUnitName, sYUnitName);
                     g_pCurrDocument->addGraph(m_iGraphType, facetGraph);
+                    pBaseGraph = facetGraph;
                 }
                 break;
                 case Graph_Linear: {
                     CLinearGraph *linearGraph = new CLinearGraph(iID, sName, sXUnitName, sYUnitName);
                     g_pCurrDocument->addGraph(m_iGraphType, linearGraph);
+                    pBaseGraph = linearGraph;
                 }
                 break;
                 case Graph_Columnar: {
                     CColumnarGraph *columnarGraph = new CColumnarGraph(iID, sName, sXUnitName, sYUnitName);
                     g_pCurrDocument->addGraph(m_iGraphType, columnarGraph);
+                    pBaseGraph = columnarGraph;
                 }
                 break;
                 case Graph_Unknown: {
                     CUnknownGraph *unknownGraph = new CUnknownGraph(iID, sName, sXUnitName, sYUnitName);
                     g_pCurrDocument->addGraph(m_iGraphType, unknownGraph);
+                    pBaseGraph = unknownGraph;
                 }
                 break;
             }
+
+            BITMAP bmp;
+            m_pSrcBitmap->GetBitmap(&bmp);
+            unsigned char * bits = new unsigned char[bmp.bmWidthBytes * bmp.bmHeight];
+            m_pSrcBitmap->GetBitmapBits(bmp.bmWidthBytes * bmp.bmHeight, bits);
+            pBaseGraph->setBitmap(bmp);
+            pBaseGraph->setBitmapBits(bmp.bmWidthBytes * bmp.bmHeight, bits);
+            delete []bits;
 
             m_iCurrGraphIndex = g_pCurrDocument->getGraphNum(m_iGraphType) - 1;
             updateGraphList();
@@ -323,7 +338,7 @@ void CGraphFormView::OnBnClickedGraphinfoBtnEditsave()
     m_bIsGraphInfoEditing = !m_bIsGraphInfoEditing;
 }
 
-void CGraphFormView::OnBnClickedCoorinfoBtnEditsave()
+void CBaseGraphView::OnBnClickedCoorinfoBtnEditsave()
 {
     m_ctrlCoorInfo_EditCoorA_X.SetReadOnly(m_bIsCoorInfoEditing);
     m_ctrlCoorInfo_EditCoorA_Y.SetReadOnly(m_bIsCoorInfoEditing);
@@ -345,7 +360,7 @@ static bool PointInRect(CPoint point, CRect rect)
             rect.top <= point.y && point.y <= rect.bottom);
 }
 
-void CGraphFormView::OnLButtonDown(UINT nFlags, CPoint point)
+void CBaseGraphView::OnLButtonDown(UINT nFlags, CPoint point)
 {
     CRect rect;
     m_ctrlMainImage.GetWindowRect(rect);
@@ -376,7 +391,7 @@ void CGraphFormView::OnLButtonDown(UINT nFlags, CPoint point)
     CView::OnLButtonDown(nFlags, point);
 }
 
-void CGraphFormView::OnMouseMove(UINT nFlags, CPoint point)
+void CBaseGraphView::OnMouseMove(UINT nFlags, CPoint point)
 {
     CRect rect;
     m_ctrlMainImage.GetWindowRect(rect);
@@ -403,7 +418,7 @@ void CGraphFormView::OnMouseMove(UINT nFlags, CPoint point)
     CView::OnMouseMove(nFlags, point);
 }
 
-void CGraphFormView::OnLButtonUp(UINT nFlags, CPoint point)
+void CBaseGraphView::OnLButtonUp(UINT nFlags, CPoint point)
 {
     CRect rect;
     m_ctrlMainImage.GetWindowRect(rect);
@@ -429,18 +444,18 @@ void CGraphFormView::OnLButtonUp(UINT nFlags, CPoint point)
 }
 
 
-void CGraphFormView::OnBnClickedCoorinfoBtnSnapCooraPixVal()
+void CBaseGraphView::OnBnClickedCoorinfoBtnSnapCooraPixVal()
 {
     m_iDrawMode = Draw_SnapCoorA;
 }
 
 
-void CGraphFormView::OnBnClickedCoorinfoBtnSnapCoorbPixVal()
+void CBaseGraphView::OnBnClickedCoorinfoBtnSnapCoorbPixVal()
 {
     m_iDrawMode = Draw_SnapCoorB;
 }
 
-void CGraphFormView::onAddGraph()
+void CBaseGraphView::onAddGraph()
 {
     m_bIsGraphInfoEditing = false;
     m_bIsCoorInfoEditing = false;
@@ -476,13 +491,12 @@ void CGraphFormView::onAddGraph()
     m_ctrlCoorInfo_BtnEditSave.SetWindowText("±à¼­");
 }
 
-void CGraphFormView::loadDataFromDB()
+void CBaseGraphView::loadData()
 {
-    char sName[256], sXUnitName[256], sYUnitName[256];
-    CBaseGraph *graph;
+    if (m_iCurrGraphIndex >= 0) {
+        char sName[256], sXUnitName[256], sYUnitName[256];
+        CBaseGraph *graph;
 
-    if (g_pCurrDocument->getGraphNum(m_iGraphType) > 0) {
-        m_iCurrGraphIndex = 0;
         graph = g_pCurrDocument->getGraph(m_iGraphType, m_iCurrGraphIndex);
         graph->getName(sName, sizeof(sName));
         m_ctrlGraphInfo_EditName.SetWindowText(sName);
@@ -490,18 +504,38 @@ void CGraphFormView::loadDataFromDB()
         m_ctrlGraphInfo_EditUnitName_X.SetWindowText(sXUnitName);
         graph->getYUnitName(sYUnitName, sizeof(sYUnitName));
         m_ctrlGraphInfo_EditUnitName_Y.SetWindowText(sYUnitName);
+
+        BITMAP bmp;   
+        graph->getBitmap(&bmp);
+        unsigned char *bits = new unsigned char[bmp.bmWidthBytes * bmp.bmHeight];
+        graph->getBitmapBits(bmp.bmWidthBytes * bmp.bmHeight, bits);
+
+        m_pSrcBitmap->DeleteObject();
+        m_pSrcBitmap->CreateBitmap(bmp.bmWidth, bmp.bmHeight, bmp.bmPlanes, bmp.bmBitsPixel, bits);
+        m_pSrcImage->Detach();
+        m_pSrcImage->Attach(*m_pSrcBitmap);
     }
-    else{
-        m_iCurrGraphIndex = -1;
+    else {
         m_ctrlGraphInfo_EditName.SetWindowText("");
         m_ctrlGraphInfo_EditUnitName_X.SetWindowText("");
         m_ctrlGraphInfo_EditUnitName_Y.SetWindowText("");
     }
-
     updateGraphList();
 }
 
-void CGraphFormView::updateGraphList()
+void CBaseGraphView::loadDataFromDB()
+{
+    if (g_pCurrDocument && g_pCurrDocument->getGraphNum(m_iGraphType) > 0) {
+        m_iCurrGraphIndex = 0;
+    }
+    else{
+        m_iCurrGraphIndex = -1;
+    }
+
+    loadData();
+}
+
+void CBaseGraphView::updateGraphList()
 {
     int num, i;
     char sName[256], buf[256];
@@ -514,4 +548,16 @@ void CGraphFormView::updateGraphList()
         m_ctrlGraphList.AddString(buf);
     }
     m_ctrlGraphList.SetCurSel(m_iCurrGraphIndex);
+
+    UpdateData();
+    RedrawWindow();
+}
+
+
+void CBaseGraphView::OnCbnSelchangeCmbGraphList()
+{
+    int iCurSel = m_ctrlGraphList.GetCurSel();
+
+    m_iCurrGraphIndex = iCurSel;
+    loadData();
 }

@@ -1,10 +1,10 @@
 #pragma once
-#include "GraphFormView.h"
+#include "BaseGraphView.h"
 
 
 // CUnknownGraphView form view
 
-class CUnknownGraphView : public CGraphFormView
+class CUnknownGraphView : public CBaseGraphView
 {
 	DECLARE_DYNCREATE(CUnknownGraphView)
 

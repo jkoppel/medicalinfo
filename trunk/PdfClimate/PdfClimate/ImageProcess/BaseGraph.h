@@ -25,8 +25,22 @@ public:
     void setType(GraphType iType) { m_iType = iType; }
     GraphType getType() { return m_iType; }
 
-    void setBitmapInfo(const BITMAPINFO *bitmap);
-    const BITMAPINFO *getBitmapInfo() { return m_pDIBInfo; }
+    void setBitmap(BITMAP bitmap) { m_bmpInfo = bitmap; }
+    void getBitmap(BITMAP *pBitmap) { *pBitmap = m_bmpInfo; }
+    void setBitmapBits(int nCount, const unsigned char *pBits) {
+        if (m_pBmpBits) {
+            delete []m_pBmpBits;
+        }
+        m_pBmpBits = new unsigned char[nCount];
+        if (m_pBmpBits) {
+            memcpy(m_pBmpBits, pBits, nCount);
+        }
+    }
+    void getBitmapBits(int nCount, unsigned char *pBits) {
+        if (m_pBmpBits) {
+            memcpy(pBits, m_pBmpBits, m_bmpInfo.bmWidthBytes * m_bmpInfo.bmHeight);
+        }
+    }
 
     void setXUnitName(const char *sXUnitName) {
         snprintf(m_sXUnitName, sizeof(m_sXUnitName), "%s", sXUnitName);
@@ -50,7 +64,8 @@ protected:
     int m_iID;
     GraphType m_iType;
     char m_sName[256];
-    BITMAPINFO *m_pDIBInfo;
+    BITMAP m_bmpInfo;
+    unsigned char *m_pBmpBits;
     char m_sXUnitName[256];
     char m_sYUnitName[256];
     int m_iGraphItemNum;

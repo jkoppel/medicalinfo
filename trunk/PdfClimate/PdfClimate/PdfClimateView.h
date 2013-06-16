@@ -69,6 +69,7 @@ protected:
     CPoint m_ptOrig, m_ptDest;
     bool m_bDragging;
     HCURSOR m_hCross;
+    HCURSOR m_hHand;
     CToolBarCtrl m_ctrlToolBar;
     CToolTipCtrl m_ctrlToolTip;
     CImageList  m_ilToolBar;

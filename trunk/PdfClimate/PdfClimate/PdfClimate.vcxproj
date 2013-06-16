@@ -157,7 +157,7 @@
     <ClCompile Include="DottedGraphView.cpp" />
     <ClCompile Include="FacetGraphView.cpp" />
     <ClCompile Include="GlobalVars.cpp" />
-    <ClCompile Include="GraphFormView.cpp" />
+    <ClCompile Include="BaseGraphView.cpp" />
     <ClCompile Include="GraphSelectView.cpp" />
     <ClCompile Include="ImageProcess\BaseDocument.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -216,7 +216,7 @@
     <ClInclude Include="DottedGraphView.h" />
     <ClInclude Include="FacetGraphView.h" />
     <ClInclude Include="GlobalVars.h" />
-    <ClInclude Include="GraphFormView.h" />
+    <ClInclude Include="BaseGraphView.h" />
     <ClInclude Include="GraphSelectView.h" />
     <ClInclude Include="ImageProcess\BaseDocument.h" />
     <ClInclude Include="ImageProcess\BaseGraph.h" />
