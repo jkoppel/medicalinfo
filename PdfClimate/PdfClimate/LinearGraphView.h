@@ -28,6 +28,7 @@ protected:
     virtual void OnDraw(CDC* /*pDC*/);
 public:
     virtual void OnInitialUpdate();
+    afx_msg void OnBnClickedGraphinfoBtnEditsave();
 };
 
 

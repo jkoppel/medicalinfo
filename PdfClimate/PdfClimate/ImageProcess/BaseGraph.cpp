@@ -6,7 +6,7 @@
 CBaseGraph::CBaseGraph()
 {
     m_iID = 0;
-    m_iType = GRAPH_UNKNOWN;
+    m_iType = Graph_Unknown;
     memset(m_sName, 0, sizeof(m_sName));
     m_pDIBInfo = NULL;
     memset(m_sXUnitName, 0, sizeof(m_sXUnitName));

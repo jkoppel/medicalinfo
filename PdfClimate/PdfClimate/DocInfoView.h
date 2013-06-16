@@ -28,10 +28,9 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
+    void loadDataFromDB();
     afx_msg void OnBnClickedDocEditsave();
     CEdit m_ctrlEditDocName;
     CEdit m_ctrlEditDocAuthor;
     CButton m_ctrlBtnEditSave;
 };
-
-

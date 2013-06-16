@@ -11,7 +11,7 @@
 IMPLEMENT_DYNCREATE(CFacetGraphView, CGraphFormView)
 
 CFacetGraphView::CFacetGraphView()
-	: CGraphFormView(CFacetGraphView::IDD)
+	: CGraphFormView(CFacetGraphView::IDD, Graph_Facet)
 {
 }
 
@@ -25,6 +25,7 @@ void CFacetGraphView::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CFacetGraphView, CGraphFormView)
+    ON_BN_CLICKED(IDC_GRAPHINFO_BTN_EDITSAVE, &CFacetGraphView::OnBnClickedGraphinfoBtnEditsave)
 END_MESSAGE_MAP()
 
 
@@ -56,4 +57,10 @@ void CFacetGraphView::OnDraw(CDC* pDC)
 void CFacetGraphView::OnInitialUpdate()
 {
     CGraphFormView::OnInitialUpdate();
+}
+
+
+void CFacetGraphView::OnBnClickedGraphinfoBtnEditsave()
+{
+    CGraphFormView::OnBnClickedGraphinfoBtnEditsave();
 }

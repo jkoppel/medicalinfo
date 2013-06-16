@@ -10,6 +10,8 @@ class CLinearGraphView;
 class CColumnarGraphView;
 class CUnknownGraphView;
 class CGraphFormView;
+class CDocInfoView;
+class CBaseDocument;
 
 extern CLeftView *g_pLeftView;
 extern CGraphSelectView *g_pGraphSelectView;
@@ -20,5 +22,7 @@ extern CFacetGraphView *g_pFacetGraphView;
 extern CColumnarGraphView *g_pColumnarGraphView;
 extern CUnknownGraphView *g_pUnknownGraphView;
 extern CGraphFormView *g_pViewList[5];
+extern CDocInfoView *g_pDocInfoView;
+extern CBaseDocument *g_pCurrDocument;
 
 #endif

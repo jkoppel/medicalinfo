@@ -5,6 +5,13 @@
 #include "PdfClimate.h"
 #include "GraphFormView.h"
 #include "resource.h"
+#include "GlobalVars.h"
+#include "ImageProcess/BaseDocument.h"
+#include "ImageProcess/DottedGraph.h"
+#include "ImageProcess/FacetGraph.h"
+#include "ImageProcess/LinearGraph.h"
+#include "ImageProcess/ColumnarGraph.h"
+#include "ImageProcess/UnknownGraph.h"
 
 
 // CGraphFormView
@@ -21,6 +28,7 @@ void CGraphFormView::initialize()
     m_bDispCoorInfo = true;
     m_bDispDotedInfo = false;
     m_iDrawMode = Draw_None;
+    m_iEditMode = Edit_None;
     m_iOldImageWidth = 0;
     m_iOldImageHeight = 0;
     m_ptCoorA = CPoint(-1, -1);
@@ -43,12 +51,14 @@ CGraphFormView::CGraphFormView()
 	: CFormView(CGraphFormView::IDD)
 {
     initialize();
+    m_iGraphType = Graph_Unknown;
 }
 
-CGraphFormView::CGraphFormView(UINT nIDTemplate)
+CGraphFormView::CGraphFormView(UINT nIDTemplate, GraphType iGraphType)
 	: CFormView(nIDTemplate)
 {
     initialize();
+    m_iGraphType = iGraphType;
 }
 
 CGraphFormView::~CGraphFormView()
@@ -64,7 +74,8 @@ void CGraphFormView::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_GRAPHINFO, m_ctrlGraphInfo);
     DDX_Control(pDX, IDC_GRAPHINFO_EDIT_NAME, m_ctrlGraphInfo_EditName);
     DDX_Control(pDX, IDC_GRAPHINFO_BTN_EDITSAVE, m_ctrlGraphInfo_BtnEditSave);
-    DDX_Control(pDX, IDC_COORINFO_EDIT_UNITNAME, m_ctrlCoorInfo_EditUnitName);
+    DDX_Control(pDX, IDC_GRAPHINFO_EDIT_UNITNAME_X, m_ctrlGraphInfo_EditUnitName_X);
+    DDX_Control(pDX, IDC_GRAPHINFO_EDIT_UNITNAME_Y, m_ctrlGraphInfo_EditUnitName_Y);
     DDX_Control(pDX, IDC_COORINFO_EDIT_COORA_PIX_VAL, m_ctrlCoorInfo_EditCoorAPixVal);
     DDX_Control(pDX, IDC_COORINFO_BTN_SNAP_COORA_PIX_VAL, m_ctrlCoorInfo_BtnSnapCoorA);
     DDX_Control(pDX, IDC_COORINFO_EDIT_COORA_X, m_ctrlCoorInfo_EditCoorA_X);
@@ -77,7 +88,6 @@ void CGraphFormView::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CGraphFormView, CFormView)
-    ON_BN_CLICKED(IDC_GRAPHINFO_BTN_EDITSAVE, &CGraphFormView::OnBnClickedGraphinfoBtnEditsave)
     ON_BN_CLICKED(IDC_COORINFO_BTN_EDITSAVE, &CGraphFormView::OnBnClickedCoorinfoBtnEditsave)
     ON_WM_LBUTTONDOWN()
     ON_WM_MOUSEMOVE()
@@ -211,7 +221,11 @@ void CGraphFormView::OnInitialUpdate()
     int ItemIDofGraphInfo[] = {
                                 IDC_GRAPHINFO,
                                 IDC_GRAPHINFO_LABEL_NAME,
+                                IDC_GRAPHINFO_LABEL_UNITNAME_X,
+                                IDC_GRAPHINFO_LABEL_UNITNAME_Y,
                                 IDC_GRAPHINFO_EDIT_NAME,
+                                IDC_GRAPHINFO_EDIT_UNITNAME_X,
+                                IDC_GRAPHINFO_EDIT_UNITNAME_Y,
                                 IDC_GRAPHINFO_BTN_EDITSAVE
                               };
     int ItemIDofCoorInfo[] = {
@@ -227,14 +241,12 @@ void CGraphFormView::OnInitialUpdate()
                                 IDC_COORINFO_LABEL_COORB_PIX_VAL,
                                 IDC_COORINFO_LABEL_COORB_X,
                                 IDC_COORINFO_LABEL_COORB_Y,
-                                IDC_COORINFO_LABEL_UNITNAME,
                                 IDC_COORINFO_EDIT_COORA_PIX_VAL,
                                 IDC_COORINFO_EDIT_COORB_PIX_VAL,
                                 IDC_COORINFO_EDIT_COORA_X,
                                 IDC_COORINFO_EDIT_COORA_Y,
                                 IDC_COORINFO_EDIT_COORB_X,
                                 IDC_COORINFO_EDIT_COORB_Y,
-                                IDC_COORINFO_EDIT_UNITNAME,
                              };
 
     int i;
@@ -249,24 +261,73 @@ void CGraphFormView::OnInitialUpdate()
 
 void CGraphFormView::OnBnClickedGraphinfoBtnEditsave()
 {
+    if (m_bIsGraphInfoEditing && g_pCurrDocument) {
+        char sName[256], sXUnitName[256], sYUnitName[256];
+        m_ctrlGraphInfo_EditName.GetWindowText(sName, sizeof(sName));
+        if (strlen(sName) == 0) {
+            AfxMessageBox("ÇëÊäÈëÍ¼ÐÎÃû³Æ");
+            return;
+        }
+        m_ctrlGraphInfo_EditUnitName_X.GetWindowText(sXUnitName, sizeof(sXUnitName));
+        m_ctrlGraphInfo_EditUnitName_Y.GetWindowText(sYUnitName, sizeof(sYUnitName));
+        if (m_iEditMode==Edit_Adding) {
+            int iID = g_pCurrDocument->getFreeGraphID(m_iGraphType);
+
+            switch (m_iGraphType) {
+                case Graph_Dotted: {
+                    CDottedGraph *dottedGraph = new CDottedGraph(iID, sName, sXUnitName, sYUnitName);
+                    g_pCurrDocument->addGraph(m_iGraphType, dottedGraph);
+                }
+                break;
+                case Graph_Facet: {
+                    CFacetGraph *facetGraph = new CFacetGraph(iID, sName, sXUnitName, sYUnitName);
+                    g_pCurrDocument->addGraph(m_iGraphType, facetGraph);
+                }
+                break;
+                case Graph_Linear: {
+                    CLinearGraph *linearGraph = new CLinearGraph(iID, sName, sXUnitName, sYUnitName);
+                    g_pCurrDocument->addGraph(m_iGraphType, linearGraph);
+                }
+                break;
+                case Graph_Columnar: {
+                    CColumnarGraph *columnarGraph = new CColumnarGraph(iID, sName, sXUnitName, sYUnitName);
+                    g_pCurrDocument->addGraph(m_iGraphType, columnarGraph);
+                }
+                break;
+                case Graph_Unknown: {
+                    CUnknownGraph *unknownGraph = new CUnknownGraph(iID, sName, sXUnitName, sYUnitName);
+                    g_pCurrDocument->addGraph(m_iGraphType, unknownGraph);
+                }
+                break;
+            }
+
+            m_iCurrGraphIndex = g_pCurrDocument->getGraphNum(m_iGraphType) - 1;
+            updateGraphList();
+            m_iEditMode = Edit_Modifying;
+        }
+        else if (m_iEditMode==Edit_Modifying) {
+            CBaseGraph *baseGraph = g_pCurrDocument->getGraph(m_iGraphType, m_iCurrGraphIndex);
+            baseGraph->setName(sName);
+            baseGraph->setXUnitName(sXUnitName);
+            baseGraph->setYUnitName(sYUnitName);
+
+            updateGraphList();
+        }
+    }
+
     m_ctrlGraphInfo_EditName.SetReadOnly(m_bIsGraphInfoEditing);
+    m_ctrlGraphInfo_EditUnitName_X.SetReadOnly(m_bIsGraphInfoEditing);
+    m_ctrlGraphInfo_EditUnitName_Y.SetReadOnly(m_bIsGraphInfoEditing);
     m_ctrlGraphInfo_BtnEditSave.SetWindowText(m_bIsGraphInfoEditing ? "±à¼­" : "±£´æ");
 
-    if (m_bIsGraphInfoEditing) {
-        //TODO SAVE THE DATA
-    }
     m_bIsGraphInfoEditing = !m_bIsGraphInfoEditing;
 }
 
 void CGraphFormView::OnBnClickedCoorinfoBtnEditsave()
 {
-
-    m_ctrlCoorInfo_EditUnitName.SetReadOnly(m_bIsCoorInfoEditing);
-    //m_ctrlCoorInfo_EditCoorAPixVal.SetReadOnly(m_bIsCoorInfoEditing);
     m_ctrlCoorInfo_EditCoorA_X.SetReadOnly(m_bIsCoorInfoEditing);
     m_ctrlCoorInfo_EditCoorA_Y.SetReadOnly(m_bIsCoorInfoEditing);
     m_ctrlCoorInfo_BtnSnapCoorA.EnableWindow(!m_bIsCoorInfoEditing);
-    //m_ctrlCoorInfo_EditCoorBPixVal.SetReadOnly(m_bIsCoorInfoEditing);
     m_ctrlCoorInfo_EditCoorB_X.SetReadOnly(m_bIsCoorInfoEditing);
     m_ctrlCoorInfo_EditCoorB_Y.SetReadOnly(m_bIsCoorInfoEditing);
     m_ctrlCoorInfo_BtnSnapCoorB.EnableWindow(!m_bIsCoorInfoEditing);
@@ -350,8 +411,6 @@ void CGraphFormView::OnLButtonUp(UINT nFlags, CPoint point)
 
     if (!m_pSrcImage->IsNull() && PointInRect(point, rect) && m_iDrawMode!=Draw_None &&
         m_bIsDragging) {
-        char buf[256];
-
         if (m_iDrawMode == Draw_SnapCoorA) {
             m_ptCoorA = CPoint(point.x - rect.left - IMAGE_X_OFFSET, point.y - rect.top - IMAGE_Y_OFFSET);
         }
@@ -389,6 +448,7 @@ void CGraphFormView::onAddGraph()
     m_bDispCoorInfo = true;
     m_bDispDotedInfo = false;
     m_iDrawMode = Draw_None;
+    m_iEditMode = Edit_Adding;
     m_iOldImageWidth = 0;
     m_iOldImageHeight = 0;
     m_ptCoorA = CPoint(-1, -1);
@@ -397,8 +457,10 @@ void CGraphFormView::onAddGraph()
     m_ctrlGraphInfo_EditName.SetReadOnly();
     m_ctrlGraphInfo_EditName.SetWindowText("");
     m_ctrlGraphInfo_BtnEditSave.SetWindowText("±à¼­");
-    m_ctrlCoorInfo_EditUnitName.SetReadOnly();
-    m_ctrlCoorInfo_EditUnitName.SetWindowText("");
+    m_ctrlGraphInfo_EditUnitName_X.SetReadOnly();
+    m_ctrlGraphInfo_EditUnitName_X.SetWindowText("");
+    m_ctrlGraphInfo_EditUnitName_Y.SetReadOnly();
+    m_ctrlGraphInfo_EditUnitName_Y.SetWindowText("");
     m_ctrlCoorInfo_EditCoorAPixVal.SetWindowText("");
     m_ctrlCoorInfo_EditCoorA_X.SetReadOnly();
     m_ctrlCoorInfo_EditCoorA_X.SetWindowText("");
@@ -412,4 +474,44 @@ void CGraphFormView::onAddGraph()
     m_ctrlCoorInfo_EditCoorB_Y.SetWindowText("");
     m_ctrlCoorInfo_BtnSnapCoorB.EnableWindow(false);
     m_ctrlCoorInfo_BtnEditSave.SetWindowText("±à¼­");
+}
+
+void CGraphFormView::loadDataFromDB()
+{
+    char sName[256], sXUnitName[256], sYUnitName[256];
+    CBaseGraph *graph;
+
+    if (g_pCurrDocument->getGraphNum(m_iGraphType) > 0) {
+        m_iCurrGraphIndex = 0;
+        graph = g_pCurrDocument->getGraph(m_iGraphType, m_iCurrGraphIndex);
+        graph->getName(sName, sizeof(sName));
+        m_ctrlGraphInfo_EditName.SetWindowText(sName);
+        graph->getXUnitName(sXUnitName, sizeof(sXUnitName));
+        m_ctrlGraphInfo_EditUnitName_X.SetWindowText(sXUnitName);
+        graph->getYUnitName(sYUnitName, sizeof(sYUnitName));
+        m_ctrlGraphInfo_EditUnitName_Y.SetWindowText(sYUnitName);
+    }
+    else{
+        m_iCurrGraphIndex = -1;
+        m_ctrlGraphInfo_EditName.SetWindowText("");
+        m_ctrlGraphInfo_EditUnitName_X.SetWindowText("");
+        m_ctrlGraphInfo_EditUnitName_Y.SetWindowText("");
+    }
+
+    updateGraphList();
+}
+
+void CGraphFormView::updateGraphList()
+{
+    int num, i;
+    char sName[256], buf[256];
+
+    m_ctrlGraphList.ResetContent();
+    num = g_pCurrDocument->getGraphNum(m_iGraphType);
+    for (i=0; i<num; i++) {
+        g_pCurrDocument->getGraph(m_iGraphType, i)->getName(sName, sizeof(sName));
+        snprintf(buf, sizeof(buf), "%d. %s", i+1, sName);
+        m_ctrlGraphList.AddString(buf);
+    }
+    m_ctrlGraphList.SetCurSel(m_iCurrGraphIndex);
 }

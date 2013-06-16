@@ -6,14 +6,14 @@
 #include "DottedGraphView.h"
 #include "GlobalVars.h"
 #include "LeftView.h"
-
+#include "ImageProcess/DottedGraph.h"
 
 // CDottedGraphView
 
 IMPLEMENT_DYNCREATE(CDottedGraphView, CGraphFormView)
 
 CDottedGraphView::CDottedGraphView()
-	: CGraphFormView(CDottedGraphView::IDD)
+	: CGraphFormView(CDottedGraphView::IDD, Graph_Dotted)
 {
 }
 
@@ -28,6 +28,7 @@ void CDottedGraphView::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CDottedGraphView, CGraphFormView)
     ON_WM_CREATE()
+    ON_BN_CLICKED(IDC_GRAPHINFO_BTN_EDITSAVE, &CDottedGraphView::OnBnClickedGraphinfoBtnEditsave)
 END_MESSAGE_MAP()
 
 
@@ -59,4 +60,10 @@ void CDottedGraphView::OnDraw(CDC* pDC)
 void CDottedGraphView::OnInitialUpdate()
 {
     CGraphFormView::OnInitialUpdate();
+}
+
+
+void CDottedGraphView::OnBnClickedGraphinfoBtnEditsave()
+{
+    CGraphFormView::OnBnClickedGraphinfoBtnEditsave();
 }

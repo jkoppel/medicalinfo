@@ -234,6 +234,7 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs,
     g_pViewList[2] = g_pLinearGraphView;
     g_pViewList[3] = g_pColumnarGraphView;
     g_pViewList[4] = g_pUnknownGraphView;
+    g_pDocInfoView = (CDocInfoView*)m_wndSplitter4.GetPane(0, 0);
 
     setActiveGraphView(0);
 	m_wndSplitter2.LockBar();

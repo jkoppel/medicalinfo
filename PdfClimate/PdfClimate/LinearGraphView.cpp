@@ -11,7 +11,7 @@
 IMPLEMENT_DYNCREATE(CLinearGraphView, CGraphFormView)
 
 CLinearGraphView::CLinearGraphView()
-	: CGraphFormView(CLinearGraphView::IDD)
+	: CGraphFormView(CLinearGraphView::IDD, Graph_Linear)
 {
 }
 
@@ -25,6 +25,7 @@ void CLinearGraphView::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CLinearGraphView, CGraphFormView)
+    ON_BN_CLICKED(IDC_GRAPHINFO_BTN_EDITSAVE, &CLinearGraphView::OnBnClickedGraphinfoBtnEditsave)
 END_MESSAGE_MAP()
 
 
@@ -56,4 +57,10 @@ void CLinearGraphView::OnDraw(CDC* pDC)
 void CLinearGraphView::OnInitialUpdate()
 {
     CGraphFormView::OnInitialUpdate();
+}
+
+
+void CLinearGraphView::OnBnClickedGraphinfoBtnEditsave()
+{
+    CGraphFormView::OnBnClickedGraphinfoBtnEditsave();
 }

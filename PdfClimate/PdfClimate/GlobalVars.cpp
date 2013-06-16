@@ -12,6 +12,8 @@
 #include "ColumnarGraphView.h"
 #include "UnknownGraphView.h"
 #include "GraphFormView.h"
+#include "DocInfoView.h"
+#include "ImageProcess/BaseDocument.h"
 
 CLeftView *g_pLeftView = NULL;
 CGraphSelectView *g_pGraphSelectView = NULL;
@@ -22,3 +24,5 @@ CFacetGraphView *g_pFacetGraphView = NULL;
 CColumnarGraphView *g_pColumnarGraphView = NULL;
 CUnknownGraphView *g_pUnknownGraphView = NULL;
 CGraphFormView *g_pViewList[5];
+CDocInfoView *g_pDocInfoView = NULL;
+CBaseDocument *g_pCurrDocument = NULL;

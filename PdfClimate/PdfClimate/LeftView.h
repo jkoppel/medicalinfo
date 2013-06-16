@@ -25,6 +25,7 @@ public:
     void closeFile();
     void selectFile(int index);
     int getCurrDocIndex();
+    void updateView();
 
 // Operations
 public:

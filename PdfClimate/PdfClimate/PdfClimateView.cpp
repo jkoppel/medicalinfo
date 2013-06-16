@@ -17,6 +17,7 @@
 #include "UnknownGraphView.h"
 #include "GraphSelectView.h"
 #include "MainFrm.h"
+#include "DocInfoView.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -460,6 +461,25 @@ void CPdfClimateView::OnLButtonUp(UINT nFlags, CPoint point)
                 pImage->Detach();
             }
 	        pImage->Attach(*pBitmap);
+
+            /*
+            static BITMAP bmp;
+            pBitmap->GetBitmap(&bmp);
+            static unsigned char *bits = NULL;
+            if (bits) {
+                delete []bits;
+            }
+            bits = new unsigned char[bmp.bmWidthBytes * bmp.bmHeight];
+            pBitmap->GetBitmapBits(bmp.bmWidthBytes * bmp.bmHeight, bits);
+            static CSize size = pBitmap->GetBitmapDimension();
+            static CBitmap *pBmp = new CBitmap();
+
+            pBmp->DeleteObject();
+            pBmp->CreateBitmap(bmp.bmWidth, bmp.bmHeight, bmp.bmPlanes, bmp.bmBitsPixel, bits);
+            HBITMAP hbmp = *pBmp;
+            pImage->Detach();
+            pImage->Attach(hbmp);
+            */ //The code to create bitmap object
 
             ((CMainFrame*)AfxGetMainWnd())->setActiveGraphView((int)m_iMode);
             g_pGraphSelectView->getTabCtrl()->SetCurSel((int)m_iMode);
