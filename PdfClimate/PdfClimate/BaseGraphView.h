@@ -1,16 +1,16 @@
 #pragma once
 #include "ImageProcess/GraphDefs.h"
 
-// CGraphFormView form view
+// CBaseGraphView form view
 
-class CGraphFormView : public CFormView
+class CBaseGraphView : public CFormView
 {
-	DECLARE_DYNCREATE(CGraphFormView)
+	DECLARE_DYNCREATE(CBaseGraphView)
 
 protected:
-    CGraphFormView(UINT nIDTemplate, GraphType iGraphType);
-	CGraphFormView();           // protected constructor used by dynamic creation
-	virtual ~CGraphFormView();
+    CBaseGraphView(UINT nIDTemplate, GraphType iGraphType);
+	CBaseGraphView();           // protected constructor used by dynamic creation
+	virtual ~CBaseGraphView();
 
 public:
     enum { IMAGE_X_OFFSET = 1};
@@ -41,6 +41,7 @@ public:
     bool isDataModified() { return m_bIsGraphInfoEditing | m_bIsCoorInfoEditing; }
     virtual void onAddGraph();
     virtual void loadDataFromDB();
+    virtual void loadData();
 
     void setXUnitName(const char *sXUnitName) {
         m_ctrlGraphInfo_EditUnitName_X.SetWindowText(sXUnitName);
@@ -111,4 +112,5 @@ public:
     afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
     afx_msg void OnBnClickedCoorinfoBtnSnapCooraPixVal();
     afx_msg void OnBnClickedCoorinfoBtnSnapCoorbPixVal();
+    afx_msg void OnCbnSelchangeCmbGraphList();
 };

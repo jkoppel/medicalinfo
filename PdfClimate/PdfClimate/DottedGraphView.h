@@ -1,12 +1,12 @@
 #pragma once
 #include "afxwin.h"
-#include "GraphFormView.h"
+#include "BaseGraphView.h"
 
 
 // CDottedGraphView form view
 class CBitmap;
 
-class CDottedGraphView : public CGraphFormView
+class CDottedGraphView : public CBaseGraphView
 {
 	DECLARE_DYNCREATE(CDottedGraphView)
 

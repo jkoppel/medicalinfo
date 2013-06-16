@@ -1,11 +1,11 @@
 #pragma once
 
-#include "GraphFormView.h"
+#include "BaseGraphView.h"
 
 
 // CFacetGraphView form view
 
-class CFacetGraphView : public CGraphFormView
+class CFacetGraphView : public CBaseGraphView
 {
 	DECLARE_DYNCREATE(CFacetGraphView)
 

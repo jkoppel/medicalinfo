@@ -70,7 +70,6 @@
     <ClCompile Include="UnknownGraphView.cpp" />
     <ClCompile Include="MyPdf.c" />
     <ClCompile Include="DocInfoView.cpp" />
-    <ClCompile Include="GraphFormView.cpp" />
     <ClCompile Include="ImageProcess\DottedGraph.cpp">
       <Filter>ImageProcess</Filter>
     </ClCompile>
@@ -86,6 +85,7 @@
     <ClCompile Include="ImageProcess\LinearGraph.cpp">
       <Filter>ImageProcess</Filter>
     </ClCompile>
+    <ClCompile Include="BaseGraphView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LeftView.h" />
@@ -162,7 +162,6 @@
     <ClInclude Include="GlobalVars.h" />
     <ClInclude Include="MyPdf.h" />
     <ClInclude Include="DocInfoView.h" />
-    <ClInclude Include="GraphFormView.h" />
     <ClInclude Include="ImageProcess\DottedGraph.h">
       <Filter>ImageProcess</Filter>
     </ClInclude>
@@ -178,6 +177,7 @@
     <ClInclude Include="ImageProcess\LinearGraph.h">
       <Filter>ImageProcess</Filter>
     </ClInclude>
+    <ClInclude Include="BaseGraphView.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PdfClimate.rc" />

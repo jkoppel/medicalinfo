@@ -71,6 +71,7 @@ CPdfClimateView::CPdfClimateView()
     m_ptOrig = CPoint(0, 0);
     m_bDragging = false;
     m_hCross = AfxGetApp()->LoadStandardCursor(IDC_CROSS);
+    m_hHand = AfxGetApp()->LoadStandardCursor(IDC_HAND);
 
     m_bDocInfoShowing = false;
 }
@@ -401,6 +402,9 @@ void CPdfClimateView::OnLButtonDown(UINT nFlags, CPoint point)
         if (m_iMode != Drag_Normal) {
     	    ::SetCursor(m_hCross);
         }
+        else {
+            ::SetCursor(m_hHand);
+        }
 
 	    m_bDragging = true;
         m_ptOrig = point;
@@ -429,7 +433,7 @@ void CPdfClimateView::OnLButtonUp(UINT nFlags, CPoint point)
 	        CDC *pDC = GetDC();
             CBitmap *pBitmap;
             CImage *pImage;
-            CGraphFormView *pView = g_pViewList[m_iMode-1];
+            CBaseGraphView *pView = g_pViewList[m_iMode-1];
             pBitmap = pView->getSrcBitmap();
             pImage= pView->getSrcImage();
 

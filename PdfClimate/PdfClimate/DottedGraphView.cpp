@@ -10,10 +10,10 @@
 
 // CDottedGraphView
 
-IMPLEMENT_DYNCREATE(CDottedGraphView, CGraphFormView)
+IMPLEMENT_DYNCREATE(CDottedGraphView, CBaseGraphView)
 
 CDottedGraphView::CDottedGraphView()
-	: CGraphFormView(CDottedGraphView::IDD, Graph_Dotted)
+	: CBaseGraphView(CDottedGraphView::IDD, Graph_Dotted)
 {
 }
 
@@ -23,10 +23,10 @@ CDottedGraphView::~CDottedGraphView()
 
 void CDottedGraphView::DoDataExchange(CDataExchange* pDX)
 {
-    CGraphFormView::DoDataExchange(pDX);
+    CBaseGraphView::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CDottedGraphView, CGraphFormView)
+BEGIN_MESSAGE_MAP(CDottedGraphView, CBaseGraphView)
     ON_WM_CREATE()
     ON_BN_CLICKED(IDC_GRAPHINFO_BTN_EDITSAVE, &CDottedGraphView::OnBnClickedGraphinfoBtnEditsave)
 END_MESSAGE_MAP()
@@ -37,13 +37,13 @@ END_MESSAGE_MAP()
 #ifdef _DEBUG
 void CDottedGraphView::AssertValid() const
 {
-	CGraphFormView::AssertValid();
+	CBaseGraphView::AssertValid();
 }
 
 #ifndef _WIN32_WCE
 void CDottedGraphView::Dump(CDumpContext& dc) const
 {
-	CGraphFormView::Dump(dc);
+	CBaseGraphView::Dump(dc);
 }
 #endif
 #endif //_DEBUG
@@ -54,16 +54,16 @@ void CDottedGraphView::Dump(CDumpContext& dc) const
 
 void CDottedGraphView::OnDraw(CDC* pDC)
 {
-    CGraphFormView::OnDraw(pDC);
+    CBaseGraphView::OnDraw(pDC);
 }
 
 void CDottedGraphView::OnInitialUpdate()
 {
-    CGraphFormView::OnInitialUpdate();
+    CBaseGraphView::OnInitialUpdate();
 }
 
 
 void CDottedGraphView::OnBnClickedGraphinfoBtnEditsave()
 {
-    CGraphFormView::OnBnClickedGraphinfoBtnEditsave();
+    CBaseGraphView::OnBnClickedGraphinfoBtnEditsave();
 }

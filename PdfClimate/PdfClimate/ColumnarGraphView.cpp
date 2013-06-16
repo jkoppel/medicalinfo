@@ -8,10 +8,10 @@
 
 // CColumnarGraphView
 
-IMPLEMENT_DYNCREATE(CColumnarGraphView, CGraphFormView)
+IMPLEMENT_DYNCREATE(CColumnarGraphView, CBaseGraphView)
 
 CColumnarGraphView::CColumnarGraphView()
-	: CGraphFormView(CColumnarGraphView::IDD, Graph_Columnar)
+	: CBaseGraphView(CColumnarGraphView::IDD, Graph_Columnar)
 {
 }
 
@@ -21,10 +21,10 @@ CColumnarGraphView::~CColumnarGraphView()
 
 void CColumnarGraphView::DoDataExchange(CDataExchange* pDX)
 {
-	CGraphFormView::DoDataExchange(pDX);
+	CBaseGraphView::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CColumnarGraphView, CGraphFormView)
+BEGIN_MESSAGE_MAP(CColumnarGraphView, CBaseGraphView)
     ON_BN_CLICKED(IDC_GRAPHINFO_BTN_EDITSAVE, &CColumnarGraphView::OnBnClickedGraphinfoBtnEditsave)
 END_MESSAGE_MAP()
 
@@ -34,13 +34,13 @@ END_MESSAGE_MAP()
 #ifdef _DEBUG
 void CColumnarGraphView::AssertValid() const
 {
-	CGraphFormView::AssertValid();
+	CBaseGraphView::AssertValid();
 }
 
 #ifndef _WIN32_WCE
 void CColumnarGraphView::Dump(CDumpContext& dc) const
 {
-	CGraphFormView::Dump(dc);
+	CBaseGraphView::Dump(dc);
 }
 #endif
 #endif //_DEBUG
@@ -49,17 +49,17 @@ void CColumnarGraphView::Dump(CDumpContext& dc) const
 // CColumnarGraphView message handlers
 void CColumnarGraphView::OnDraw(CDC* pDC)
 {
-    CGraphFormView::OnDraw(pDC);
+    CBaseGraphView::OnDraw(pDC);
 }
 
 
 void CColumnarGraphView::OnInitialUpdate()
 {
-    CGraphFormView::OnInitialUpdate();
+    CBaseGraphView::OnInitialUpdate();
 }
 
 
 void CColumnarGraphView::OnBnClickedGraphinfoBtnEditsave()
 {
-    CGraphFormView::OnBnClickedGraphinfoBtnEditsave();
+    CBaseGraphView::OnBnClickedGraphinfoBtnEditsave();
 }
